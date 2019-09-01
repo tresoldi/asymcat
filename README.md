@@ -1,6 +1,6 @@
-# cooccurran
+# catcoocc
 
-Library for analysis of co-occurrences in sequence for alignment
+Library for symmetrical and assymetrical analysis of categorical co-occurrences
 
 ## Related
 

@@ -2,17 +2,17 @@
 # encoding: utf-8
 
 """
-test_cooccurran
-===============
+test_catcoocc
+=============
 
-Tests for the `cooccurran` package.
+Tests for the `catcoocc` package.
 """
 
 # Import system libraries
 import unittest
 
 # Import the library being test
-import cooccurran
+import catcoocc
 
 class TestCooccuran(unittest.TestCase):
     """
