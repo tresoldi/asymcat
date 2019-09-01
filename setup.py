@@ -9,12 +9,12 @@ README_FILE = (LOCAL_PATH / "README.md").read_text()
 
 # This call to setup() does all the work
 setup(
-    name="cooccurran",
+    name="catcoocc",
     version="0.1",
-    description="Methods for categorical co-occurrence analysis by scorers",
+    description="Methods for symmetric and assymetric analysis of categorical co-occurrences",
     long_description=README_FILE,
     long_description_content_type="text/markdown",
-    url="https://github.com/tresoldi/cooccuran",
+    url="https://github.com/tresoldi/catcoocc",
     author="Tiago Tresoldi",
     author_email="tresoldi@shh.mpg.de",
     license="MIT",
@@ -24,7 +24,7 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries",
     ],
-    packages=["cooccurren"],
+    packages=["catcoocc"],
     keywords=["co-occurrence", "cooccurrence", "categorical variables", "mutual information", "scorer"],
     include_package_data=True,
     install_requires=[
@@ -33,7 +33,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "ngesh=ngesh.__main__:main",
+            "catcoocc=catcoocc.__main__:main",
         ]
     },
     test_suite='tests',
