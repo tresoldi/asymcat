@@ -1,23 +1,48 @@
 # encoding: utf-8
 
+"""
+Utility functions for the `catcoocc` library.
+
+The module mostly includes functions for input/output, as well as
+pre-computations from raw data.
+"""
+
+# TODO: add function for smoothing of co-occurrences after collect_cooccs()
+# TODO: add function for reading mushroom and pokemon data
+
+# Import Python standard libraries
 import csv
 from collections import Counter
 from itertools import chain, combinations, product
 
-# TODO: later rename the module to `data` or something
 
-
-def get_ngrams(seq, order, pad):
+def collect_alphabets(cooccs):
     """
-    Function for yielding ngrams of a sequence.
+    Return the `x` and `y` alphabets from a list of co-occurrences.
+
+    :param list cooccs: The list of co-occurrence tuples.
+
+    :return tuple alphabets: A tuple of two elements, the sorted list of
+        symbols in series `x` and the sorted list of symbols in series `y`.
+    """
+
+    alphabet_x, alphabet_y = zip(*cooccs)
+
+    return sorted(set(alphabet_x)), sorted(set(alphabet_y))
+
+
+def collect_ngrams(seq, order, pad):
+    """
+    Function for yielding the ngrams of a sequence.
 
     The sequence is padded so that symbols at the extremities will be
-    repeated the same number of times that other symbols. The operation also
+    repeated the same number of times that other symbols. This operation also
     guarantees that sequences shorter than the order will be collected.
 
     :param list seq: The list of elements for ngram collection.
     :param int order: The ngram order.
     :param string pad: The padding symbol.
+
     :yield: The ngrams of the sequence.
     """
 
@@ -27,8 +52,7 @@ def get_ngrams(seq, order, pad):
         yield ngram
 
 
-# TODO: add some smoothing?
-def get_cooccs(seqs, order=None, pad="#"):
+def collect_cooccs(seqs, order=None, pad="#"):
     """
     Collects tuples of co-occurring elements in pairs of sequences.
 
@@ -72,7 +96,7 @@ def get_cooccs(seqs, order=None, pad="#"):
 
         # Collect the ngrams for each sequence in each pair
         ngram_seqs = [
-            [get_ngrams(seq_a, order, pad), get_ngrams(seq_b, order, pad)]
+            [collect_ngrams(seq_a, order, pad), collect_ngrams(seq_b, order, pad)]
             for seq_a, seq_b in seqs
         ]
 
@@ -96,7 +120,7 @@ def get_cooccs(seqs, order=None, pad="#"):
     return coocc
 
 
-def get_observations(cooccs):
+def collect_observations(cooccs):
     """
     Build a dictionary of observations for all possible correspondences.
 
@@ -120,10 +144,14 @@ def get_observations(cooccs):
     are mismatching, but where both necessarily mismatch.
 
     When doing x->y, a non-squared contingency table will be
-    
+
         |            |  pair[1]  | pair[1]==y | pair[1]!=y |
         | pair[0]==x | obs["10"] | obs["11"]  | obs["12"]  |
         | pair[0]!=x | obs["20"] | obs["21"]  | obs["22"]  |
+
+    :param list cooccs: A list of co-occurrence tuples.
+
+    :return dict obs: A dictionary of observations per co-occurrence type.
     """
 
     # Collect observation counts; while this could be done in linear fashion,
@@ -148,7 +176,9 @@ def get_observations(cooccs):
     obs_11 = Counter(cooccs)
 
     # Extract the `x` and `y` symbols, so they can be counted as well;
-    # the alphabets can be built from their respective sets
+    # the alphabets can be built from their respective sets. We don't
+    # use collect_alphabet() as we need the symbols as well, in order to
+    # build `x_counter` and `y_counter`
     symbols_x, symbols_y = zip(*cooccs)
     x_counter, y_counter = Counter(symbols_x), Counter(symbols_y)
     alphabet_x = set(symbols_x)
@@ -173,10 +203,7 @@ def get_observations(cooccs):
     return obs
 
 
-# TODO: allow more than two columns, checking columns
-# TODO: skip rows with empty entries
-# TODO: allow to skip header
-def read_sequences(filename, skip_header=True, col_delim="\t", elem_delim=" "):
+def read_sequences(filename, cols=None, col_delim="\t", elem_delim=" "):
     """
     Reads parallel sequences, returning them as a list of lists.
 
@@ -195,27 +222,57 @@ def read_sequences(filename, skip_header=True, col_delim="\t", elem_delim=" "):
     U N Q U O T E               ʌ n k w oʊ t
     H A S H M A R K             h æ m ɑ ɹ k
     ```
+
+    Rows without complete data are not included. The function allows to
+    collect data from multiple columns, but it is inteded to pairwise
+    comparison; if no column names are provided, as per default,
+    the reading will skip the first row (assumed to be header).
+
+    :param str filename: Path to the file to be read.
+    :param cols list: List of column names to be collected (default: None)
+    :param str col_delim: String used as field delimiter (default: `"\t"`).
+    :param str elem_delim: String used as element delimiter (default: `" "`).
     """
 
+    # Column names must always be specified, otherwise we will skip over
+    # the header (thus assuming that there are only two columns); the logic
+    # is different
     data = []
     with open(filename) as handler:
-        for line in handler.readlines():
-            if skip_header:
-                skip_header = False
-                continue
-                
-            data.append(
-                [column.split(elem_delim) for column in line.strip().split(col_delim)]
-            )
+        if not cols:
+            skip_header = True
+            for line in handler.readlines():
+                if skip_header:
+                    skip_header = False
+                    continue
+
+                data.append(
+                    [
+                        column.split(elem_delim)
+                        for column in line.strip().split(col_delim)
+                    ]
+                )
+        else:
+            reader = csv.DictReader(handler, delimiter=col_delim)
+            data = [
+                [row[col_name].split(elem_delim) for col_name in cols] for row in reader
+            ]
+
+    # Remove incomplete rows
+    data = [row for row in data if all(row)]
 
     return data
 
 
 # TODO: assuming one taxon per col and locations per row, allow to switch
-# TODO; assumin column name in position 0
 def read_pa_matrix(filename, delimiter="\t"):
     """
     Reads a presence-absence matrix, returning as equivalent sequences.
+
+    The location must be specified under column name `ID`.
+
+    :param str filename: Path to the file to be read.
+    :param str delimiter: String used as field delimiter (default: `"\t"`).
     """
 
     # We read the matrix and filter each row (location), keeping only
@@ -224,7 +281,7 @@ def read_pa_matrix(filename, delimiter="\t"):
     with open(filename) as csvfile:
         reader = csv.DictReader(csvfile, delimiter=delimiter)
         for row in reader:
-            location = row.pop("NAME")
+            location = row.pop("ID")
             matrix[location] = sorted(
                 [taxon for taxon, observed in row.items() if observed == "1"]
             )

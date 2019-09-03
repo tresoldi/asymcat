@@ -6,5 +6,5 @@ __author__ = "Tiago Tresoldi"
 __email__ = "tresoldi@shh.mpg.de"
 
 # Build the namespace
-from catcoocc import dataio
+from catcoocc.utils import *
 from catcoocc import scorers
