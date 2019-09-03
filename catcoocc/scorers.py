@@ -12,6 +12,8 @@ import scipy.stats as ss
 # import local libraries
 from . import dataio
 
+# TODO: always ask for `obs`, or even for cont_table?
+
 # TODO: in all cases, receive the co-occs (which can be properly checked)
 # and compute the observations if needed and not provided (could be cached
 # and given by the user)
@@ -49,7 +51,7 @@ def build_ct(obs, square=False):
     return cont_table
 
 
-def comp_chi2(cont_table):
+def compute_chi2(cont_table):
     """
     Computes the chi2 for a contigency table of observations.
     """
@@ -60,7 +62,7 @@ def comp_chi2(cont_table):
 # TODO: rename to comp_cramer_v() or use other normalization
 # from https://stackoverflow.com/questions/46498455/categorical-features-correlation/46498792#46498792
 # and https://towardsdatascience.com/the-search-for-categorical-correlation-a1cf7f1888c9
-def cramers_v(cont_table):
+def compute_cramers_v(cont_table):
     """
     Compute Cramer's V
     """
@@ -68,7 +70,7 @@ def cramers_v(cont_table):
     n = cont_table.sum()
     r, k = cont_table.shape
 
-    chi2 = comp_chi2(cont_table)
+    chi2 = compute_chi2(cont_table)
     phi2 = chi2 / n
 
     phi2corr = max(0, phi2 - ((k - 1) * (r - 1)) / (n - 1))
@@ -80,15 +82,18 @@ def cramers_v(cont_table):
 
 # TODO: make sure it is 2x2
 # TODO: what if it is infinite?
-def fisher_exact_odds_ratio(cont_table):
+def compute_fisher_exact_odds_ratio(cont_table):
     return ss.fisher_exact(cont_table)[0]
 
 
-# TODO: can only call if it was smoothed, remove exception here
-def comp_pmi(p_x, p_y, p_xy, normalized):
+# TODO: can only call if it was smoothed, remove exception here?
+def compute_pmi(p_x, p_y, p_xy, normalized):
 
+    # assumes independence
+    # TODO: a `strict` argument could make it fail or return zero
+    # this is like a limit, should get the lowest score?
     if p_xy == 0.0:
-        return None
+        p_xy = 0.000000001
 
     pmi = math.log(p_xy / (p_x * p_y))
 
@@ -96,70 +101,6 @@ def comp_pmi(p_x, p_y, p_xy, normalized):
         pmi = pmi / -math.log(p_xy)
 
     return pmi
-
-
-# TODO: rename MLE
-def frequency_scorer(obs):
-    """
-    Return a simple assymetric scorer based on frequency.
-    """
-
-    scorer = {
-        pair: (obs[pair]["11"] / obs[pair]["10"], obs[pair]["11"] / obs[pair]["01"])
-        for pair in obs
-    }
-
-    return scorer
-
-
-def pmi_scorer(obs, normalized):
-
-    scorer = {}
-    for pair in obs:
-        p_xy = obs[pair]["11"] / obs[pair]["00"]
-        p_x = obs[pair]["10"] / obs[pair]["00"]
-        p_y = obs[pair]["01"] / obs[pair]["00"]
-
-        scorer[pair] = (
-            comp_pmi(p_x, p_y, p_xy, normalized),
-            comp_pmi(p_y, p_x, p_xy, normalized),
-        )
-
-    return scorer
-
-
-# NOTE: returning twice (v, v) as it is symmetric
-def chi2_scorer(obs, square=True):
-    scorer = {}
-    for pair in obs:
-        cont_table = build_ct(obs[pair], square)
-        v = comp_chi2(cont_table)
-        scorer[pair] = (v, v)
-
-    return scorer
-
-
-# NOTE: returning twice (v, v) as it is symmetric
-def cramers_v_scorer(obs, square=True):
-    scorer = {}
-    for pair in obs:
-        cont_table = build_ct(obs[pair], square)
-        v = cramers_v(cont_table)
-        scorer[pair] = (v, v)
-
-    return scorer
-
-
-# NOTE: returning twice (v, v) as it is symmetric
-def fisher_exact_scorer(obs):
-    scorer = {}
-    for pair in obs:
-        cont_table = build_ct(obs[pair], True)
-        v = fisher_exact_odds_ratio(cont_table)
-        scorer[pair] = (v, v)
-
-    return scorer
-
 
 def conditional_entropy(x, y):
     # entropy of x given y
@@ -175,7 +116,7 @@ def conditional_entropy(x, y):
     return entropy
 
 
-def theil_u(x, y):
+def compute_theil_u(x, y):
     s_xy = conditional_entropy(x, y)
     x_counter = Counter(x)
     total_occurrences = sum(x_counter.values())
@@ -187,35 +128,71 @@ def theil_u(x, y):
         return (s_x - s_xy) / s_x
 
 
-# TODO: x/y or a/b?
-def theil_u_scorer(cooccs):
-    # Get the product from the alphabets
-    alphabet_a, alphabet_b = zip(*cooccs)
-    alphabet_a = list(sorted(set(alphabet_a)))
-    alphabet_b = list(sorted(set(alphabet_b)))
 
-    # build scorer
-    scorer = {}
-    for x, y in product(alphabet_a, alphabet_b):
-        # Subset by taking the cooccurrences that have either
-        sub_cooccs = [pair for pair in cooccs if any([pair[0] == x, pair[1] == y])]
-        all_x, all_y = zip(*sub_cooccs)
 
-        # run theil's
-        scorer[(x, y)] = (theil_u(all_x, all_y), theil_u(all_y, all_x))
 
-    return scorer
+# TODO: allow independent normalization, not by default
+# TODO: rename to scaling
+def normalize_scorer(scorer, method, nrange=None):
+    # Extract scores as a list, combining `xy` and `yx`
+    scores = list(chain.from_iterable(scorer.values()))
 
+    # normalizatoin is performed over xy and yx together
+    if method == "minmax":
+        # Set normalization range        
+        if not nrange:
+            range_low, range_high = (0, 1)
+        else:
+            range_low, range_high = nrange
+
+        # Cache values for speeding computation
+        min_score = min(scores)
+        max_score = max(scores)
+        score_diff = max_score - min_score
+        range_diff = range_high - range_low
+
+        norm_scorer = {
+            pair : (
+            
+            range_low + (((value[0] - min_score)*range_diff) / score_diff), 
+            range_low + (((value[1] - min_score)*range_diff) / score_diff)
+            )
+            
+            for pair, value in scorer.items()
+        }
+
+    elif method == "mean":
+        # Cache values for speeding computation
+        mean = np.mean(scores)
+        score_diff = max(scores) - min(scores)
+        
+        
+        norm_scorer = {
+            pair : ( (value[0] - mean) / score_diff, (value[1] - mean) / score_diff)
+            for pair, value in scorer.items()
+        }
+    elif method == "stdev":
+        print("not implemented")
+    else:
+        print("unknown normalization")
+
+    return norm_scorer
+    
 
 def scorer2matrix(scorer):
-    """
-    Builds a matrix from a scorer.
-    """
+    alphabet_x, alphabet_y = get_alphabets(scorer)
 
-    print(scorer)
+    xy = np.array(
+        [np.array([scorer[(x, y)][0] for x in alphabet_x]) for y in alphabet_y]
+    )
+    yx = np.array(
+        [np.array([scorer[(x, y)][1] for y in alphabet_y]) for x in alphabet_x]
+    )
 
+    return xy, yx, alphabet_x, alphabet_y
 
-# TODO: add normalization
+####################### SCORERS
+
 # TODO: extend comment, also with what is returned
 # TODO: smoothing?
 def mle_scorer(cooccs, obs=None):
@@ -233,24 +210,106 @@ def mle_scorer(cooccs, obs=None):
     alphabet_x, alphabet_y = get_alphabets(cooccs)
 
     # Collect the scorer
-    scorer = {}
-    for pair in product(alphabet_x, alphabet_y):
-        scorer[pair] = (
+    scorer = {
+        pair : (
             obs[pair]["11"] / obs[pair]["10"],
             obs[pair]["11"] / obs[pair]["01"],
         )
+        for pair in product(alphabet_x, alphabet_y)
+    }
+    
+    return scorer
+
+def pmi_scorer(cooccs, obs=None, normalized=False):
+    # Collect the observations, if not provided
+    if not obs:
+        obs = dataio.get_observations(cooccs)
+        
+    scorer = {}
+    for pair in obs:
+        p_xy = obs[pair]["11"] / obs[pair]["00"]
+        p_x = obs[pair]["10"] / obs[pair]["00"]
+        p_y = obs[pair]["01"] / obs[pair]["00"]
+
+        scorer[pair] = (
+            compute_pmi(p_x, p_y, p_xy, normalized),
+            compute_pmi(p_y, p_x, p_xy, normalized),
+        )
+
+    return scorer
+    
+
+def chi2_scorer(cooccs, obs=None, square=True):
+    # Collect the observations, if not provided
+    if not obs:
+        obs = dataio.get_observations(cooccs)
+
+    scorer = {}
+    for pair in obs:
+        cont_table = build_ct(obs[pair], square)
+        chi2 = compute_chi2(cont_table)
+        scorer[pair] = (chi2, chi2)
+
+    return scorer
+    
+def cramers_v_scorer(cooccs, obs=None, square=True):
+    # Collect the observations, if not provided
+    if not obs:
+        obs = dataio.get_observations(cooccs)
+
+    scorer = {}
+    for pair in obs:
+        cont_table = build_ct(obs[pair], square)
+        cramers_v = compute_cramers_v(cont_table)
+        scorer[pair] = (cramers_v, cramers_v)
 
     return scorer
 
+def fisher_exact_scorer(cooccs, obs=None):
+    # Collect the observations, if not provided
+    if not obs:
+        obs = dataio.get_observations(cooccs)
 
-def scorer2matrix(scorer):
-    alphabet_x, alphabet_y = get_alphabets(scorer)
+    scorer = {}
+    for pair in obs:
+        cont_table = build_ct(obs[pair], True)
+        fischer = compute_fisher_exact_odds_ratio(cont_table)
+        scorer[pair] = (fischer, fischer)
 
-    xy = np.array(
-        [np.array([scorer[(x, y)][0] for x in alphabet_x]) for y in alphabet_y]
-    )
-    yx = np.array(
-        [np.array([scorer[(x, y)][1] for y in alphabet_y]) for x in alphabet_x]
-    )
+    return scorer
+    
+def theil_u_scorer(cooccs):
+    # Get the product from the alphabets
+    alphabet_x, alphabet_y = zip(*cooccs)
+    alphabet_x = set(alphabet_x)
+    alphabet_y = set(alphabet_y)
 
-    return xy, yx, alphabet_x, alphabet_y
+    # build scorer
+    scorer = {}
+    for x, y in product(alphabet_x, alphabet_y):
+        # Subset by taking the cooccurrences that have either
+        sub_cooccs = [pair for pair in cooccs if any([pair[0] == x, pair[1] == y])]
+        all_x, all_y = zip(*sub_cooccs)
+
+        # run theil's
+        scorer[(x, y)] = (compute_theil_u(all_x, all_y), compute_theil_u(all_y, all_x))
+
+    return scorer
+    
+# TODO: allow normalized PMI
+def tresoldi_scorer(cooccs, obs=None):
+    # Collect the observations, if not provided
+    if not obs:
+        obs = dataio.get_observations(cooccs)
+    
+    # get the NPMI and theil_u scorer for all pairs
+    npmi = pmi_scorer(cooccs, obs, normalized=False)
+    theil_u = theil_u_scorer(cooccs)
+    
+    # build new scorer and return
+    scorer = {
+        pair : tuple([score * npmi[pair][0] for score in theil_u[pair]])
+        for pair in obs.keys()
+    }
+    
+    return scorer
