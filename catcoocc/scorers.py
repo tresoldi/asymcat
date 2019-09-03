@@ -10,7 +10,7 @@ import numpy as np
 import scipy.stats as ss
 
 # import local libraries
-from . import dataio
+from . import utils
 
 # TODO: always ask for `obs`, or even for cont_table?
 
@@ -22,14 +22,7 @@ from . import dataio
 # to return 0 instead of none in other cases for consistency
 
 
-def get_alphabets(cooccs):
-    """
-    Return the `x` and `y` alphabets from a list of co-occurrences.
-    """
 
-    alphabet_x, alphabet_y = zip(*cooccs)
-
-    return sorted(set(alphabet_x)), sorted(set(alphabet_y))
 
 
 # TODO: better explanation on square/non-square
@@ -102,6 +95,7 @@ def compute_pmi(p_x, p_y, p_xy, normalized):
 
     return pmi
 
+# TODO: rename to x_symbols and y_symbols
 def conditional_entropy(x, y):
     # entropy of x given y
     y_counter = Counter(y)
@@ -180,7 +174,7 @@ def normalize_scorer(scorer, method, nrange=None):
     
 
 def scorer2matrix(scorer):
-    alphabet_x, alphabet_y = get_alphabets(scorer)
+    alphabet_x, alphabet_y = utils.collect_alphabets(scorer)
 
     xy = np.array(
         [np.array([scorer[(x, y)][0] for x in alphabet_x]) for y in alphabet_y]
@@ -204,10 +198,10 @@ def mle_scorer(cooccs, obs=None):
 
     # Collect the observations, if not provided
     if not obs:
-        obs = dataio.get_observations(cooccs)
+        obs = utils.collect_observations(cooccs)
 
     # Obtain the alphabets from the co-occurrence pairs
-    alphabet_x, alphabet_y = get_alphabets(cooccs)
+    alphabet_x, alphabet_y = utils.collect_alphabets(cooccs)
 
     # Collect the scorer
     scorer = {
@@ -223,7 +217,7 @@ def mle_scorer(cooccs, obs=None):
 def pmi_scorer(cooccs, obs=None, normalized=False):
     # Collect the observations, if not provided
     if not obs:
-        obs = dataio.get_observations(cooccs)
+        obs = utils.collect_observations(cooccs)
         
     scorer = {}
     for pair in obs:
@@ -242,7 +236,7 @@ def pmi_scorer(cooccs, obs=None, normalized=False):
 def chi2_scorer(cooccs, obs=None, square=True):
     # Collect the observations, if not provided
     if not obs:
-        obs = dataio.get_observations(cooccs)
+        obs = utils.collect_observations(cooccs)
 
     scorer = {}
     for pair in obs:
@@ -255,7 +249,7 @@ def chi2_scorer(cooccs, obs=None, square=True):
 def cramers_v_scorer(cooccs, obs=None, square=True):
     # Collect the observations, if not provided
     if not obs:
-        obs = dataio.get_observations(cooccs)
+        obs = utils.collect_observations(cooccs)
 
     scorer = {}
     for pair in obs:
@@ -268,7 +262,7 @@ def cramers_v_scorer(cooccs, obs=None, square=True):
 def fisher_exact_scorer(cooccs, obs=None):
     # Collect the observations, if not provided
     if not obs:
-        obs = dataio.get_observations(cooccs)
+        obs = utils.collect_observations(cooccs)
 
     scorer = {}
     for pair in obs:
@@ -300,7 +294,7 @@ def theil_u_scorer(cooccs):
 def tresoldi_scorer(cooccs, obs=None):
     # Collect the observations, if not provided
     if not obs:
-        obs = dataio.get_observations(cooccs)
+        obs = utils.collect_observations(cooccs)
     
     # get the NPMI and theil_u scorer for all pairs
     npmi = pmi_scorer(cooccs, obs, normalized=False)

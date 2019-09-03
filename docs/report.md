@@ -17,9 +17,9 @@ Lorem ipsum
 
 ```python
 
-toy_data = catcoocc.dataio.read_sequences("docs/cmudict.tsv")
-toy_co = catcoocc.dataio.get_cooccs(toy_data)
-toy_obs = catcoocc.dataio.get_observations(toy_co)
+toy_data = catcoocc.read_sequences("docs/cmudict.tsv")
+toy_co = catcoocc.collect_cooccs(toy_data)
+toy_obs = catcoocc.collect_observations(toy_co)
 
 print(len(toy_data), len(toy_co), len(toy_obs))
 
