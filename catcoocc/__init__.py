@@ -7,4 +7,4 @@ __email__ = "tresoldi@shh.mpg.de"
 
 # Build the namespace
 from catcoocc.utils import *
-from catcoocc import scorers
+from catcoocc import scorer

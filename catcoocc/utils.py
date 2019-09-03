@@ -15,6 +15,9 @@ import csv
 from collections import Counter
 from itertools import chain, combinations, product
 
+# Import 3rd party libraries
+import numpy as np
+
 
 def collect_alphabets(cooccs):
     """
@@ -201,6 +204,38 @@ def collect_observations(cooccs):
     }
 
     return obs
+
+
+def build_ct(observ, square):
+    """
+    Build a contingency table from a dictionary of observations.
+
+    The contingency table can be either square (2x2) or not (3x2). Non-squared
+    contingency tables include co-occurrences where neither the `x` or `y`
+    under investigation occur.
+    
+    :param dict observ: A dictionary of observations, as provided by
+        utils.collect_observations()
+    :param bool square: Whether to return a square (2x2) or non-square (3x2)
+            contingency table.
+    """
+
+    # Build the contingency tables as np.arrays(), as they will necessary
+    # for the functions consuming them and as it allows to use np methods
+    # directly (such as .sum())
+    if square:
+        cont_table = np.array(
+            [[observ["11"], observ["12"]], [observ["21"], observ["22"]]]
+        )
+    else:
+        cont_table = np.array(
+            [
+                [observ["10"], observ["11"], observ["12"]],
+                [observ["20"], observ["21"], observ["22"]],
+            ]
+        )
+
+    return cont_table
 
 
 def read_sequences(filename, cols=None, col_delim="\t", elem_delim=" "):
