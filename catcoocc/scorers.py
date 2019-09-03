@@ -307,3 +307,247 @@ def tresoldi_scorer(cooccs, obs=None):
     }
     
     return scorer
+    
+# TODO: should the smoothing be part of this? better not
+class CatScorer:
+    """
+    Class for computing catagorical co-occurrence scores.
+    """
+    
+    def __init__(self, cooccs):
+        """
+        Initialization function.
+        """
+        
+        # Store co-occs, observations, symbols and alphabets
+        self.cooccs = cooccs
+        self.obs = utils.collect_observations(cooccs)
+
+        # Obtain the alphabets from the co-occurrence pairs
+        self.alphabet_x, self.alphabet_y = utils.collect_alphabets(self.cooccs)
+
+        # Initialize the square and non-square contingency table as None
+        self._square_ct = None
+        self._nonsquare_ct = None
+
+        # Initialize the scorers as None, in a lazy fashion
+        self._mle = None
+        self._pmi = None
+        self._npmi = None
+        self._chi2 = None
+        self._chi2_nonsquare = None
+        self._cramersv = None
+        self._cramersv_nonsquare = None
+        self._fisher = None
+        self._theil_u = None
+        self._tresoldi = None
+        
+        
+    def mle(self):
+        """
+        Return an MLE scorer, computing it if necessary.
+        """
+        
+        # Compute the scorer, if necessary
+        if not self._mle:
+            self._mle = {
+                pair : (
+                    self.obs[pair]["11"] / self.obs[pair]["10"],
+                    self.obs[pair]["11"] / self.obs[pair]["01"],
+                )
+                for pair in product(self.alphabet_x, self.alphabet_y)
+            }
+         
+        return self._mle
+        
+    def pmi(self, normalized=False):
+        """
+        Return a PMI scorer.
+        
+        :param bool normalize: Whether to return a normalized PMI or
+            not (default: False)
+        """
+
+        # Compute the non-normalized scorer, if necessary
+        if not normalized and not self._pmi:
+            self._pmi = {}
+            for pair in self.obs:
+                p_xy = self.obs[pair]["11"] / self.obs[pair]["00"]
+                p_x = self.obs[pair]["10"] / self.obs[pair]["00"]
+                p_y = self.obs[pair]["01"] / self.obs[pair]["00"]
+
+                self._pmi[pair] = (
+                    compute_pmi(p_x, p_y, p_xy, False),
+                    compute_pmi(p_y, p_x, p_xy, False),
+                )
+
+        # Compute the normalized scorer, if necessary
+        if normalized and not self._npmi:
+            self._npmi = {}
+            for pair in self.obs:
+                p_xy = self.obs[pair]["11"] / self.obs[pair]["00"]
+                p_x = self.obs[pair]["10"] / self.obs[pair]["00"]
+                p_y = self.obs[pair]["01"] / self.obs[pair]["00"]
+
+                self._npmi[pair] = (
+                    compute_pmi(p_x, p_y, p_xy, True),
+                    compute_pmi(p_y, p_x, p_xy, True),
+                )
+
+        # Select the scorer to return (this allows easier refactoring later)
+        if not normalized:
+            ret = self._pmi
+        else:
+            ret = self._npmi
+            
+        return ret
+
+    def chi2(self, square_ct=True):
+        """
+        Return a Chi2 scorer.
+        
+        :param bool square_ct: Whether to return the score over a squared or
+            non squared contingency table (default: True)
+        """
+
+        # Compute the scorer over a square contingency table, if necessary
+        if square_ct and not self._chi2:
+            # Compute the square contingency table, if necessary
+            if not self._square_ct:
+                self._square_ct = {
+                    pair : build_ct(self.obs[pair], True)
+                    for pair in self.obs
+                    }
+
+            # Build the scorer
+            self._chi2 = {}
+            for pair in self.obs:
+                chi2 = compute_chi2(self._square_ct[pair])
+                self._chi2[pair] = (chi2, chi2)
+        
+        # Compute the scorer over a non-square contingency table, if necessary
+        if square_ct and not self._chi2_nonsquare:
+            # Compute the square contingency table, if necessary
+            if not self._nonsquare_ct:
+                self._nonsquare_ct = {
+                    pair : build_ct(self.obs[pair], False)
+                    for pair in self.obs
+                    }
+
+            # Build the scorer
+            self._chi2_nonsquare = {}
+            for pair in self.obs:
+                chi2 = compute_chi2(self._nonsquare_ct[pair])
+                self._chi2_nonsquare[pair] = (chi2, chi2)
+
+        # Select the scorer to return (this allows easier refactoring later)
+        if square_ct:
+            ret = self._chi2
+        else:
+            ret = self._chi2_nonsquare
+            
+        return ret
+
+    def cramers_v(self, square_ct=True):
+        """
+        Return a Cramér's V scorer.
+        
+        :param bool square_ct: Whether to return the score over a squared or
+            non squared contingency table (default: True)
+        """
+
+        # Compute the scorer over a square contingency table, if necessary
+        if square_ct and not self._cramersv:
+            # Compute the square contingency table, if necessary
+            if not self._square_ct:
+                self._square_ct = {
+                    pair : build_ct(self.obs[pair], True)
+                    for pair in self.obs
+                    }
+
+            # Build the scorer
+            self._cramersv = {}
+            for pair in self.obs:
+                cramersv = compute_cramers_v(self._square_ct[pair])
+                self._cramersv[pair] = (cramersv, cramersv)
+        
+        # Compute the scorer over a non-square contingency table, if necessary
+        if square_ct and not self._cramersv_nonsquare:
+            # Compute the square contingency table, if necessary
+            if not self._nonsquare_ct:
+                self._nonsquare_ct = {
+                    pair : build_ct(self.obs[pair], False)
+                    for pair in self.obs
+                    }
+
+            # Build the scorer
+            self._cramersv_nonsquare = {}
+            for pair in self.obs:
+                cramersv = compute_cramers_v(self._nonsquare_ct[pair])
+                self._cramersv_nonsquare[pair] = (cramersv, cramersv)
+
+        # Select the scorer to return (this allows easier refactoring later)
+        if square_ct:
+            ret = self._cramersv
+        else:
+            ret = self._cramersv_nonsquare
+            
+        return ret
+
+    def fisher(self):
+        """
+        Return a Fisher Exact Odds Ratio scorer.
+        """
+
+        # Compute the square contingency table, if necessary
+        if not self._square_ct:
+            self._square_ct = {
+                pair : build_ct(self.obs[pair], True)
+                for pair in self.obs
+                }
+
+        # Compute the scorer, if necessary
+        if not self._fisher:
+            self._fisher = {}
+            for pair in self.obs:
+                fisher = ss.fisher_exact(self._square_ct[pair])[0]
+                self._fisher[pair] = (fisher, fisher)
+                
+        return self._fisher
+
+    def theil_u(self):
+        """
+        Return a Theil's U uncertainty scorer.
+        """
+        
+        if not self._theil_u:
+            self._theil_u = {}
+            for x, y in product(self.alphabet_x, self.alphabet_y):
+                # Subset by taking the cooccurrences that have either
+                sub_cooccs = [pair for pair in self.cooccs if any([pair[0] == x, pair[1] == y])]
+                all_x, all_y = zip(*sub_cooccs)
+
+                # run theil's
+                self._theil_u[(x, y)] = (compute_theil_u(all_x, all_y), compute_theil_u(all_y, all_x))
+
+        return self._theil_u
+
+    def tresoldi(self):
+        """
+        Return a Tresoldi asymmetric uncertainty scorer.
+        """
+        
+        # Build the scorer, if necessary
+        if not self._tresoldi:
+            # Obtain the NPMI and Theil's U scorers for all pairs (which will
+            # force the object to compute them, if necessary)
+            pmi = self.pmi()
+            theil_u = self.theil_u()
+    
+            # Build the new scorer
+            self._tresoldi = {
+                pair : tuple([score * pmi[pair][0] for score in theil_u[pair]])
+                for pair in self.obs
+            }
+    
+        return self._tresoldi
