@@ -34,19 +34,19 @@ print('y', alpha_y)
 
 
 
-def plot_scorer(scorer, alpha_x, alpha_y, title=None):
+def plot_scorer(scorer, alpha_x, alpha_y, title=None, figsize=(25, 25)):
     if not title:
         title = ""
 
     matrix = pd.DataFrame(scorer, index=alpha_y, columns=alpha_x)
 
-    sns.set(font_scale=2.5)
-    plt.figure(figsize=(25, 25))
+    sns.set(font_scale=2, font="FreeMono")
+    plt.figure(figsize=figsize)
 
     ax = plt.subplot(111)
-    sns.heatmap(matrix, annot=True, linewidths=.5, center=0, ax=ax).set_title(title, fontsize=100)
+    sns.heatmap(matrix, annot=True, fmt='.2f', linewidths=.5, center=0, ax=ax).set_title(title, fontsize=100)
 
-plot_scorer(xy, alpha_x, alpha_y, "x->y")
+plot_scorer(xy, alpha_x, alpha_y, "x->y", (50, 50))
 
 
 ```
@@ -54,7 +54,7 @@ plot_scorer(xy, alpha_x, alpha_y, "x->y")
 another
 
 ```python
-plot_scorer(yx, alpha_y, alpha_x, "y->x")
+plot_scorer(yx, alpha_y, alpha_x, "y->x", (50, 50))
 ```
 
 leftover
