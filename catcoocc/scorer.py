@@ -254,6 +254,7 @@ class CatScorer:
         self._fisher = None
         self._theil_u = None
         self._catcooc_i = None
+        self._catcooc_ii = None
 
     def _compute_contingency_table(self, square):
         """
@@ -485,7 +486,7 @@ class CatScorer:
 
         # Build the scorer, if necessary
         if not self._catcooc_i:
-            # Obtain the NPMI and Theil's U scorers for all pairs (which will
+            # Obtain the PMI and Theil's U scorers for all pairs (which will
             # force the object to compute them, if necessary)
             pmi = self.pmi()
             theil_u = self.theil_u()
@@ -497,3 +498,28 @@ class CatScorer:
             }
 
         return self._catcooc_i
+        
+    def catcooc_ii(self):
+        """
+        Return a `catcooc II` asymmetric uncertainty scorer.
+        
+        This scorer is intended as an alternative to `catcooc I` scorer,
+        using an adjusted but faster to compute Chi2 instead of the
+        more precise but expansive Theil U. It is recommended that it is
+        used only on smoothed data.
+        """
+
+        # Build the scorer, if necessary
+        if not self._catcooc_ii:
+            # Obtain the NPMI and Chi2 scorers for all pairs (which will
+            # force the object to compute them, if necessary)
+            pmi = self.pmi()
+            chi2 = self.chi2(True)
+            
+            # Build the new scorer
+            self._catcooc_ii = {
+                pair: tuple([score * pmi[pair][0] for score in chi2[pair]])
+                for pair in self.obs
+            }
+
+        return self._catcooc_ii
