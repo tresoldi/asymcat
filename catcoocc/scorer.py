@@ -139,8 +139,8 @@ def compute_theil_u(x_symbols, y_symbols):
 
 
 # TODO: allow independent scaling over `x` and independent over `y` (currently doing all)
-# TODO: add stdev scaling
 # TODO: allow scaling withing percentile borders
+# TODO: see if we can vectorize numpy operations (now on dicts)
 def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
     """
     Scale a scorer.
@@ -191,7 +191,13 @@ def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
             for pair, value in scorer.items()
         }
     elif method == "stdev":
-        raise ValueError("Standard Deviation scaling not implemented.")
+        mean = np.mean(scores)
+        stdev = np.std(scores)
+        
+        scaled_scorer = {
+            pair : ((value[0] - mean) / stdev, (value[1] - mean) / stdev)
+            for pair, value in scorer.items()
+        }
     else:
         raise ValueError("Unknown scaling method.")
 
