@@ -259,8 +259,8 @@ class CatScorer:
         self._cramersv_nonsquare = None
         self._fisher = None
         self._theil_u = None
-        self._catcooc_i = None
-        self._catcooc_ii = None
+        self._catcoocc_i = None
+        self._catcoocc_ii = None
 
     def _compute_contingency_table(self, square):
         """
@@ -480,9 +480,9 @@ class CatScorer:
 
         return self._theil_u
 
-    def catcooc_i(self):
+    def catcoocc_i(self):
         """
-        Return a `catcooc I` asymmetric uncertainty scorer.
+        Return a `catcoocc I` asymmetric uncertainty scorer.
         
         This is our intended scorer, but it can be slow on large datasets
         due to the underlying computation of Theil's uncertainty scorer
@@ -491,41 +491,41 @@ class CatScorer:
         """
 
         # Build the scorer, if necessary
-        if not self._catcooc_i:
+        if not self._catcoocc_i:
             # Obtain the PMI and Theil's U scorers for all pairs (which will
             # force the object to compute them, if necessary)
             pmi = self.pmi()
             theil_u = self.theil_u()
 
             # Build the new scorer
-            self._catcooc_i = {
+            self._catcoocc_i = {
                 pair: tuple([score * pmi[pair][0] for score in theil_u[pair]])
                 for pair in self.obs
             }
 
-        return self._catcooc_i
+        return self._catcoocc_i
         
-    def catcooc_ii(self):
+    def catcoocc_ii(self):
         """
-        Return a `catcooc II` asymmetric uncertainty scorer.
+        Return a `catcoocc II` asymmetric uncertainty scorer.
         
-        This scorer is intended as an alternative to `catcooc I` scorer,
+        This scorer is intended as an alternative to `catcoocc I` scorer,
         using an adjusted but faster to compute Chi2 instead of the
         more precise but expansive Theil U. It is recommended that it is
         used only on smoothed data.
         """
 
         # Build the scorer, if necessary
-        if not self._catcooc_ii:
+        if not self._catcoocc_ii:
             # Obtain the NPMI and Chi2 scorers for all pairs (which will
             # force the object to compute them, if necessary)
             pmi = self.pmi()
             chi2 = self.chi2(True)
             
             # Build the new scorer
-            self._catcooc_ii = {
+            self._catcoocc_ii = {
                 pair: tuple([score * pmi[pair][0] for score in chi2[pair]])
                 for pair in self.obs
             }
 
-        return self._catcooc_ii
+        return self._catcoocc_ii

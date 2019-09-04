@@ -33,7 +33,9 @@ cramersv = scorer.cramers_v()
 cramersv_ns = scorer.cramers_v(False)
 #fisher = scorer.fisher()
 theil_u = scorer.theil_u()
-tresoldi = scorer.tresoldi()
+catcoocc_i = scorer.catcoocc_i()
+catcoocc_ii = scorer.catcoocc_ii()
+
 
 for pair in sorted(scorer.obs):
     print("--", pair)
@@ -46,7 +48,8 @@ for pair in sorted(scorer.obs):
     print("  cramersv_ns\t%0.4f %0.4f" % cramersv_ns[pair])
 #    print("  fisher     \t%0.4f %0.4f" % fisher[pair])
     print("  theil_u    \t%0.4f %0.4f" % theil_u[pair])
-    print("  tresoldi   \t%0.4f %0.4f" % tresoldi[pair])
+    print("  catcoocc_i \t%0.4f %0.4f" % catcoocc_i[pair])
+    print("  catcoocc_ii\t%0.4f %0.4f" % catcoocc_ii[pair])
 ```
 
 And now more
@@ -65,7 +68,7 @@ def plot_scorer(scorer, alpha_x, alpha_y, title=None, figsize=(25, 25)):
     ax = plt.subplot(111)
     sns.heatmap(matrix, annot=True, fmt='.2f', linewidths=.5, center=0, ax=ax).set_title(title, fontsize=100)
 
-xy, yx, alpha_x, alpha_y = catcoocc.scorer.scorer2matrices(tresoldi)
+xy, yx, alpha_x, alpha_y = catcoocc.scorer.scorer2matrices(catcoocc_ii)
 plot_scorer(xy, alpha_x, alpha_y, "x->y", (50, 50))
 
 
