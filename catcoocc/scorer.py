@@ -12,6 +12,8 @@ Defines the various scorers for categorical co-occurrence analysis.
 # TODO: improve the speed of theil's u computation
 # TODO: extend scipy options in chi2_contingency
 # TODO: investigate if it is worth reusing chi2 statistics for cramer
+# TODO: include a logarithmic scaler (instead of percentile one)
+# TODO: allow to combine scalers? log within range?
 
 # Import Python standard libraries
 from collections import Counter
@@ -193,9 +195,9 @@ def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
     elif method == "stdev":
         mean = np.mean(scores)
         stdev = np.std(scores)
-        
+
         scaled_scorer = {
-            pair : ((value[0] - mean) / stdev, (value[1] - mean) / stdev)
+            pair: ((value[0] - mean) / stdev, (value[1] - mean) / stdev)
             for pair, value in scorer.items()
         }
     else:
@@ -424,7 +426,7 @@ class CatScorer:
     def fisher(self):
         """
         Return a Fisher Exact Odds Ratio scorer.
-        
+
         Please note that in scipy's implementation the calculated odds ratio
         is different from the one found in R. While the latter returns the
         "conditional Maximum Likelihood Estimate", this implementation computes
@@ -454,11 +456,11 @@ class CatScorer:
         # For all `x` and `y` symbols, cache the observed symbols in the
         # other series
         pairs_with_x = {
-            x : [pair[1] for pair in self.cooccs if pair[0] == x]
+            x: [pair[1] for pair in self.cooccs if pair[0] == x]
             for x in self.alphabet_x
         }
         pairs_with_y = {
-            y : [pair[0] for pair in self.cooccs if pair[1] == y]
+            y: [pair[0] for pair in self.cooccs if pair[1] == y]
             for y in self.alphabet_y
         }
 
@@ -466,7 +468,7 @@ class CatScorer:
         # instead of a product(x, y) to gain some speed
         if not self._theil_u:
             self._theil_u = {}
-            
+
             for x in self.alphabet_x:
                 all_y = pairs_with_x[x]
                 for y in self.alphabet_y:
@@ -483,7 +485,7 @@ class CatScorer:
     def catcoocc_i(self):
         """
         Return a `catcoocc I` asymmetric uncertainty scorer.
-        
+
         This is our intended scorer, but it can be slow on large datasets
         due to the underlying computation of Theil's uncertainty scorer
         for all co-occurrence pairs. A less precise but faster alternative
@@ -504,11 +506,11 @@ class CatScorer:
             }
 
         return self._catcoocc_i
-        
+
     def catcoocc_ii(self):
         """
         Return a `catcoocc II` asymmetric uncertainty scorer.
-        
+
         This scorer is intended as an alternative to `catcoocc I` scorer,
         using an adjusted but faster to compute Chi2 instead of the
         more precise but expansive Theil U. It is recommended that it is
@@ -517,11 +519,11 @@ class CatScorer:
 
         # Build the scorer, if necessary
         if not self._catcoocc_ii:
-            # Obtain the NPMI and Chi2 scorers for all pairs (which will
+            # Obtain the PMI and Chi2 scorers for all pairs (which will
             # force the object to compute them, if necessary)
             pmi = self.pmi()
             chi2 = self.chi2(True)
-            
+
             # Build the new scorer
             self._catcoocc_ii = {
                 pair: tuple([score * pmi[pair][0] for score in chi2[pair]])
