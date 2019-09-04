@@ -10,6 +10,8 @@ Defines the various scorers for categorical co-occurrence analysis.
 
 # TODO: have a function for checking if we have enough data for a chi2, combined with smoothing
 # TODO: improve the speed of theil's u computation
+# TODO: extend scipy options in chi2_contingency
+# TODO: investigate if it is worth reusing chi2 statistics for cramer
 
 # Import Python standard libraries
 from collections import Counter
@@ -138,6 +140,7 @@ def compute_theil_u(x_symbols, y_symbols):
 
 # TODO: allow independent scaling over `x` and independent over `y` (currently doing all)
 # TODO: add stdev scaling
+# TODO: allow scaling withing percentile borders
 def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
     """
     Scale a scorer.
@@ -250,7 +253,7 @@ class CatScorer:
         self._cramersv_nonsquare = None
         self._fisher = None
         self._theil_u = None
-        self._tresoldi = None
+        self._catcooc_i = None
 
     def _compute_contingency_table(self, square):
         """
@@ -411,10 +414,17 @@ class CatScorer:
 
         return ret
 
-    # TODO: use ss.chi2_contingency(self._square_ct[pair])[0]
     def fisher(self):
         """
         Return a Fisher Exact Odds Ratio scorer.
+        
+        Please note that in scipy's implementation the calculated odds ratio
+        is different from the one found in R. While the latter returns the
+        "conditional Maximum Likelihood Estimate", this implementation computes
+        the more common "unconditional Maximum Likelihood Estimate", which
+        is known to be very slow for contingency tables with large numbers.
+        If the computation is too slow, the similar but inexact chi-square
+        test the the chi2 contingency scorer can be used.
         """
 
         # Compute the square contingency table, if necessary
@@ -463,22 +473,27 @@ class CatScorer:
 
         return self._theil_u
 
-    def tresoldi(self):
+    def catcooc_i(self):
         """
-        Return a Tresoldi asymmetric uncertainty scorer.
+        Return a `catcooc I` asymmetric uncertainty scorer.
+        
+        This is our intended scorer, but it can be slow on large datasets
+        due to the underlying computation of Theil's uncertainty scorer
+        for all co-occurrence pairs. A less precise but faster alternative
+        is the `catcooc II` scorer.
         """
 
         # Build the scorer, if necessary
-        if not self._tresoldi:
+        if not self._catcooc_i:
             # Obtain the NPMI and Theil's U scorers for all pairs (which will
             # force the object to compute them, if necessary)
             pmi = self.pmi()
             theil_u = self.theil_u()
 
             # Build the new scorer
-            self._tresoldi = {
+            self._catcooc_i = {
                 pair: tuple([score * pmi[pair][0] for score in theil_u[pair]])
                 for pair in self.obs
             }
 
-        return self._tresoldi
+        return self._catcooc_i
