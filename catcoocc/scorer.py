@@ -9,6 +9,7 @@ Defines the various scorers for categorical co-occurrence analysis.
 """
 
 # TODO: have a function for checking if we have enough data for a chi2, combined with smoothing
+# TODO: improve the speed of theil's u computation
 
 # Import Python standard libraries
 from collections import Counter
@@ -410,6 +411,7 @@ class CatScorer:
 
         return ret
 
+    # TODO: use ss.chi2_contingency(self._square_ct[pair])[0]
     def fisher(self):
         """
         Return a Fisher Exact Odds Ratio scorer.
@@ -432,20 +434,32 @@ class CatScorer:
         Return a Theil's U uncertainty scorer.
         """
 
+        # For all `x` and `y` symbols, cache the observed symbols in the
+        # other series
+        pairs_with_x = {
+            x : [pair[1] for pair in self.cooccs if pair[0] == x]
+            for x in self.alphabet_x
+        }
+        pairs_with_y = {
+            y : [pair[0] for pair in self.cooccs if pair[1] == y]
+            for y in self.alphabet_y
+        }
+
+        # Compute theil u, if necessary; the code uses two nested loops
+        # instead of a product(x, y) to gain some speed
         if not self._theil_u:
             self._theil_u = {}
-            for x, y in product(self.alphabet_x, self.alphabet_y):
-                # Subset by taking the cooccurrences that have either
-                sub_cooccs = [
-                    pair for pair in self.cooccs if any([pair[0] == x, pair[1] == y])
-                ]
-                all_x, all_y = zip(*sub_cooccs)
+            
+            for x in self.alphabet_x:
+                all_y = pairs_with_x[x]
+                for y in self.alphabet_y:
+                    all_x = pairs_with_y[y]
 
-                # run theil's
-                self._theil_u[(x, y)] = (
-                    compute_theil_u(all_x, all_y),
-                    compute_theil_u(all_y, all_x),
-                )
+                    # run theil's
+                    self._theil_u[(x, y)] = (
+                        compute_theil_u(all_x, all_y),
+                        compute_theil_u(all_y, all_x),
+                    )
 
         return self._theil_u
 

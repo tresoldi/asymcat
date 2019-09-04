@@ -11,6 +11,7 @@ import seaborn as sns
 
 # Import own libraries
 import catcoocc
+from catcoocc.scorer import CatScorer
 ```
 
 Lorem ipsum
@@ -18,21 +19,39 @@ Lorem ipsum
 ```python
 
 toy_data = catcoocc.read_sequences("docs/cmudict.tsv")
-toy_co = catcoocc.collect_cooccs(toy_data)
-toy_obs = catcoocc.collect_observations(toy_co)
+toy_cooccs = catcoocc.collect_cooccs(toy_data)
 
-print(len(toy_data), len(toy_co), len(toy_obs))
+print(len(toy_data), len(toy_cooccs))
 
-mle = catcoocc.scorers.mle_scorer(toy_co)
-xy, yx, alpha_x, alpha_y = catcoocc.scorers.scorer2matrix(mle)
+scorer = catcoocc.scorer.CatScorer(toy_cooccs)
+mle = scorer.mle()
+pmi = scorer.pmi()
+npmi = scorer.pmi(True)
+chi2 = scorer.chi2()
+chi2_ns = scorer.chi2(False)
+cramersv = scorer.cramers_v()
+cramersv_ns = scorer.cramers_v(False)
+#fisher = scorer.fisher()
+theil_u = scorer.theil_u()
+tresoldi = scorer.tresoldi()
 
-#for pair in mle:
-#    print(pair, mle[pair])
+for pair in sorted(scorer.obs):
+    print("--", pair)
+    print("  mle        \t%0.4f %0.4f" % mle[pair])
+    print("  pmi        \t%0.4f %0.4f" % pmi[pair])
+    print("  npmi       \t%0.4f %0.4f" % npmi[pair])
+    print("  chi2       \t%0.4f %0.4f" % chi2[pair])
+    print("  chi2_ns    \t%0.4f %0.4f" % chi2_ns[pair])
+    print("  cramersv   \t%0.4f %0.4f" % cramersv[pair])
+    print("  cramersv_ns\t%0.4f %0.4f" % cramersv_ns[pair])
+#    print("  fisher     \t%0.4f %0.4f" % fisher[pair])
+    print("  theil_u    \t%0.4f %0.4f" % theil_u[pair])
+    print("  tresoldi   \t%0.4f %0.4f" % tresoldi[pair])
+```
 
-print('x', alpha_x)
-print('y', alpha_y)
+And now more
 
-
+```python
 
 def plot_scorer(scorer, alpha_x, alpha_y, title=None, figsize=(25, 25)):
     if not title:
@@ -46,6 +65,7 @@ def plot_scorer(scorer, alpha_x, alpha_y, title=None, figsize=(25, 25)):
     ax = plt.subplot(111)
     sns.heatmap(matrix, annot=True, fmt='.2f', linewidths=.5, center=0, ax=ax).set_title(title, fontsize=100)
 
+xy, yx, alpha_x, alpha_y = catcoocc.scorer.scorer2matrices(tresoldi)
 plot_scorer(xy, alpha_x, alpha_y, "x->y", (50, 50))
 
 
