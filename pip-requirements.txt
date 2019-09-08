@@ -3,5 +3,4 @@ pandas
 scipy
 matplotlib
 seaborn
-pweave
 tabulate
