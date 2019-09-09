@@ -213,7 +213,7 @@ def build_ct(observ, square):
     The contingency table can be either square (2x2) or not (3x2). Non-squared
     contingency tables include co-occurrences where neither the `x` or `y`
     under investigation occur.
-    
+
     :param dict observ: A dictionary of observations, as provided by
         utils.collect_observations()
     :param bool square: Whether to return a square (2x2) or non-square (3x2)
@@ -290,11 +290,14 @@ def read_sequences(filename, cols=None, col_delim="\t", elem_delim=" "):
         else:
             reader = csv.DictReader(handler, delimiter=col_delim)
             data = [
-                [row[col_name].split(elem_delim) for col_name in cols] for row in reader
+                [row[col_name].split(elem_delim) for col_name in cols if
+                    row[col_name]] for row in reader
             ]
 
     # Remove incomplete rows
-    data = [row for row in data if all(row)]
+    # NOTE: Checking length is not really effective, but will allow easier
+    # expansion in the future
+    data = [row for row in data if len(row)==2]
 
     return data
 
