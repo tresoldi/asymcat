@@ -11,7 +11,7 @@ README_FILE = (LOCAL_PATH / "README.md").read_text()
 setup(
     name="catcoocc",
     version="0.1",
-    description="Methods for symmetric and assymetric analysis of categorical co-occurrences",
+    description="Methods for symmetric and asymmetric analysis of categorical co-occurrences",
     long_description=README_FILE,
     long_description_content_type="text/markdown",
     url="https://github.com/tresoldi/catcoocc",
