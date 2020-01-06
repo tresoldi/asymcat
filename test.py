@@ -10,7 +10,8 @@ import seaborn as sns
 import catcoocc
 
 #toy_data = catcoocc.read_sequences("docs/cmudict.tsv")
-toy_data = catcoocc.read_sequences("docs/toy.tsv")
+#toy_data = catcoocc.read_sequences("docs/toy.tsv")
+toy_data = catcoocc.read_sequences("docs/mushroom-small.tsv")
 toy_co = catcoocc.collect_cooccs(toy_data)
 
 print(len(toy_data), len(toy_co))
@@ -52,11 +53,15 @@ for pair in sorted(sc.obs):
     print("  theil_u    \t%0.4f %0.4f" % theil_u[pair])
     print("  catcoocc_i \t%0.4f %0.4f" % catcoocc_i[pair])
     print("  catcoocc_ii\t%0.4f %0.4f" % catcoocc_ii[pair])
-    
-    
+
+xy, yx, alpha_x, alpha_y = catcoocc.scorer.scorer2matrices(catcoocc_i)
+print(xy)
+print(yx)
+
+
 # scaling
-mle_minmax = catcoocc.scorer.scale_scorer(mle, method="minmax")
-mle_mean = catcoocc.scorer.scale_scorer(mle, method="mean")
-mle_stdev = catcoocc.scorer.scale_scorer(mle, method="stdev")
-for pair in sorted(sc.obs):
-    print("==", pair, mle[pair], mle_minmax[pair], mle_mean[pair], mle_stdev[pair])
+#mle_minmax = catcoocc.scorer.scale_scorer(mle, method="minmax")
+#mle_mean = catcoocc.scorer.scale_scorer(mle, method="mean")
+#mle_stdev = catcoocc.scorer.scale_scorer(mle, method="stdev")
+#for pair in sorted(sc.obs):
+#    print("==", pair, mle[pair], mle_minmax[pair], mle_mean[pair], mle_stdev[pair])
