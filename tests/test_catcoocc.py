@@ -14,6 +14,7 @@ import unittest
 # Import the library being test
 import catcoocc
 
+
 class TestCooccuran(unittest.TestCase):
     """
     Class for `cooccurran` tests.
