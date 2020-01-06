@@ -24,7 +24,7 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries",
     ],
-    packages=["catcoocc"],
+    packages=["catcoocc", "docs"],
     keywords=["co-occurrence", "cooccurrence", "categorical variables", "mutual information", "scorer"],
     include_package_data=True,
     install_requires=[
@@ -39,5 +39,6 @@ setup(
     },
     test_suite='tests',
     tests_require=[],
+    zip_safe=False,
 )
 
