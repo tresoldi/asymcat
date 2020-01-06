@@ -177,8 +177,10 @@ def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
 
         scaled_scorer = {
             pair: (
-                range_low + (((value[0] - min_score) * range_diff) / score_diff),
-                range_low + (((value[1] - min_score) * range_diff) / score_diff),
+                range_low
+                + (((value[0] - min_score) * range_diff) / score_diff),
+                range_low
+                + (((value[1] - min_score) * range_diff) / score_diff),
             )
             for pair, value in scorer.items()
         }
@@ -189,7 +191,10 @@ def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
         score_diff = max(scores) - min(scores)
 
         scaled_scorer = {
-            pair: ((value[0] - mean) / score_diff, (value[1] - mean) / score_diff)
+            pair: (
+                (value[0] - mean) / score_diff,
+                (value[1] - mean) / score_diff,
+            )
             for pair, value in scorer.items()
         }
     elif method == "stdev":
