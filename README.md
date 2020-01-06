@@ -1,5 +1,7 @@
 # catcoocc
 
+[![Build Status](https://travis-ci.org/tresoldi/catcoocc.svg?branch=master)](https://travis-ci.org/tresoldi/catcoocc)
+
 Library for symmetrical and assymetrical analysis of categorical co-occurrences
 
 ## Related
