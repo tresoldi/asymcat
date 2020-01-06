@@ -30,6 +30,7 @@ setup(
     install_requires=[
         "numpy",
         "scipy",
+        "tabulate",
     ],
     entry_points={
         "console_scripts": [
