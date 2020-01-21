@@ -11,7 +11,7 @@ README_FILE = (LOCAL_PATH / "README.md").read_text()
 setup(
     name="catcoocc",
     version="0.1",
-    description="Methods for symmetric and assymetric analysis of categorical co-occurrences",
+    description="Methods for symmetric and asymmetric analysis of categorical co-occurrences",
     long_description=README_FILE,
     long_description_content_type="text/markdown",
     url="https://github.com/tresoldi/catcoocc",
@@ -24,12 +24,13 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries",
     ],
-    packages=["catcoocc"],
+    packages=["catcoocc", "docs"],
     keywords=["co-occurrence", "cooccurrence", "categorical variables", "mutual information", "scorer"],
     include_package_data=True,
     install_requires=[
         "numpy",
         "scipy",
+        "tabulate",
     ],
     entry_points={
         "console_scripts": [
@@ -38,5 +39,6 @@ setup(
     },
     test_suite='tests',
     tests_require=[],
+    zip_safe=False,
 )
 
