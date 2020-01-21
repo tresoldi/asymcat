@@ -24,11 +24,11 @@ For the purposes of the library, the following definitions are used:
 # Google CoLab requires the runtime to be restarted (CTRL+M) in order for it
 # to pick the new package (thus: run this cell, restart the runtime, and
 # run other cells)
-!rm -rf catcoocc
-!git clone https://github.com/tresoldi/catcoocc.git
-!pip3 install --force-reinstall --no-deps -e catcoocc/
+#!rm -rf catcoocc
+#!git clone https://github.com/tresoldi/catcoocc.git
+#!pip3 install --force-reinstall --no-deps -e catcoocc/
 
-from IPython.display import HTML, display
+#from IPython.display import HTML, display
 
 # Import 3rd party libraries
 from matplotlib import pyplot as plt
@@ -81,7 +81,7 @@ def plot_scorer(scorer, alpha_x, alpha_y, title=None, font_scale=2, figsize=(25,
 Mushrooms can be either edible or poisonous, and the cap shapre can be of four types, convex, bell, flat, or sunken. In this subset, flat and sunken are underrepresented, with a single case, both being edibles, but of course it is not safe to eat it?
 """
 
-mushroom_data = catcoocc.read_sequences("catcoocc/docs/mushroom-small.tsv")
+mushroom_data = catcoocc.read_sequences("docs/mushroom-small.tsv")
 mushroom_cooccs = catcoocc.collect_cooccs(mushroom_data)
 scorer = catcoocc.scorer.CatScorer(mushroom_cooccs)
 
@@ -99,17 +99,17 @@ catcoocc_ii = scorer.catcoocc_ii()
 
 headers = [
     'pair',
-    'mle_0',        'mle_1', 
-    'pmi_0',        'pmi_1', 
-    'npmi_0',       'npmi_1', 
-    'chi2_0',       'chi2_1', 
-    'chi2ns_0',     'chi2ns_1', 
-    'cremersv_0',   'cremersv_1', 
-    'cremersvns_0', 'cremersvns_1', 
-    'fisher_0',     'fisher_1', 
-    'theilu_0',     'theilu_1', 
-    'catcoocci_0',  'catcoocci_1', 
-    'catcooccii_0', 'catcooccii_1', 
+    'mle_0',        'mle_1',
+    'pmi_0',        'pmi_1',
+    'npmi_0',       'npmi_1',
+    'chi2_0',       'chi2_1',
+    'chi2ns_0',     'chi2ns_1',
+    'cremersv_0',   'cremersv_1',
+    'cremersvns_0', 'cremersvns_1',
+    'fisher_0',     'fisher_1',
+    'theilu_0',     'theilu_1',
+    'catcoocci_0',  'catcoocci_1',
+    'catcooccii_0', 'catcooccii_1',
 ]
 
 table = []
@@ -131,7 +131,7 @@ for pair in sorted(scorer.obs):
     table.append(buf)
 
     
-display(HTML(tabulate.tabulate(table, headers=headers, tablefmt='html')))
+print(tabulate.tabulate(table, headers=headers, tablefmt='markdown'))
 
 """and now more"""
 
