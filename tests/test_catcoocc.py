@@ -202,6 +202,36 @@ class TestCoocc(unittest.TestCase):
 
             assert np.allclose(vals, ref, rtol=1e-05, atol=1e-08)
 
+        # Build a scaling dictionary
+        score_dict = scorer.catcoocc_i()
+
+        # Build matrices from scorer
+        xy, yx, alpha_x, alpha_y = catcoocc.scorer.scorer2matrices(score_dict)
+        assert len(xy) == 28
+        assert len(yx) == 23
+        assert len(alpha_x) == 23
+        assert len(alpha_y) == 28
+        assert "A" in alpha_x and "s" not in alpha_x
+        assert "s" in alpha_y and "A" not in alpha_y
+
+        # Scale the scorer
+        scaled_minmax = catcoocc.scorer.scale_scorer(
+            score_dict, method="minmax"
+        )
+        np.allclose(
+            scaled_minmax["H", "i"],
+            (0.14622204114513698, 0.16974413347933295),
+            rtol=1e-05,
+            atol=1e-08,
+        )
+        scaled_mean = catcoocc.scorer.scale_scorer(score_dict, method="mean")
+        np.allclose(
+            scaled_mean["H", "i"],
+            (-0.22273464237233198, -0.199212550038136),
+            rtol=1e-05,
+            atol=1e-08,
+        )
+
     def test_readers(self):
         # Read a sequences file
         cmu_file = catcoocc.RESOURCE_DIR / "cmudict.tsv"
