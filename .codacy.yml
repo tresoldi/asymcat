@@ -1,0 +1,5 @@
+exclude_paths:
+    - "AUTHORS.md"
+    - "README.md"
+    - "catcooc/__init__.py"
+    - "tests/*.py"
