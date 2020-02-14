@@ -10,7 +10,7 @@ README_FILE = (LOCAL_PATH / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="catcoocc",
-    version="0.1",
+    version="0.2",
     description="Methods for symmetric and asymmetric analysis of categorical co-occurrences",
     long_description=README_FILE,
     long_description_content_type="text/markdown",
@@ -24,7 +24,7 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries",
     ],
-    packages=["catcoocc", "docs"],
+    packages=["catcoocc", "docs", "resources"],
     keywords=["co-occurrence", "cooccurrence", "categorical variables", "mutual information", "scorer"],
     include_package_data=True,
     install_requires=[
