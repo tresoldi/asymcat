@@ -215,6 +215,26 @@ class TestCoocc(unittest.TestCase):
         assert len(cmu) == 134373
         assert len(finches) == 447
 
+    def test_utils(self):
+        # Test additional functions from utils
+        ngrams = tuple(catcoocc.collect_ngrams("abcde", 2, "#"))
+        assert ngrams == (
+            ("#", "a"),
+            ("a", "b"),
+            ("b", "c"),
+            ("c", "d"),
+            ("d", "e"),
+            ("e", "#"),
+        )
+
+        # Test collect co-occoc on ngrams
+        # TODO: this is giving three ("i", "I"), check if correct/intended
+        seqs = [("abcde", "ABCDE"), ("fgh", "FGH"), ("i", "I"), ("jkl", "JKL")]
+        cooccs = catcoocc.collect_cooccs(seqs, order=3)
+        assert len(cooccs) == 78
+        assert ("a", "B") in cooccs
+        assert ("l", "L") in cooccs
+
 
 if __name__ == "__main__":
     # Explicitly creating and running test suite allows to profile
