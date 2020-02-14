@@ -202,6 +202,19 @@ class TestCoocc(unittest.TestCase):
 
             assert np.allclose(vals, ref, rtol=1e-05, atol=1e-08)
 
+    def test_readers(self):
+        # Read a sequences file
+        cmu_file = catcoocc.RESOURCE_DIR / "cmudict.tsv"
+        cmu = catcoocc.read_sequences(cmu_file.as_posix())
+
+        # Read presence/absence matrix
+        finches_file = catcoocc.RESOURCE_DIR / "galapagos.tsv"
+        finches = catcoocc.read_pa_matrix(finches_file.as_posix())
+
+        # For assertion, just check length
+        assert len(cmu) == 134373
+        assert len(finches) == 447
+
 
 if __name__ == "__main__":
     # Explicitly creating and running test suite allows to profile
