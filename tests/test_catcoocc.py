@@ -231,6 +231,14 @@ class TestCoocc(unittest.TestCase):
             rtol=1e-05,
             atol=1e-08,
         )
+        scaled_stdev = catcoocc.scorer.scale_scorer(score_dict, method="stdev")
+        np.allclose(
+            scaled_stdev["H", "i"],
+            (-1.074262591153208, -0.9608141235455608),
+            rtol=1e-05,
+            atol=1e-08,
+        )
+        scaled_stdev = catcoocc.scorer.scale_scorer(score_dict, method="stdev")
 
     def test_readers(self):
         # Read a sequences file

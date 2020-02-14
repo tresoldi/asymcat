@@ -154,7 +154,7 @@ def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
 
     :param dict scorer: A scoring dictionary.
     :param str method: The scoring method to be used, either `"minmax"` or
-        `"mean"` (default: `"minmax"`).
+        `"mean"` or `"stdev"` (default: `"minmax"`).
     :param tuple nrange: A tuple with the scaling range, to be used when
         applicable (default: (0, 1)).
 
