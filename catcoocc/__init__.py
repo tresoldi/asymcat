@@ -11,4 +11,5 @@ from catcoocc import scorer
 
 # Resource dir (mostly for tests)
 from pathlib import Path
+
 RESOURCE_DIR = Path(__file__).parent.parent / "resources"

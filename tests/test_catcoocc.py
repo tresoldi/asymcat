@@ -128,10 +128,10 @@ class TestCoocc(unittest.TestCase):
                 0.0,  # cramersv_ns y>x
                 1.0984661058881742,  # fisher x>y
                 1.0984661058881742,  # fisher y>x
-                0.6593343352835512,  # theil_u x>y
-                0.5997312299898745,  # theil_u y>x
-                0.05173392773198948,  # catcoocc_i x>y
-                0.04705723705041114,  # catcoocc_i y>x
+                0.21299752425693524,  # theil_u x>y
+                0.3356184612000498,  # theil_u y>x
+                0.016712611398073306,  # catcoocc_i x>y
+                0.026333925427647984,  # catcoocc_i y>x
                 3.7474543524283964e-05,  # catcoocc_ii x>y
                 3.7474543524283964e-05,  # catcoocc_ii y>x
             ),
@@ -152,10 +152,10 @@ class TestCoocc(unittest.TestCase):
                 0.07452170854897658,  # cramersv_ns y>x
                 4.512581547064306,  # fisher x>y
                 4.512581547064306,  # fisher y>x
-                0.6169022357243095,  # theil_u x>y
-                0.54447314456517,  # theil_u y>x
-                0.7735930530343602,  # catcoocc_i x_y
-                0.682767248695174,  # catcoocc_i y>x
+                0.22071631715993364,  # theil_u x>y
+                0.2841291022637977,  # theil_u y>x
+                0.27677742072985145,  # catcoocc_i x_y
+                0.3562968116302805,  # catcoocc_i y>x
                 11.506888541379661,  # catcoocc_ii x>y
                 11.506888541379661,  # catcoocc_ii y>x
             ),
@@ -176,10 +176,10 @@ class TestCoocc(unittest.TestCase):
                 0.0,  # cramersv_ns y>x
                 0.0,  # fisher x>y
                 0.0,  # fisher y>x
-                0.7381300186001525,  # theil_u x>y
-                0.6937287111206101,  # theil_u y>x
-                -4.799904537544586,  # catcoocc_i x>y
-                -4.511172157240979,  # catcoocc_i y>x
+                0.386699915220347,  # theil_u x>y
+                0.34435838354803283,  # theil_u y>x
+                -2.5146283594492576,  # catcoocc_i x>y
+                -2.2392902687637424,  # catcoocc_i y>x
                 -0.6095830534614555,  # catcoocc_ii x>y
                 -0.6095830534614555,  # catcoocc_ii y>x
             ),
@@ -199,7 +199,7 @@ class TestCoocc(unittest.TestCase):
                 + catcoocc_i[pair]
                 + catcoocc_ii[pair]
             )
-
+            # print(pair, vals)
             assert np.allclose(vals, ref, rtol=1e-05, atol=1e-08)
 
         # Build a scaling dictionary
