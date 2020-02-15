@@ -267,8 +267,7 @@ class CatScorer:
         self._fisher = None
         self._theil_u = None
         self._cond_entropy = None
-        self._catcoocc_i = None
-        self._catcoocc_ii = None
+        self._tresoldi = None
 
     def _compute_contingency_table(self, square):
         """
@@ -508,52 +507,33 @@ class CatScorer:
 
         return self._cond_entropy
 
-    def catcoocc_i(self):
+    def tresoldi(self):
         """
-        Return a `catcoocc I` asymmetric uncertainty scorer.
+        Return a `tresoldi` asymmetric uncertainty scorer.
 
-        This is our intended scorer, but it can be slow on large datasets
-        due to the underlying computation of Theil's uncertainty scorer
-        for all co-occurrence pairs. A less precise but faster alternative
-        is the `catcooc II` scorer.
+        This is our intended scorer for alignments.
         """
 
         # Build the scorer, if necessary
-        if not self._catcoocc_i:
-            # Obtain the PMI and Theil's U scorers for all pairs (which will
-            # force the object to compute them, if necessary)
+        if not self._tresoldi:
+            # Obtain the MLE and PMI scorers for all pairs (which will
+            # trigger their computation, if necessary)
+            mle = self.mle()
             pmi = self.pmi()
-            theil_u = self.theil_u()
 
             # Build the new scorer
-            self._catcoocc_i = {
-                pair: tuple([score * pmi[pair][0] for score in theil_u[pair]])
-                for pair in self.obs
-            }
+            self._tresoldi = {}
+            for pair in self.obs:
+                if pmi[pair][0] < 0:
+                    xy = -((-pmi[pair][0]) ** (1 - mle[pair][0]))
+                else:
+                    xy = pmi[pair][0] ** (1 - mle[pair][0])
 
-        return self._catcoocc_i
+                if pmi[pair][1] < 0:
+                    yx = -((-pmi[pair][1]) ** (1 - mle[pair][1]))
+                else:
+                    yx = pmi[pair][1] ** (1 - mle[pair][1])
 
-    def catcoocc_ii(self):
-        """
-        Return a `catcoocc II` asymmetric uncertainty scorer.
+                self._tresoldi[pair] = (xy, yx)
 
-        This scorer is intended as an alternative to `catcoocc I` scorer,
-        using an adjusted but faster to compute Chi2 instead of the
-        more precise but expansive Theil U. It is recommended that it is
-        used only on smoothed data.
-        """
-
-        # Build the scorer, if necessary
-        if not self._catcoocc_ii:
-            # Obtain the PMI and Chi2 scorers for all pairs (which will
-            # force the object to compute them, if necessary)
-            pmi = self.pmi()
-            chi2 = self.chi2(True)
-
-            # Build the new scorer
-            self._catcoocc_ii = {
-                pair: tuple([score * pmi[pair][0] for score in chi2[pair]])
-                for pair in self.obs
-            }
-
-        return self._catcoocc_ii
+        return self._tresoldi
