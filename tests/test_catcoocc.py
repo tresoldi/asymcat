@@ -83,8 +83,7 @@ class TestCoocc(unittest.TestCase):
         fisher = scorer.fisher()
         theil_u = scorer.theil_u()
         cond_entropy = scorer.cond_entropy()
-        catcoocc_i = scorer.catcoocc_i()
-        catcoocc_ii = scorer.catcoocc_ii()
+        tresoldi = scorer.tresoldi()
 
         # Defines testing pairs
         pairs = {
@@ -109,10 +108,8 @@ class TestCoocc(unittest.TestCase):
                 1.0,  # theil_u y>x
                 0.0,  # cond_entropy, x>y
                 0.0,  # cond_entropy, y>x
-                5.680172609017068,  # catcoocc_i x>y
-                5.680172609017068,  # catcoocc_i y>x
-                3462.523968980434,  # catcoocc_ii x>y
-                3462.523968980434,  # catcoocc_ii y>x
+                1.0,  # tresoldi x>y
+                1.0,  # tresoldi y>x
             ),
             ("A", "b"): (
                 0.06521739130434782,  # mle x>y
@@ -135,10 +132,8 @@ class TestCoocc(unittest.TestCase):
                 0.3356184612000498,  # theil_u y>x
                 1.86638224482290279,  # cond_entropy, x>y
                 0.9999327965500219,  # cond_entropy, y>x
-                0.016712611398073306,  # catcoocc_i x>y
-                0.026333925427647984,  # catcoocc_i y>x
-                3.7474543524283964e-05,  # catcoocc_ii x>y
-                3.7474543524283964e-05,  # catcoocc_ii y>x
+                0.0926310345228265,  # tresoldi x>y
+                0.10466500171366895,  # tresoldi y>x
             ),
             ("S", "s"): (
                 0.13953488372093023,  # mle x>y
@@ -161,10 +156,8 @@ class TestCoocc(unittest.TestCase):
                 0.2841291022637977,  # theil_u y>x
                 1.5938047875022765,  # cond_entropy, x>y
                 1.137346966185816,  # cond_entropy, y>x
-                0.27677742072985145,  # catcoocc_i x_y
-                0.3562968116302805,  # catcoocc_i y>x
-                11.506888541379661,  # catcoocc_ii x>y
-                11.506888541379661,  # catcoocc_ii y>x
+                1.2150117159149825,  # tresoldi x>y
+                1.2062725270739942,  # tresoldi y>x
             ),
             ("H", "i"): (
                 0.0,  # mle x>y
@@ -187,10 +180,8 @@ class TestCoocc(unittest.TestCase):
                 0.34435838354803283,  # theil_u y>x
                 1.0887395664391526,  # cond_entropy, x>y
                 1.3070160180503212,  # cond_entropy, y>x
-                -2.5146283594492576,  # catcoocc_i x>y
-                -2.2392902687637424,  # catcoocc_i y>x
-                -0.6095830534614555,  # catcoocc_ii x>y
-                -0.6095830534614555,  # catcoocc_ii y>x
+                -6.502790045915624,  # tresoldi x>y
+                -6.502790045915624,  # tresoldi y>x
             ),
         }
 
@@ -206,14 +197,13 @@ class TestCoocc(unittest.TestCase):
                 + fisher[pair]
                 + theil_u[pair]
                 + cond_entropy[pair]
-                + catcoocc_i[pair]
-                + catcoocc_ii[pair]
+                + tresoldi[pair]
             )
             # print(pair, vals)
             assert np.allclose(vals, ref, rtol=1e-05, atol=1e-08)
 
         # Build a scaling dictionary
-        score_dict = scorer.catcoocc_i()
+        score_dict = scorer.tresoldi()
 
         # Build matrices from scorer
         xy, yx, alpha_x, alpha_y = catcoocc.scorer.scorer2matrices(score_dict)
@@ -228,27 +218,26 @@ class TestCoocc(unittest.TestCase):
         scaled_minmax = catcoocc.scorer.scale_scorer(
             score_dict, method="minmax"
         )
-        np.allclose(
+        assert np.allclose(
             scaled_minmax["H", "i"],
-            (0.14622204114513698, 0.16974413347933295),
+            (0.15476857281060225, 0.15476857281060225),
             rtol=1e-05,
             atol=1e-08,
         )
         scaled_mean = catcoocc.scorer.scale_scorer(score_dict, method="mean")
-        np.allclose(
+        assert np.allclose(
             scaled_mean["H", "i"],
-            (-0.22273464237233198, -0.199212550038136),
+            (-0.36871270234063913, -0.36871270234063913),
             rtol=1e-05,
             atol=1e-08,
         )
         scaled_stdev = catcoocc.scorer.scale_scorer(score_dict, method="stdev")
-        np.allclose(
+        assert np.allclose(
             scaled_stdev["H", "i"],
-            (-1.074262591153208, -0.9608141235455608),
+            (-1.3465717087048406, -1.3465717087048406),
             rtol=1e-05,
             atol=1e-08,
         )
-        scaled_stdev = catcoocc.scorer.scale_scorer(score_dict, method="stdev")
 
     def test_readers(self):
         # Read a sequences file
