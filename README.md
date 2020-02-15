@@ -7,6 +7,67 @@ Badge](https://api.codacy.com/project/badge/Grade/0f820951c6374be29717a02471a3fd
 
 Library for symmetrical and assymetrical analysis of categorical co-occurrences
 
+## Background
+
+A measure of association is any factor or coefficient used to quantify
+the relationship between two or more variables. Various measures exist to
+determine the strength and relationship of such associations, the most
+common being measures of *correlation* which, in a sense stricter than
+*association*, refers to linear correlation. Among the most common measures,
+are Pearson's **rho** coefficient of product-moment correlation for
+continuous values, Spearman **rho** coefficient for measuring the strenght
+of monotonic ordinal or ranked variables, Chi-square measure for
+association between categorical values. Most measures only express
+measures of either strength (such as Pearson's **rho**) or significance
+(such as Chi-square), and are **symmetric**, meaning that, when
+measuring the relationship between `x` and `y` the association between
+a given value of `x` and a given value of `y` is equal to the association
+between the same value of `y` and the same value of `x`.
+
+While symmetric measures are the natural measure for numeric variables,
+the analyses arising from many studies and applications for categorical
+variables can in most cases benefit from asymmetric measures, as
+the fraction of variability in `x` that is explainable by variations in `y` 
+(Pearson, 2016). Such property can be easily demonstrated by modifying the
+example given by (Zychlinski, 2018) while introducing his `dython`
+library
+
+  | x | y |
+  |---|---|
+  | A | c |
+  | A | d |
+  | A | c |
+  | B | g |
+  | B | g |
+  | B | f |
+
+In this example, the categorical value of `y` cannot be determined with full
+certainty given `x`, but `x` can be determined with certainty from `y`.
+
+The best known methods for measure of categorical association are the
+aforementioned Chi-square and Cramer's V, defined as the square root of a
+normalized chi-square value. Both are symmetric values. Among the best
+known asymmetric measures are Theil's U and Goodman and Kruskal's tau.
+The former is particularly useful for domains of the humanities such as
+lingustic research, as it is ultimately based on the conditional entropy
+between `x` and `y`, that is, how many possible states of `y` are observed
+given `x` and how often they occur.
+
+![Table 1, chi2, xy](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_chi2_xy.png)
+
+![Table 1, chi2, yx](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_chi2_yx.png)
+
+Even with a simple MLE scorer, the difference is evident
+
+![Table 1, mle, xy](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_mle_xy.png)
+
+![Table 1, mle, yx](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_mle_yx.png)
+
+The `catcoocc` library implements a series of symmetric and asymmetric
+measures for categorical association from co-occurrences, including two
+new measures developed by the author, that cover a range of potential
+usages first intended for but not limited to linguistic research.
+
 ## Installation and usage
 
 The library can be installed as any standard Python library with `pip`:
@@ -100,6 +161,8 @@ https://github.com/pafoster/pyitlib
 Griffith, Daniel M.; Veech, Joseph A.; and Marsh, Charles J. (2016)
 *cooccur: Probabilistic Species Co-Occurrence Analysis in R*. Journal
 of Statistical Software (69). doi: 10.18627/jss.v069.c02
+
+https://cran.r-project.org/web/packages/GoodmanKruskal/vignettes/GoodmanKruskal.html
 
 ## Community guidelines
 
