@@ -82,6 +82,7 @@ class TestCoocc(unittest.TestCase):
         cramersv_ns = scorer.cramers_v(False)
         fisher = scorer.fisher()
         theil_u = scorer.theil_u()
+        cond_entropy = scorer.cond_entropy()
         catcoocc_i = scorer.catcoocc_i()
         catcoocc_ii = scorer.catcoocc_ii()
 
@@ -106,6 +107,8 @@ class TestCoocc(unittest.TestCase):
                 np.inf,  # fisher y>x
                 1.0,  # theil_u x>y
                 1.0,  # theil_u y>x
+                0.0,  # cond_entropy, x>y
+                0.0,  # cond_entropy, y>x
                 5.680172609017068,  # catcoocc_i x>y
                 5.680172609017068,  # catcoocc_i y>x
                 3462.523968980434,  # catcoocc_ii x>y
@@ -130,6 +133,8 @@ class TestCoocc(unittest.TestCase):
                 1.0984661058881742,  # fisher y>x
                 0.21299752425693524,  # theil_u x>y
                 0.3356184612000498,  # theil_u y>x
+                1.86638224482290279,  # cond_entropy, x>y
+                0.9999327965500219,  # cond_entropy, y>x
                 0.016712611398073306,  # catcoocc_i x>y
                 0.026333925427647984,  # catcoocc_i y>x
                 3.7474543524283964e-05,  # catcoocc_ii x>y
@@ -154,6 +159,8 @@ class TestCoocc(unittest.TestCase):
                 4.512581547064306,  # fisher y>x
                 0.22071631715993364,  # theil_u x>y
                 0.2841291022637977,  # theil_u y>x
+                1.5938047875022765,  # cond_entropy, x>y
+                1.137346966185816,  # cond_entropy, y>x
                 0.27677742072985145,  # catcoocc_i x_y
                 0.3562968116302805,  # catcoocc_i y>x
                 11.506888541379661,  # catcoocc_ii x>y
@@ -178,6 +185,8 @@ class TestCoocc(unittest.TestCase):
                 0.0,  # fisher y>x
                 0.386699915220347,  # theil_u x>y
                 0.34435838354803283,  # theil_u y>x
+                1.0887395664391526,  # cond_entropy, x>y
+                1.3070160180503212,  # cond_entropy, y>x
                 -2.5146283594492576,  # catcoocc_i x>y
                 -2.2392902687637424,  # catcoocc_i y>x
                 -0.6095830534614555,  # catcoocc_ii x>y
@@ -196,6 +205,7 @@ class TestCoocc(unittest.TestCase):
                 + cramersv_ns[pair]
                 + fisher[pair]
                 + theil_u[pair]
+                + cond_entropy[pair]
                 + catcoocc_i[pair]
                 + catcoocc_ii[pair]
             )

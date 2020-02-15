@@ -266,6 +266,7 @@ class CatScorer:
         self._cramersv_nonsquare = None
         self._fisher = None
         self._theil_u = None
+        self._cond_entropy = None
         self._catcoocc_i = None
         self._catcoocc_ii = None
 
@@ -480,6 +481,32 @@ class CatScorer:
                     )
 
         return self._theil_u
+
+    def cond_entropy(self):
+        """
+        Return a corrected conditional entropy scorer.
+        """
+
+        if not self._cond_entropy:
+            self._cond_entropy = {}
+
+            for x in self.alphabet_x:
+                for y in self.alphabet_y:
+                    subset = [
+                        pair
+                        for pair in self.cooccs
+                        if pair[0] == x or pair[1] == y
+                    ]
+                    X = [pair[0] for pair in subset]
+                    Y = [pair[1] for pair in subset]
+
+                    # run theil's
+                    self._cond_entropy[(x, y)] = (
+                        conditional_entropy(Y, X),
+                        conditional_entropy(X, Y),
+                    )
+
+        return self._cond_entropy
 
     def catcoocc_i(self):
         """
