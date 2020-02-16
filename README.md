@@ -5,8 +5,6 @@
 [![Codacy
 Badge](https://api.codacy.com/project/badge/Grade/0f820951c6374be29717a02471a3fd45)](https://www.codacy.com/manual/tresoldi/catcoocc?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tresoldi/catcoocc&amp;utm_campaign=Badge_Grade)
 
-## Background
-
 The `catcoocc` library is designed for the study of co-occurrence association
 between categorical variables by implementing a number of symmetric and
 asymmetric measures of association.
@@ -22,6 +20,9 @@ measures of
 association, it includes auxiliary ones for dealing with relational data,
 n-grams from sequences, alignments, and binary matrices of
 presence/absence.
+
+
+## Background
 
 A measure of association is a factor or coefficient used to quantify
 the relationship between two or more variables. Various measures exist to
@@ -135,14 +136,14 @@ pip install catcoocc
 Detailed instructions on how to use the library can be found in
 the [official documentation]().
 
-A show-case example is shown here:
+A show-case example with a subset of the `mushroom` dataset is shown here:
 
 ```python
 import tabulate
 import catcoocc
 from catcoocc.scorer import CatScorer
 
-mushroom_data = catcoocc.read_sequences("docs/mushroom-small.tsv")
+mushroom_data = catcoocc.read_sequences("resources/mushroom-small.tsv")
 mushroom_cooccs = catcoocc.collect_cooccs(mushroom_data)
 scorer = catcoocc.scorer.CatScorer(mushroom_cooccs)
 
@@ -155,39 +156,39 @@ cramersv = scorer.cramers_v()
 cramersv_ns = scorer.cramers_v(False)
 fisher = scorer.fisher()
 theil_u = scorer.theil_u()
-catcoocc_i = scorer.catcoocc_i()
-catcoocc_ii = scorer.catcoocc_ii()
+cond_entropy = scorer.cond_entropy()
+tresoldi = scorer.tresoldi()
 
 headers = [
     'pair',
-    'mle_0',        'mle_1', 
-    'pmi_0',        'pmi_1', 
-    'npmi_0',       'npmi_1', 
-    'chi2_0',       'chi2_1', 
-    'chi2ns_0',     'chi2ns_1', 
-    'cremersv_0',   'cremersv_1', 
-    'cremersvns_0', 'cremersvns_1', 
-    'fisher_0',     'fisher_1', 
-    'theilu_0',     'theilu_1', 
-    'catcoocci_0',  'catcoocci_1', 
-    'catcooccii_0', 'catcooccii_1', 
+    'mle_xy',          'mle_yx', 
+    'pmi_xy',          'pmi_yx', 
+    'npmi_xy',         'npmi_yx', 
+    'chi2_xy',         'chi2_yx', 
+    'chi2ns_xy',       'chi2ns_yx', 
+    'cremersv_xy',     'cremersv_yx', 
+    'cremersvns_xy',   'cremersvns_yx', 
+    'fisher_xy',       'fisher_yx', 
+    'theilu_xy',       'theilu_yx', 
+    'cond_entropy_xy', 'cond_entropy_yx',
+    'tresoldi_xy',     'tresoldi_yx'
 ]
 
 table = []
 for pair in sorted(scorer.obs):
     buf = [
         pair,
-        "%0.4f" % mle[pair][0],         "%0.4f" % mle[pair][1],
-        "%0.4f" % pmi[pair][0],         "%0.4f" % pmi[pair][1],
-        "%0.4f" % npmi[pair][0],        "%0.4f" % npmi[pair][1],
-        "%0.4f" % chi2[pair][0],        "%0.4f" % chi2[pair][1],
-        "%0.4f" % chi2_ns[pair][0],     "%0.4f" % chi2_ns[pair][1],
-        "%0.4f" % cramersv[pair][0],    "%0.4f" % cramersv[pair][1],
-        "%0.4f" % cramersv_ns[pair][0], "%0.4f" % cramersv_ns[pair][1],
-        "%0.4f" % fisher[pair][0],      "%0.4f" % fisher[pair][1],
-        "%0.4f" % theil_u[pair][0],     "%0.4f" % theil_u[pair][1],
-        "%0.4f" % catcoocc_i[pair][0],  "%0.4f" % catcoocc_i[pair][1],
-        "%0.4f" % catcoocc_ii[pair][0], "%0.4f" % catcoocc_ii[pair][1],
+        "%0.4f" % mle[pair][0],          "%0.4f" % mle[pair][1],
+        "%0.4f" % pmi[pair][0],          "%0.4f" % pmi[pair][1],
+        "%0.4f" % npmi[pair][0],         "%0.4f" % npmi[pair][1],
+        "%0.4f" % chi2[pair][0],         "%0.4f" % chi2[pair][1],
+        "%0.4f" % chi2_ns[pair][0],      "%0.4f" % chi2_ns[pair][1],
+        "%0.4f" % cramersv[pair][0],     "%0.4f" % cramersv[pair][1],
+        "%0.4f" % cramersv_ns[pair][0],  "%0.4f" % cramersv_ns[pair][1],
+        "%0.4f" % fisher[pair][0],       "%0.4f" % fisher[pair][1],
+        "%0.4f" % theil_u[pair][0],      "%0.4f" % theil_u[pair][1],
+        "%0.4f" % cond_entropy[pair][0], "%0.4f" % cond_entropy[pair][1],
+        "%0.4f" % tresoldi[pair][0],     "%0.4f" % tresoldi[pair][1],
     ]
     table.append(buf)
 
@@ -197,18 +198,16 @@ print(tabulate.tabulate(table, headers=headers, tablefmt='markdown'))
 
 Which will output:
 
-```bash
-pair                       mle_0    mle_1    pmi_0    pmi_1    npmi_0    npmi_1    chi2_0    chi2_1    chi2ns_0    chi2ns_1    cremersv_0    cremersv_1    cremersvns_0    cremersvns_1    fisher_0    fisher_1    theilu_0    theilu_1    catcoocci_0    catcoocci_1    catcooccii_0    catcooccii_1
------------------------  -------  -------  -------  -------  --------  --------  --------  --------  ----------  ----------  ------------  ------------  --------------  --------------  ----------  ----------  ----------  ----------  -------------  -------------  --------------  --------------
-('edible', 'bell')        0.3846   1        0.4308   0.4308    0.3107    0.3107    1.8315    1.8315      3.5897      3.5897        0.2027        0.2027          0.1987          0.1987         inf         inf      1           0.3985         0.4308         0.1717          0.789           0.789
-('edible', 'convex')      0.4615   0.4615  -0.3424  -0.3424   -0.2844   -0.2844    3.6735    3.6735      5.7988      5.7988        0.3719        0.3719          0.3101          0.3101           0           0      0.2955      0.1823        -0.1012        -0.0624         -1.2578         -1.2578
-('edible', 'flat')        0.0769   1        0.4308   0.4308    0.1438    0.1438    0.1041    0.1041      0.5668      0.5668        0             0               0               0              inf         inf      1           1              0.4308         0.4308          0.0448          0.0448
-('edible', 'sunken')      0.0769   1        0.4308   0.4308    0.1438    0.1438    0.1041    0.1041      0.5668      0.5668        0             0               0               0              inf         inf      1           1              0.4308         0.4308          0.0448          0.0448
-('poisonous', 'bell')     0        0       -3.5553  -3.5553   -0.5934   -0.5934    1.8315    1.8315      3.5897      3.5897        0.2027        0.2027          0.1987          0.1987           0           0      1           1             -3.5553        -3.5553         -6.5116         -6.5116
-('poisonous', 'convex')   1        0.5385   0.4308   0.4308    0.4103    0.4103    3.6735    3.6735      5.7988      5.7988        0.3719        0.3719          0.3101          0.3101         inf         inf      0.0105      1              0.0045         0.4308          1.5825          1.5825
-('poisonous', 'flat')     0        0       -1.9459  -1.9459   -0.3248   -0.3248    0.1041    0.1041      0.5668      0.5668        0             0               0               0                0           0      1           1             -1.9459        -1.9459         -0.2026         -0.2026
-('poisonous', 'sunken')   0        0       -1.9459  -1.9459   -0.3248   -0.3248    0.1041    0.1041      0.5668      0.5668        0             0               0               0                0           0      1           1             -1.9459        -1.9459         -0.2026         -0.2026
-```
+|                         |   pair |   mle_xy |   mle_yx |   pmi_xy |   pmi_yx |   npmi_xy |   npmi_yx |   chi2_xy |   chi2_yx |   chi2ns_xy |   chi2ns_yx |   cremersv_xy |   cremersv_yx |   cremersvns_xy |   cremersvns_yx |   fisher_xy |   fisher_yx |   theilu_xy |   theilu_yx |   cond_entropy_xycond_entropy_yx |   tresoldi_xy |   tresoldi_yx |
+|-------------------------|--------|----------|----------|----------|----------|-----------|-----------|-----------|-----------|-------------|-------------|---------------|---------------|-----------------|-----------------|-------------|-------------|-------------|-------------|----------------------------------|---------------|---------------|
+| ('edible', 'bell')      | 0.3846 |   1      |   0.4308 |   0.4308 |   0.3107 |    0.3107 |    1.8315 |    1.8315 |    3.5897 |      3.5897 |      0.2027 |        0.2027 |        0.1987 |          0.1987 |             inf |         inf |      0      |      1      |      1.119  |                           0      |        0.5956 |        1      |
+| ('edible', 'convex')    | 0.4615 |   0.4615 |  -0.3424 |  -0.3424 |  -0.2844 |   -0.2844 |    3.6735 |    3.6735 |    5.7988 |      5.7988 |      0.3719 |        0.3719 |        0.3101 |          0.3101 |               0 |           0 |      0.2147 |      0.3071 |      0.7273 |                           0.4486 |       -0.5615 |       -0.5615 |
+| ('edible', 'flat')      | 0.0769 |   1      |   0.4308 |   0.4308 |   0.1438 |    0.1438 |    0.1041 |    0.1041 |    0.5668 |      0.5668 |      0      |        0      |        0      |          0      |             inf |         inf |      0      |      1      |      1.119  |                           0      |        0.4596 |        1      |
+| ('edible', 'sunken')    | 0.0769 |   1      |   0.4308 |   0.4308 |   0.1438 |    0.1438 |    0.1041 |    0.1041 |    0.5668 |      0.5668 |      0      |        0      |        0      |          0      |             inf |         inf |      0      |      1      |      1.119  |                           0      |        0.4596 |        1      |
+| ('poisonous', 'bell')   | 0      |   0      |  -3.5553 |  -3.5553 |  -0.5934 |   -0.5934 |    1.8315 |    1.8315 |    3.5897 |      3.5897 |      0.2027 |        0.2027 |        0.1987 |          0.1987 |               0 |           0 |      1      |      1      |      0      |                           0      |       -3.5553 |       -3.5553 |
+| ('poisonous', 'convex') | 1      |   0.5385 |   0.4308 |   0.4308 |   0.4103 |    0.4103 |    3.6735 |    3.6735 |    5.7988 |      5.7988 |      0.3719 |        0.3719 |        0.3101 |          0.3101 |             inf |         inf |      1      |      0      |      0      |                           0.6902 |        1      |        0.6779 |
+| ('poisonous', 'flat')   | 0      |   0      |  -1.9459 |  -1.9459 |  -0.3248 |   -0.3248 |    0.1041 |    0.1041 |    0.5668 |      0.5668 |      0      |        0      |        0      |          0      |               0 |           0 |      1      |      1      |      0      |                           0      |       -1.9459 |       -1.9459 |
+| ('poisonous', 'sunken') | 0      |   0      |  -1.9459 |  -1.9459 |  -0.3248 |   -0.3248 |    0.1041 |    0.1041 |    0.5668 |      0.5668 |      0      |        0      |        0      |          0      |               0 |           0 |      1      |      1      |      0      |                           0      |       -1.9459 |       -1.9459 |
 
 ## Related Projects
 
