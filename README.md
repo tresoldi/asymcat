@@ -5,24 +5,38 @@
 [![Codacy
 Badge](https://api.codacy.com/project/badge/Grade/0f820951c6374be29717a02471a3fd45)](https://www.codacy.com/manual/tresoldi/catcoocc?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tresoldi/catcoocc&amp;utm_campaign=Badge_Grade)
 
-Library for symmetrical and assymetrical analysis of categorical co-occurrences
-
 ## Background
 
-A measure of association is any factor or coefficient used to quantify
+The `catcoocc` library is designed for the study of co-occurrence association
+between categorical variables by implementing a number of symmetric and
+asymmetric measures of association.
+Given a series of
+co-occurrence observations, starting from data such as records,
+alignments, and matrices of presence-absence, it allows to compute
+dictionaries with the association score between categories, offering
+methods focused on strength of association, direction of association, or
+both. It is primarily developed for linguistic research, but can be
+applied to any kind of data exploration and description based on
+categorical data; besides the main methods for numeric computation of
+measures of
+association, it includes auxiliary ones for dealing with relational data,
+n-grams from sequences, alignments, and binary matrices of
+presence/absence.
+
+A measure of association is a factor or coefficient used to quantify
 the relationship between two or more variables. Various measures exist to
 determine the strength and relationship of such associations, the most
 common being measures of *correlation* which, in a sense stricter than
 *association*, refers to linear correlation. Among the most common measures,
 are Pearson's **rho** coefficient of product-moment correlation for
 continuous values, Spearman **rho** coefficient for measuring the strenght
-of monotonic ordinal or ranked variables, Chi-square measure for
-association between categorical values. Most measures only express
-measures of either strength (such as Pearson's **rho**) or significance
-(such as Chi-square), and are **symmetric**, meaning that, when
-measuring the relationship between `x` and `y` the association between
-a given value of `x` and a given value of `y` is equal to the association
-between the same value of `y` and the same value of `x`.
+of monotonic ordinal or ranked variables, and Chi-square measure for
+association between categorical values. Each measure is usually indicated
+to investigate either strength (such as Pearson's **rho**) or significance
+(such as Chi-square), and most are **symmetric**, meaning that, when
+measuring the relationship between series `X` and series `Y`,
+ the association between any `x` and `y` value is equal to that
+between `y` and `x`.
 
 While symmetric measures are the natural measure for numeric variables,
 the analyses arising from many studies and applications for categorical
@@ -32,19 +46,51 @@ the fraction of variability in `x` that is explainable by variations in `y`
 example given by (Zychlinski, 2018) while introducing his `dython`
 library
 
-  | x | y |
-  |---|---|
-  | A | c |
-  | A | d |
-  | A | c |
-  | B | g |
-  | B | g |
-  | B | f |
+  |               | X | Y |
+  |---------------|---|---|
+  | Observation 1 | A | c |
+  | Observation 2 | A | d |
+  | Observation 3 | A | c |
+  | Observation 4 | B | g |
+  | Observation 5 | B | g |
+  | Observation 6 | B | f |
 
 In this example, the categorical value of `y` cannot be determined with full
-certainty given `x`, but `x` can be determined with certainty from `y`.
+certainty given `x`, but `x` can be determined with certainty from `y`. In
+a symmetric version Maximum-Likelihood estimation (MLE), which just divides
+the number of cases for the total number of observations (i.e., Cxy/Cx and
+Cxy/Cy, where C is the overall count), the tables the XY and YX
+are the transposed version of each other:
 
-The best known methods for measure of categorical association are the
+  | X given Y | `A`  | `B`  |
+  |-----------|------|------|
+  | **`c`**   | 0.75 | 0.75 |
+  | **`d`**   | 0.00 | 0.00 |
+  | **`f`**   | 0.00 | 0.00 |
+  | **`g`**   | 0.75 | 0.75 |
+
+  | Y given X | `c`  | `d`  | `f`  | `g`  |
+  |-----------|------|------|------|------|
+  | **`A`**   | 0.75 | 0.00 | 0.00 | 0.75 |
+  | **`B`**   | 0.75 | 0.00 | 0.00 | 0.75 |
+
+With the same MLE scorer, asymmetric tables are
+able to capture the difference in information expressing that, if we know
+`y` in this simple dataset, we can predict `x` with certainty.
+
+  | X given Y  | `A`  | `B`  |
+  |------------|------|------|
+  | **`c`**    | 1.00 | 0.00 |
+  | **`d`**    | 1.00 | 0.00 |
+  | **`f`**    | 0.00 | 1.00 |
+  | **`g`**    | 0.00 | 1.00 |
+
+  | Y given X | `c`  | `d`  | `f`  | `g`  |
+  |-----------|------|------|------|------|
+  | **`A`**   | 0.67 | 0.33 | 0.00 | 0.00 |
+  | **`B`**   | 0.00 | 0.00 | 0.33 | 0.67 |
+
+The most popular methods for measure of categorical association are the
 aforementioned Chi-square and Cramer's V, defined as the square root of a
 normalized chi-square value. Both are symmetric values. Among the best
 known asymmetric measures are Theil's U and Goodman and Kruskal's tau.
@@ -53,33 +99,30 @@ lingustic research, as it is ultimately based on the conditional entropy
 between `x` and `y`, that is, how many possible states of `y` are observed
 given `x` and how often they occur.
 
-  |         | `A`  | `B`  |
-  |---------|------|------|
-  | **`c`** | 0.75 | 0.75 |
-  | **`d`** | 0.00 | 0.00 |
-  | **`f`** | 0.00 | 0.00 |
-  | **`g`** | 0.75 | 0.75 |
+The following scorers are implemented:
 
-  |         | `c`  | `d`  | `f`  | `g`  |
-  |---------|------|------|------|------|
-  | **`A`** | 0.75 | 0.00 | 0.00 | 0.75 |
-  | **`B`** | 0.75 | 0.00 | 0.00 | 0.75 |
+- Maximum-Likelihood Estimation
+- Pointwise Mutual Information
+- Normalized Pointwise Mutual Information
+- Chi-square (over both 2x2 and 3x2 contingency tables)
+- Cramér's V (over both 2x2 and 3x2 contingency tables)
+- Fisher Exact Odds Ratio (over unconditional MLE)
+- Theil's U ("uncertainty score")
+- Conditional Entropy
+- A new scorer `tresoldi`, for the study of linguistic alignment
+  (combining information from MLE and PMI)
 
+The library also offers functions for scaling scores with user-determined
+ranges using different methods (`minmax`, `mean`, and `stdev`) as well
+as functions for plotting heatmaps of the scorers. The same dataset of
+above plotted with the `tresoldi` scorer, where positive numbers indicate
+co-occurrence and negative numbers indicate no co-occurrence (with the
+larger the number, the higher the degree of confidence), results in the
+following heatmaps:
 
-![Table 1, chi2, xy](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_chi2_xy.png)
+![Table 1, tresoldi, xy](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_tresoldi_xy.png)
 
-![Table 1, chi2, yx](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_chi2_yx.png)
-
-Even with a simple MLE scorer, the difference is evident
-
-![Table 1, mle, xy](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_mle_xy.png)
-
-![Table 1, mle, yx](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_mle_yx.png)
-
-The `catcoocc` library implements a series of symmetric and asymmetric
-measures for categorical association from co-occurrences, including two
-new measures developed by the author, that cover a range of potential
-usages first intended for but not limited to linguistic research.
+![Table 1, tresoldi, yx](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_tresoldi_yx.png)
 
 ## Installation and usage
 
