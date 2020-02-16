@@ -53,6 +53,13 @@ lingustic research, as it is ultimately based on the conditional entropy
 between `x` and `y`, that is, how many possible states of `y` are observed
 given `x` and how often they occur.
 
+  |       | A    | B    |
+  |-------|------|------|
+  | **c** | 0.75 | 0.75 |
+  | **d** | 0.00 | 0.00 |
+  | **f** | 0.00 | 0.00 |
+  | **g** | 0.75 | 0.75 |
+
 ![Table 1, chi2, xy](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_chi2_xy.png)
 
 ![Table 1, chi2, yx](https://raw.githubusercontent.com/tresoldi/catcoocc/master/docs/zychlinski_chi2_yx.png)
