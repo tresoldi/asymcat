@@ -42,7 +42,7 @@ between `y` and `x`.
 While symmetric measures are the natural measure for numeric variables,
 the analyses arising from many studies and applications for categorical
 variables can in most cases benefit from asymmetric measures, as
-the fraction of variability in `x` that is explainable by variations in `y` 
+the fraction of variability in `x` that is explainable by variations in `y`
 (Pearson, 2016). Such property can be easily demonstrated by modifying the
 example given by (Zychlinski, 2018) while introducing his `dython`
 library
@@ -161,15 +161,15 @@ tresoldi = scorer.tresoldi()
 
 headers = [
     'pair',
-    'mle_xy',          'mle_yx', 
-    'pmi_xy',          'pmi_yx', 
-    'npmi_xy',         'npmi_yx', 
-    'chi2_xy',         'chi2_yx', 
-    'chi2ns_xy',       'chi2ns_yx', 
-    'cremersv_xy',     'cremersv_yx', 
-    'cremersvns_xy',   'cremersvns_yx', 
-    'fisher_xy',       'fisher_yx', 
-    'theilu_xy',       'theilu_yx', 
+    'mle_xy',          'mle_yx',
+    'pmi_xy',          'pmi_yx',
+    'npmi_xy',         'npmi_yx',
+    'chi2_xy',         'chi2_yx',
+    'chi2ns_xy',       'chi2ns_yx',
+    'cremersv_xy',     'cremersv_yx',
+    'cremersvns_xy',   'cremersvns_yx',
+    'fisher_xy',       'fisher_yx',
+    'theilu_xy',       'theilu_yx',
     'cond_entropy_xy', 'cond_entropy_yx',
     'tresoldi_xy',     'tresoldi_yx'
 ]
@@ -192,7 +192,7 @@ for pair in sorted(scorer.obs):
     ]
     table.append(buf)
 
-    
+
 print(tabulate.tabulate(table, headers=headers, tablefmt='markdown'))
 ```
 
@@ -209,7 +209,13 @@ Which will output:
 | ('poisonous', 'flat')   |   0      |   0      |  -1.9459 |  -1.9459 |   -0.3248 |   -0.3248 |    0.1041 |    0.1041 |      0.5668 |      0.5668 |        0      |        0      |          0      |          0      |           0 |           0 |      1      |      1      |            0      |            0      |       -1.9459 |       -1.9459 |
 | ('poisonous', 'sunken') |   0      |   0      |  -1.9459 |  -1.9459 |   -0.3248 |   -0.3248 |    0.1041 |    0.1041 |      0.5668 |      0.5668 |        0      |        0      |          0      |          0      |           0 |           0 |      1      |      1      |            0      |            0      |       -1.9459 |       -1.9459 |
 
-## Related Projects
+## Changelog
+
+Version 0.2.1:
+
+  - Added basic functions for double series correlation
+
+## Similar Projects
 
 https://github.com/pafoster/pyitlib
 
