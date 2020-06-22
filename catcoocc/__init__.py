@@ -8,6 +8,7 @@ __email__ = "tresoldi@shh.mpg.de"
 # Build the namespace
 from catcoocc.utils import *
 from catcoocc import scorer
+from catcoocc import correlation
 
 # Resource dir (mostly for tests)
 from pathlib import Path
