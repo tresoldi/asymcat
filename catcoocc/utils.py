@@ -99,10 +99,7 @@ def collect_cooccs(seqs, order=None, pad="#"):
 
         # Collect the ngrams for each sequence in each pair
         ngram_seqs = [
-            [
-                collect_ngrams(seq_a, order, pad),
-                collect_ngrams(seq_b, order, pad),
-            ]
+            [collect_ngrams(seq_a, order, pad), collect_ngrams(seq_b, order, pad)]
             for seq_a, seq_b in seqs
         ]
 
@@ -293,11 +290,7 @@ def read_sequences(filename, cols=None, col_delim="\t", elem_delim=" "):
         else:
             reader = csv.DictReader(handler, delimiter=col_delim)
             data = [
-                [
-                    row[col_name].split(elem_delim)
-                    for col_name in cols
-                    if row[col_name]
-                ]
+                [row[col_name].split(elem_delim) for col_name in cols if row[col_name]]
                 for row in reader
             ]
 
