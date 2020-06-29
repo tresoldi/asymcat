@@ -205,6 +205,7 @@ def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
 
     return scaled_scorer
 
+
 def invert_scorer(scorer):
     """
     Inverts a scorer, so that the higher the affinity, the higher the score.
@@ -217,9 +218,8 @@ def invert_scorer(scorer):
     max_score = max(scores)
 
     inverted_scorer = {
-        coocc : tuple([max_score-value for value in values])
+        coocc: tuple([max_score - value for value in values])
         for coocc, values in scorer.items()
-
     }
 
     return inverted_scorer
