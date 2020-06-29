@@ -211,6 +211,9 @@ Which will output:
 
 ## Changelog
 
+Version 0.2.2:
+  - Added function for inverting a scorer
+
 Version 0.2.1:
 
   - Added basic functions for double series correlation
