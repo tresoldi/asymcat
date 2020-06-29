@@ -58,9 +58,7 @@ class TestCoocc(unittest.TestCase):
 
         # Collect lengths
         cooccs_A = [coocc for coocc in cooccs if coocc[0] == "A"]
-        cooccs_Ll = [
-            coocc for coocc in cooccs if coocc[0] == "L" and coocc[1] == "l"
-        ]
+        cooccs_Ll = [coocc for coocc in cooccs if coocc[0] == "L" and coocc[1] == "l"]
 
         # Assert length as proxy for right collection
         assert len(cooccs) == 879
@@ -215,9 +213,7 @@ class TestCoocc(unittest.TestCase):
         assert "s" in alpha_y and "A" not in alpha_y
 
         # Scale the scorer
-        scaled_minmax = catcoocc.scorer.scale_scorer(
-            score_dict, method="minmax"
-        )
+        scaled_minmax = catcoocc.scorer.scale_scorer(score_dict, method="minmax")
         assert np.allclose(
             scaled_minmax["H", "i"],
             (0.15476857281060225, 0.15476857281060225),
