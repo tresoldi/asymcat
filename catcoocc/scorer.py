@@ -205,6 +205,25 @@ def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
 
     return scaled_scorer
 
+def invert_scorer(scorer):
+    """
+    Inverts a scorer, so that the higher the affinity, the higher the score.
+
+    It is recommended than only scorers in range [0..] are inverted.
+    """
+
+    # Collect the highest overall value
+    scores = list(chain.from_iterable(scorer.values()))
+    max_score = max(scores)
+
+    inverted_scorer = {
+        coocc : tuple([max_score-value for value in values])
+        for coocc, values in scorer.items()
+
+    }
+
+    return inverted_scorer
+
 
 def scorer2matrices(scorer):
     """

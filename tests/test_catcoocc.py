@@ -239,6 +239,15 @@ class TestCoocc(unittest.TestCase):
             atol=1e-08,
         )
 
+        # invert the scorer
+        inverted = catcoocc.scorer.invert_scorer(scaled_minmax)
+        assert np.allclose(
+            inverted["H", "i"],
+            (0.8452314271893977, 0.8452314271893977),
+            rtol=1e-05,
+            atol=1e-08,
+        )
+
     def test_readers(self):
         # Read a sequences file
         cmu_file = catcoocc.RESOURCE_DIR / "cmudict.tsv"
