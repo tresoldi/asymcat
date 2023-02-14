@@ -1,14 +1,13 @@
-# catcoocc
+# ASymCat
 
 [![Build Status](https://travis-ci.org/tresoldi/catcoocc.svg?branch=master)](https://travis-ci.org/tresoldi/catcoocc)
 [![codecov](https://codecov.io/gh/tresoldi/catcoocc/branch/master/graph/badge.svg)](https://codecov.io/gh/tresoldi/catcoocc)
 [![Codacy
 Badge](https://api.codacy.com/project/badge/Grade/0f820951c6374be29717a02471a3fd45)](https://www.codacy.com/manual/tresoldi/catcoocc?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tresoldi/catcoocc&amp;utm_campaign=Badge_Grade)
 
-The `catcoocc` library is designed for the study of co-occurrence association
+The `asymcat` library is designed for the study of co-occurrence association
 between categorical variables by implementing a number of symmetric and
-asymmetric measures of association.
-Given a series of
+asymmetric measures of association. When given a series of
 co-occurrence observations, starting from data such as records,
 alignments, and matrices of presence-absence, it allows to compute
 dictionaries with the association score between categories, offering
@@ -16,8 +15,7 @@ methods focused on strength of association, direction of association, or
 both. It is primarily developed for linguistic research, but can be
 applied to any kind of data exploration and description based on
 categorical data; besides the main methods for numeric computation of
-measures of
-association, it includes auxiliary ones for dealing with relational data,
+measures of association, it includes auxiliary ones for dealing with relational data,
 n-grams from sequences, alignments, and binary matrices of
 presence/absence.
 
@@ -30,7 +28,7 @@ determine the strength and relationship of such associations, the most
 common being measures of *correlation* which, in a sense stricter than
 *association*, refers to linear correlation. Among the most common measures,
 are Pearson's **rho** coefficient of product-moment correlation for
-continuous values, Spearman **rho** coefficient for measuring the strenght
+continuous values, Spearman **rho** coefficient for measuring the strength
 of monotonic ordinal or ranked variables, and Chi-square measure for
 association between categorical values. Each measure is usually indicated
 to investigate either strength (such as Pearson's **rho**) or significance
@@ -130,7 +128,7 @@ following heatmaps:
 The library can be installed as any standard Python library with `pip`:
 
 ```bash
-pip install catcoocc
+pip install asymcat
 ```
 
 Detailed instructions on how to use the library can be found in
@@ -140,12 +138,12 @@ A show-case example with a subset of the `mushroom` dataset is shown here:
 
 ```python
 import tabulate
-import catcoocc
+from src import asymcat
 from catcoocc.scorer import CatScorer
 
-mushroom_data = catcoocc.read_sequences("resources/mushroom-small.tsv")
-mushroom_cooccs = catcoocc.collect_cooccs(mushroom_data)
-scorer = catcoocc.scorer.CatScorer(mushroom_cooccs)
+mushroom_data = asymcat.read_sequences("resources/mushroom-small.tsv")
+mushroom_cooccs = asymcat.collect_cooccs(mushroom_data)
+scorer = asymcat.scorer.CatScorer(mushroom_cooccs)
 
 mle = scorer.mle()
 pmi = scorer.pmi()
@@ -160,38 +158,37 @@ cond_entropy = scorer.cond_entropy()
 tresoldi = scorer.tresoldi()
 
 headers = [
-    'pair',
-    'mle_xy',          'mle_yx',
-    'pmi_xy',          'pmi_yx',
-    'npmi_xy',         'npmi_yx',
-    'chi2_xy',         'chi2_yx',
-    'chi2ns_xy',       'chi2ns_yx',
-    'cremersv_xy',     'cremersv_yx',
-    'cremersvns_xy',   'cremersvns_yx',
-    'fisher_xy',       'fisher_yx',
-    'theilu_xy',       'theilu_yx',
-    'cond_entropy_xy', 'cond_entropy_yx',
-    'tresoldi_xy',     'tresoldi_yx'
+  'pair',
+  'mle_xy', 'mle_yx',
+  'pmi_xy', 'pmi_yx',
+  'npmi_xy', 'npmi_yx',
+  'chi2_xy', 'chi2_yx',
+  'chi2ns_xy', 'chi2ns_yx',
+  'cremersv_xy', 'cremersv_yx',
+  'cremersvns_xy', 'cremersvns_yx',
+  'fisher_xy', 'fisher_yx',
+  'theilu_xy', 'theilu_yx',
+  'cond_entropy_xy', 'cond_entropy_yx',
+  'tresoldi_xy', 'tresoldi_yx'
 ]
 
 table = []
 for pair in sorted(scorer.obs):
-    buf = [
-        pair,
-        "%0.4f" % mle[pair][0],          "%0.4f" % mle[pair][1],
-        "%0.4f" % pmi[pair][0],          "%0.4f" % pmi[pair][1],
-        "%0.4f" % npmi[pair][0],         "%0.4f" % npmi[pair][1],
-        "%0.4f" % chi2[pair][0],         "%0.4f" % chi2[pair][1],
-        "%0.4f" % chi2_ns[pair][0],      "%0.4f" % chi2_ns[pair][1],
-        "%0.4f" % cramersv[pair][0],     "%0.4f" % cramersv[pair][1],
-        "%0.4f" % cramersv_ns[pair][0],  "%0.4f" % cramersv_ns[pair][1],
-        "%0.4f" % fisher[pair][0],       "%0.4f" % fisher[pair][1],
-        "%0.4f" % theil_u[pair][0],      "%0.4f" % theil_u[pair][1],
-        "%0.4f" % cond_entropy[pair][0], "%0.4f" % cond_entropy[pair][1],
-        "%0.4f" % tresoldi[pair][0],     "%0.4f" % tresoldi[pair][1],
-    ]
-    table.append(buf)
-
+  buf = [
+    pair,
+    "%0.4f" % mle[pair][0], "%0.4f" % mle[pair][1],
+    "%0.4f" % pmi[pair][0], "%0.4f" % pmi[pair][1],
+    "%0.4f" % npmi[pair][0], "%0.4f" % npmi[pair][1],
+    "%0.4f" % chi2[pair][0], "%0.4f" % chi2[pair][1],
+    "%0.4f" % chi2_ns[pair][0], "%0.4f" % chi2_ns[pair][1],
+    "%0.4f" % cramersv[pair][0], "%0.4f" % cramersv[pair][1],
+    "%0.4f" % cramersv_ns[pair][0], "%0.4f" % cramersv_ns[pair][1],
+    "%0.4f" % fisher[pair][0], "%0.4f" % fisher[pair][1],
+    "%0.4f" % theil_u[pair][0], "%0.4f" % theil_u[pair][1],
+    "%0.4f" % cond_entropy[pair][0], "%0.4f" % cond_entropy[pair][1],
+    "%0.4f" % tresoldi[pair][0], "%0.4f" % tresoldi[pair][1],
+  ]
+  table.append(buf)
 
 print(tabulate.tabulate(table, headers=headers, tablefmt='markdown'))
 ```
@@ -210,6 +207,10 @@ Which will output:
 | ('poisonous', 'sunken') |   0      |   0      |  -1.9459 |  -1.9459 |   -0.3248 |   -0.3248 |    0.1041 |    0.1041 |      0.5668 |      0.5668 |        0      |        0      |          0      |          0      |           0 |           0 |      1      |      1      |            0      |            0      |       -1.9459 |       -1.9459 |
 
 ## Changelog
+
+Version 0.3:
+  - Renamed from `catcoocc` to `asymcat`, to better reflect the
+    functionality of the library
 
 Version 0.2.2:
   - Added function for inverting a scorer
@@ -236,28 +237,32 @@ pull requests, to contribute, report problems, or seek support.
 
 ## Author and citation
 
-The library is developed by Tiago Tresoldi (tresoldi@shh.mpg.de).
 
-The author has received funding from the European Research Council (ERC)
-under the European Union’s Horizon 2020 research and innovation
-programme (grant agreement
+The library is developed by Tiago Tresoldi (tiago.tresoldi@lingfil.uu.se). The library is developed in the context of
+the [Cultural Evolution of Texts](https://github.com/evotext/) project, with funding from the
+[Riksbankens Jubileumsfond](https://www.rj.se/) (grant agreement ID:
+[MXM19-1087:1](https://www.rj.se/en/anslag/2019/cultural-evolution-of-texts/)).
+
+During the first stages of development, the author received funding from the
+[European Research Council](https://erc.europa.eu/) (ERC) under the European Union’s Horizon 2020
+research and innovation programme (grant agreement
 No. [ERC Grant #715618](https://cordis.europa.eu/project/rcn/206320/factsheet/en),
-[Computer-Assisted Language Comparison](https://digling.org/calc/).
+[Computer-Assisted Language Comparison](https://digling.org/calc/)).
 
-If you use `catcoocc`, please cite it as:
+If you use `asymcat`, please cite it as:
 
-> Tresoldi, Tiago (2020). `catcoocc`, a library for symmetric and asymmetric
-analysis of categorical co-occurrences. Version 0.1. Jena. Available at:
-> <https://github.com/tresoldi/catcoocc>
+> Tresoldi, Tiago (2023). `asymcat`, a library for symmetric and asymmetric
+analysis of categorical co-occurrences. Version 0.3. Uppsala. Available at:
+> <https://github.com/tresoldi/asymcat>
 
 In BibTeX:
 
 ```bibtex
-@misc{Tresoldi2020catcoocc,
+@misc{Tresoldi2023asymcat,
   author = {Tresoldi, Tiago},
-  title = {catcoocc, a library for symmetric and asymmetric analysis of categorical co-occurrences. Version 0.1.},
-  howpublished = {\url{https://github.com/tresoldi/catcoocc}},
-  address = {Jena},
-  year = {2020},
+  title = {asymcat, a library for symmetric and asymmetric analysis of categorical co-occurrences. Version 0.3.},
+  howpublished = {\url{https://github.com/tresoldi/asymcat}},
+  address = {Uppsala},
+  year = {2023},
 }
 ```

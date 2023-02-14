@@ -2,7 +2,7 @@ import catcoocc
 
 
 def main():
-    print("catcoocc entry point")
+    print("asymcat entry point")
 
 
 if __name__ == "__main__":
