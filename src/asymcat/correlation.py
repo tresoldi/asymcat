@@ -14,7 +14,7 @@ from collections import Counter
 import numpy as np
 
 # Import local modules
-from . import utils
+from . import common
 from . import scorer
 
 
