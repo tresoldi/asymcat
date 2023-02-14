@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 """
-Utility functions for the `catcoocc` library.
+Utility functions for the `asymcat` library.
 
 The module mostly includes functions for input/output, as well as
 pre-computations from raw data.
@@ -273,7 +273,7 @@ def read_sequences(filename, cols=None, col_delim="\t", elem_delim=" "):
     # the header (thus assuming that there are only two columns); the logic
     # is different
     data = []
-    with open(filename) as handler:
+    with open(filename, encoding="utf-8") as handler:
         if not cols:
             skip_header = True
             for line in handler.readlines():

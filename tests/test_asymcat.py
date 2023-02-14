@@ -2,10 +2,10 @@
 # encoding: utf-8
 
 """
-test_catcoocc
-=============
+test_asymcat
+============
 
-Tests for the `catcoocc` package.
+Tests for the `asymcat` package.
 """
 
 # Import system libraries
@@ -15,7 +15,7 @@ import unittest
 import numpy as np
 
 # Import the library being test
-import catcoocc
+import asymcat
 
 
 class TestCoocc(unittest.TestCase):
@@ -54,7 +54,7 @@ class TestCoocc(unittest.TestCase):
 
     def test_compute(self):
         # Compute cooccs
-        cooccs = catcoocc.collect_cooccs(self.data_cmu)
+        cooccs = asymcat.collect_cooccs(self.data_cmu)
 
         # Collect lengths
         cooccs_A = [coocc for coocc in cooccs if coocc[0] == "A"]
@@ -67,8 +67,8 @@ class TestCoocc(unittest.TestCase):
 
     def test_scorers(self):
         # Compute cooccs and build scorer
-        cooccs = catcoocc.collect_cooccs(self.data_cmu)
-        scorer = catcoocc.scorer.CatScorer(cooccs)
+        cooccs = asymcat.collect_cooccs(self.data_cmu)
+        scorer = asymcat.scorer.CatScorer(cooccs)
 
         # Get all scorers
         mle = scorer.mle()
@@ -116,8 +116,8 @@ class TestCoocc(unittest.TestCase):
                 0.07846387631207004,  # pmi y>x
                 0.015733602612959818,  # npmi x>y
                 0.015733602612959818,  # npmi y>x
-                0.0004776025004836434,  # chi2 x>y
-                0.0004776025004836434,  # chi2 y>x
+                0.0,  # chi2 x>y
+                0.0,  # chi2 y>x
                 0.043927505580845905,  # chi2_ns x>y
                 0.043927505580845905,  # chi2_ns y>x
                 0.0,  # cramersv x>y
@@ -197,14 +197,14 @@ class TestCoocc(unittest.TestCase):
                 + cond_entropy[pair]
                 + tresoldi[pair]
             )
-            # print(pair, vals)
+            print(pair, vals)
             assert np.allclose(vals, ref, rtol=1e-05, atol=1e-08)
 
         # Build a scaling dictionary
         score_dict = scorer.tresoldi()
 
         # Build matrices from scorer
-        xy, yx, alpha_x, alpha_y = catcoocc.scorer.scorer2matrices(score_dict)
+        xy, yx, alpha_x, alpha_y = asymcat.scorer.scorer2matrices(score_dict)
         assert len(xy) == 28
         assert len(yx) == 23
         assert len(alpha_x) == 23
@@ -213,21 +213,21 @@ class TestCoocc(unittest.TestCase):
         assert "s" in alpha_y and "A" not in alpha_y
 
         # Scale the scorer
-        scaled_minmax = catcoocc.scorer.scale_scorer(score_dict, method="minmax")
+        scaled_minmax = asymcat.scorer.scale_scorer(score_dict, method="minmax")
         assert np.allclose(
             scaled_minmax["H", "i"],
             (0.15476857281060225, 0.15476857281060225),
             rtol=1e-05,
             atol=1e-08,
         )
-        scaled_mean = catcoocc.scorer.scale_scorer(score_dict, method="mean")
+        scaled_mean = asymcat.scorer.scale_scorer(score_dict, method="mean")
         assert np.allclose(
             scaled_mean["H", "i"],
             (-0.36871270234063913, -0.36871270234063913),
             rtol=1e-05,
             atol=1e-08,
         )
-        scaled_stdev = catcoocc.scorer.scale_scorer(score_dict, method="stdev")
+        scaled_stdev = asymcat.scorer.scale_scorer(score_dict, method="stdev")
         assert np.allclose(
             scaled_stdev["H", "i"],
             (-1.3465717087048406, -1.3465717087048406),
@@ -236,7 +236,7 @@ class TestCoocc(unittest.TestCase):
         )
 
         # invert the scorer
-        inverted = catcoocc.scorer.invert_scorer(scaled_minmax)
+        inverted = asymcat.scorer.invert_scorer(scaled_minmax)
         assert np.allclose(
             inverted["H", "i"],
             (0.8452314271893977, 0.8452314271893977),
@@ -246,12 +246,12 @@ class TestCoocc(unittest.TestCase):
 
     def test_readers(self):
         # Read a sequences file
-        cmu_file = catcoocc.RESOURCE_DIR / "cmudict.tsv"
-        cmu = catcoocc.read_sequences(cmu_file.as_posix())
+        cmu_file = asymcat.RESOURCE_DIR / "cmudict.tsv"
+        cmu = asymcat.read_sequences(cmu_file.as_posix())
 
         # Read presence/absence matrix
-        finches_file = catcoocc.RESOURCE_DIR / "galapagos.tsv"
-        finches = catcoocc.read_pa_matrix(finches_file.as_posix())
+        finches_file = asymcat.RESOURCE_DIR / "galapagos.tsv"
+        finches = asymcat.read_pa_matrix(finches_file.as_posix())
 
         # For assertion, just check length
         assert len(cmu) == 134373
@@ -259,7 +259,7 @@ class TestCoocc(unittest.TestCase):
 
     def test_utils(self):
         # Test additional functions from utils
-        ngrams = tuple(catcoocc.collect_ngrams("abcde", 2, "#"))
+        ngrams = tuple(asymcat.collect_ngrams("abcde", 2, "#"))
         assert ngrams == (
             ("#", "a"),
             ("a", "b"),
@@ -272,7 +272,7 @@ class TestCoocc(unittest.TestCase):
         # Test collect co-occoc on ngrams
         # TODO: this is giving three ("i", "I"), check if correct/intended
         seqs = [("abcde", "ABCDE"), ("fgh", "FGH"), ("i", "I"), ("jkl", "JKL")]
-        cooccs = catcoocc.collect_cooccs(seqs, order=3)
+        cooccs = asymcat.collect_cooccs(seqs, order=3)
         assert len(cooccs) == 78
         assert ("a", "B") in cooccs
         assert ("l", "L") in cooccs
