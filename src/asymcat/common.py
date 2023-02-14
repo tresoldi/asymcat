@@ -11,30 +11,36 @@ pre-computations from raw data.
 # TODO: add function for reading mushroom and pokemon data
 
 # Import Python standard libraries
-import csv
 from collections import Counter
 from itertools import chain, combinations, product
+from typing import *
+import csv
 
 # Import 3rd party libraries
 import numpy as np
 
-
-def collect_alphabets(cooccs):
+def collect_alphabets(cooccs: list) -> tuple:
     """
     Return the `x` and `y` alphabets from a list of co-occurrences.
 
-    :param list cooccs: The list of co-occurrence tuples.
+    Parameters
+    ----------
+    cooccs : list
+        The list of co-occurrence tuples.
 
-    :return tuple alphabets: A tuple of two elements, the sorted list of
-        symbols in series `x` and the sorted list of symbols in series `y`.
+    Returns
+    -------
+    alphabets : tuple
+        A tuple of two elements, the sorted list of symbols in series `x` and
+        the sorted list of symbols in series `y`.
     """
 
     alphabet_x, alphabet_y = zip(*cooccs)
 
     return sorted(set(alphabet_x)), sorted(set(alphabet_y))
 
-
-def collect_ngrams(seq, order, pad):
+# TODO: Use lpngrams?
+def collect_ngrams(seq:list , order:int, pad:str)-> tuple:
     """
     Function for yielding the ngrams of a sequence.
 
@@ -42,11 +48,19 @@ def collect_ngrams(seq, order, pad):
     repeated the same number of times that other symbols. This operation also
     guarantees that sequences shorter than the order will be collected.
 
-    :param list seq: The list of elements for ngram collection.
-    :param int order: The ngram order.
-    :param string pad: The padding symbol.
+    Parameters
+    ----------
+    seq : list
+        The list of elements for ngram collection.
+    order : int
+        The ngram order.
+    pad : string
+        The padding symbol.
 
-    :yield: The ngrams of the sequence.
+    Yields
+    ------
+    ngram : tuple
+        The ngrams of the sequence.
     """
 
     seq = tuple(chain((pad,) * (order - 1), seq, (pad,) * (order - 1)))
@@ -55,7 +69,8 @@ def collect_ngrams(seq, order, pad):
         yield ngram
 
 
-def collect_cooccs(seqs, order=None, pad="#"):
+#TODO: should yield?
+def collect_cooccs(seqs:list, order:Optional[int]=None, pad:str="#")->list:
     """
     Collects tuples of co-occurring elements in pairs of sequences.
 
@@ -72,17 +87,25 @@ def collect_cooccs(seqs, order=None, pad="#"):
     to set an appropriate, non-conflicting pad symbol in case the default
     is used in the data.
 
-    :param list seqs: A list of lists of sequence pairs.
-    :param number order: The order of the ngrams to be collected, with `None`
-        indicating the collection of the entire sequences (default: None).
-    :param string pad: The symbol for internal padding, which must not
-        conflict with symbols in the sequences (default: "#").
+    Parameters
+    ----------
+    seqs : list
+        A list of lists of sequence pairs.
+    order : int, optional
+        The order of the ngrams to be collected, with `None` indicating the
+        collection of the entire sequences (default: None).
+    pad : string, optional
+        The symbol for internal padding, which must not conflict with symbols
+        in the sequences (default: "#").
 
-    :return list: A list of tuples of co-occurring elements.
+    Returns
+    -------
+    coocc : list
+        A list of tuples of co-occurring elements.
     """
 
     # If an ngram order is specified, instead of looking for co-occurrences
-    # across the full lenght of the sequences of a pair we need to take
+    # across the full length of the sequences of a pair we need to take
     # overlapping ngrams in those (which must be aligned or, at least,
     # have the same length), creating a new set of sequences to get the
     # cooccurrences which is actually a set of ngram subsequences
@@ -123,7 +146,7 @@ def collect_cooccs(seqs, order=None, pad="#"):
     return coocc
 
 
-def collect_observations(cooccs):
+def collect_observations(cooccs: list) -> dict:
     """
     Build a dictionary of observations for all possible correspondences.
 
@@ -152,9 +175,15 @@ def collect_observations(cooccs):
         | pair[0]==x | obs["10"] | obs["11"]  | obs["12"]  |
         | pair[0]!=x | obs["20"] | obs["21"]  | obs["22"]  |
 
-    :param list cooccs: A list of co-occurrence tuples.
+    Parameters
+    ----------
+    cooccs : list
+        A list of tuples of co-occurring elements.
 
-    :return dict obs: A dictionary of observations per co-occurrence type.
+    Returns
+    -------
+    obs : dict
+        A dictionary of observations per co-occurrence type.
     """
 
     # Collect observation counts; while this could be done in linear fashion,
@@ -205,8 +234,8 @@ def collect_observations(cooccs):
 
     return obs
 
-
-def build_ct(observ, square):
+# TODO: does it need to be np.array?
+def build_ct(observ, square: bool = True)-> np.array:
     """
     Build a contingency table from a dictionary of observations.
 
@@ -214,10 +243,18 @@ def build_ct(observ, square):
     contingency tables include co-occurrences where neither the `x` or `y`
     under investigation occur.
 
-    :param dict observ: A dictionary of observations, as provided by
-        utils.collect_observations()
-    :param bool square: Whether to return a square (2x2) or non-square (3x2)
-            contingency table.
+    Parameters
+    ----------
+    observ : dict
+        A dictionary of observations, as provided by
+        common.collect_observations().
+    square : bool, optional
+        Whether to return a square (2x2) or non-square (3x2) contingency table.
+        
+    Returns
+    -------
+    cont_table : np.array
+        A contingency table as a numpy array.
     """
 
     # Build the contingency tables as np.arrays(), as they will necessary
@@ -238,7 +275,7 @@ def build_ct(observ, square):
     return cont_table
 
 
-def read_sequences(filename, cols=None, col_delim="\t", elem_delim=" "):
+def read_sequences(filename:str, cols:Optional[List[str]]=None, col_delim:str="\t", elem_delim:str=" "):
     """
     Reads parallel sequences, returning them as a list of lists.
 
@@ -263,10 +300,21 @@ def read_sequences(filename, cols=None, col_delim="\t", elem_delim=" "):
     comparison; if no column names are provided, as per default,
     the reading will skip the first row (assumed to be header).
 
-    :param str filename: Path to the file to be read.
-    :param cols list: List of column names to be collected (default: None)
-    :param str col_delim: String used as field delimiter (default: `"\t"`).
-    :param str elem_delim: String used as element delimiter (default: `" "`).
+    Parameters
+    ----------
+    filename : str
+        Path to the file to be read.
+    cols : list, optional
+        List of column names to be collected (default: None)
+    col_delim : str, optional
+        String used as field delimiter (default: `"\t"`).
+    elem_delim : str, optional
+        String used as element delimiter (default: `" "`).
+
+    Returns
+    -------
+    data : list
+        A list of lists, where each list contains the data from a row.
     """
 
     # Column names must always be specified, otherwise we will skip over
@@ -303,14 +351,24 @@ def read_sequences(filename, cols=None, col_delim="\t", elem_delim=" "):
 
 
 # TODO: assuming one taxon per col and locations per row, allow to switch
-def read_pa_matrix(filename, delimiter="\t"):
+def read_pa_matrix(filename:str, delimiter:str="\t")-> Dict[str, List[str]]:
     """
     Reads a presence-absence matrix, returning as equivalent sequences.
 
     The location must be specified under column name `ID`.
 
-    :param str filename: Path to the file to be read.
-    :param str delimiter: String used as field delimiter (default: `"\t"`).
+    Parameters
+    ----------
+    filename : str
+        Path to the file to be read.
+    delimiter : str, optional
+        String used as field delimiter (default: `"\t"`).
+
+    Returns
+    -------
+    matrix : dict
+        A dictionary of lists, where each list contains the taxa observed
+        at a given location.
     """
 
     # We read the matrix and filter each row (location), keeping only

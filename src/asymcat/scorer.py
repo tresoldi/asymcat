@@ -25,7 +25,7 @@ import numpy as np
 import scipy.stats as ss
 
 # import local modules
-from . import utils
+from . import common
 
 
 def conditional_entropy(x_symbols, y_symbols):
@@ -237,7 +237,7 @@ def scorer2matrices(scorer):
     :return list alphabet_y: The alphabet for matrix `y`.
     """
 
-    alphabet_x, alphabet_y = utils.collect_alphabets(scorer)
+    alphabet_x, alphabet_y = common.collect_alphabets(scorer)
 
     xy = np.array(
         [np.array([scorer[(x, y)][0] for x in alphabet_x]) for y in alphabet_y]
@@ -261,10 +261,10 @@ class CatScorer:
 
         # Store co-occs, observations, symbols and alphabets
         self.cooccs = cooccs
-        self.obs = utils.collect_observations(cooccs)
+        self.obs = common.collect_observations(cooccs)
 
         # Obtain the alphabets from the co-occurrence pairs
-        self.alphabet_x, self.alphabet_y = utils.collect_alphabets(self.cooccs)
+        self.alphabet_x, self.alphabet_y = common.collect_alphabets(self.cooccs)
 
         # Initialize the square and non-square contingency table as None
         self._square_ct = None
@@ -293,12 +293,12 @@ class CatScorer:
 
         if square and not self._square_ct:
             self._square_ct = {
-                pair: utils.build_ct(self.obs[pair], True) for pair in self.obs
+                pair: common.build_ct(self.obs[pair], True) for pair in self.obs
             }
 
         if not square and not self._nonsquare_ct:
             self._nonsquare_ct = {
-                pair: utils.build_ct(self.obs[pair], False) for pair in self.obs
+                pair: common.build_ct(self.obs[pair], False) for pair in self.obs
             }
 
     def mle(self):
