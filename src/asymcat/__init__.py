@@ -1,4 +1,4 @@
-# __init__.py
+# __init__.py for the ASymCat library
 
 """
 ASymCat: a library for symmetric and asymmetric analysis of categorical co-occurrences
@@ -13,11 +13,12 @@ __email__ = "tiago.tresoldi@lingfil.uu.se"
 __version__ = "0.3"  # sync with setup.py
 
 # Build the namespace
+from asymcat import correlation, scorer
 from asymcat.common import *
-from asymcat import scorer
-from asymcat import correlation
 
 # Resource dir (mostly for tests)
 # TODO: can this be dropped, at least from the namespace?
 from pathlib import Path
 RESOURCE_DIR = Path(__file__).parent.parent.parent / "resources"
+
+# TODO: build the __all__ for exporting
