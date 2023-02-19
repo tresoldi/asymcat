@@ -4,4 +4,4 @@ Credits
 Development
 -----------
 
-* Tiago Tresoldi <tresoldi@shh.mpg.de>
+* Tiago Tresoldi <tiago.tresoldi@lingfil.uu.se>

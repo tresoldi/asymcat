@@ -15,27 +15,36 @@ Defines the various scorers for categorical co-occurrence analysis.
 # TODO: include a logarithmic scaler (instead of percentile one)
 # TODO: allow to combine scalers? log within range?
 
+import math
+
 # Import Python standard libraries
 from collections import Counter
 from itertools import chain, product
-import math
+from typing import List, Optional
 
 # Import 3rd party libraries
 import numpy as np
-import scipy.stats as ss
+import scipy.stats as ss  # type: ignore
 
 # import local modules
-from . import utils
+from . import common
 
 
-def conditional_entropy(x_symbols, y_symbols):
+def conditional_entropy(x_symbols: list, y_symbols: list) -> float:
     """
     Computes the entropy of `x` given `y`.
 
-    :param list x_symbols: A list of all observed `x` symbols.
-    :param list y_symbols: A list of all observed `y` symbols.
+    Parameters
+    ----------
+    x_symbols : list
+        A list of all observed `x` symbols.
+    y_symbols : list
+        A list of all observed `y` symbols.
 
-    :return float entropy: The conditional entropy of `x` given `y`.
+    Returns
+    -------
+    float
+        The conditional entropy of `x` given `y`.
     """
 
     # Cache counters; while the xy_counter is already computed in other
@@ -46,7 +55,7 @@ def conditional_entropy(x_symbols, y_symbols):
     population = sum(y_counter.values())
 
     # Compute the entropy and return
-    entropy = 0
+    entropy = 0.0
     for xy_pair, xy_count in xy_counter.items():
         p_xy = xy_count / population
         p_y = y_counter[xy_pair[1]] / population
@@ -55,18 +64,25 @@ def conditional_entropy(x_symbols, y_symbols):
     return entropy
 
 
-def compute_cramers_v(cont_table):
+def compute_cramers_v(cont_table: List[List[float]]) -> float:
     """
     Compute Cramer's V from a contingency table.
 
-    :param np.array cont_table: The contingency table for computation.
+    Parameters
+    ----------
+    cont_table : np.array
+        The contingency table for computation.
 
-    :return float v: The Cramér's V measure for the given contingency table.
+    Returns
+    -------
+    float
+        The Cramér's V measure for the given contingency table.
     """
 
     # Cache the shape and sum of the contingency table
-    rows, cols = cont_table.shape
-    population = cont_table.sum()
+    rows = len(cont_table)
+    cols = len(cont_table[0])
+    population = sum([sum(r) for r in cont_table])
 
     # Compute chi2 and phi2
     chi2 = ss.chi2_contingency(cont_table)[0]
@@ -81,19 +97,29 @@ def compute_cramers_v(cont_table):
     return np.sqrt(phi2corr / min((kcorr - 1), (rcorr - 1)))
 
 
-def compute_pmi(p_x, p_y, p_xy, normalized, limit=1e-6):
+def compute_pmi(p_x: float, p_y: float, p_xy: float, normalized: bool, limit: float = 1e-6) -> float:
     """
     Compute the Pointwise Mutual Information.
 
-    :param float p_x: The probability of `x`, p(x).
-    :param float p_y: The probability of `y`, p(y).
-    :param float p_xy: The probability of `xy`, p(xy).
-    :param bool normalized: Whether to return the normalized Pointwise
-        Mutual Information in range [-1, 1].
-    :param float limit: The value to use for computation when `p_xy` is 0.0
-        (i.e., non observed), as the limit of PMI to zero (default: 1e-6).
+    Parameters
+    ----------
+    p_x : float
+        The probability of `x`, p(x).
+    p_y : float
+        The probability of `y`, p(y).
+    p_xy : float
+        The probability of `xy`, p(xy).
+    normalized : bool
+        Whether to return the normalized Pointwise Mutual Information in
+        range [-1, 1].
+    limit : float, optional
+        The value to use for computation when `p_xy` is 0.0 (i.e., non
+        observed), as the limit of PMI to zero (default: 1e-6).
 
-    :return float pmi: The Pointwise Mutual Information.
+    Returns
+    -------
+    float
+        The Pointwise Mutual Information.
     """
 
     if p_xy == 0.0:
@@ -108,14 +134,21 @@ def compute_pmi(p_x, p_y, p_xy, normalized, limit=1e-6):
     return pmi
 
 
-def compute_theil_u(x_symbols, y_symbols):
+def compute_theil_u(x_symbols: list, y_symbols: list) -> float:
     """
     Compute the uncertainty coefficient Theil's U.
 
-    :param list x_symbols: The list of observed symbols in series `x`.
-    :param list y_symbols: The list of observed symbols in series `y`.
+    Parameters
+    ----------
+    x_symbols : list
+        The list of observed symbols in series `x`.
+    y_symbols : list
+        The list of observed symbols in series `y`.
 
-    :return float theil_u : The uncertainty coefficient given `x` and `y`.
+    Returns
+    -------
+    float
+        The uncertainty coefficient given `x` and `y`.
     """
 
     # Compute the conditional entropy of `x` given `y`
@@ -143,28 +176,36 @@ def compute_theil_u(x_symbols, y_symbols):
 # TODO: allow independent scaling over `x` and independent over `y` (currently doing all)
 # TODO: allow scaling withing percentile borders
 # TODO: see if we can vectorize numpy operations (now on dicts)
-def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
+def scale_scorer(scorer: dict, method: str = "minmax", nrange=(0, 1)) -> dict:
     """
     Scale a scorer.
 
     The function returns a scaled version of a scorer considering all
-    the assymmetric scorers (i.e., both `x` given `y` and `y` given `x`).
+    the asymmetric scorers (i.e., both `x` given `y` and `y` given `x`).
     Implemented scoring methods are "minmax" (by default on range [0, 1],
     which can be modified by the `nrange` parameter) and "mean".
 
-    :param dict scorer: A scoring dictionary.
-    :param str method: The scoring method to be used, either `"minmax"` or
-        `"mean"` or `"stdev"` (default: `"minmax"`).
-    :param tuple nrange: A tuple with the scaling range, to be used when
-        applicable (default: (0, 1)).
+    Parameters
+    ----------
+    scorer : dict
+        A scoring dictionary.
+    method : str, optional
+        The scoring method to be used, either `"minmax"` or `"mean"` or
+        `"stdev"` (default: `"minmax"`).
+    nrange : tuple, optional
+        A tuple with the scaling range, to be used when applicable
+        (default: (0, 1)).
 
-    :return dict scaled_scorer: A scaled version of the scorer.
+    Returns
+    -------
+    dict
+        A scaled version of the scorer.
     """
 
     # Extract scores as a list, combining `xy` and `yx`
     scores = list(chain.from_iterable(scorer.values()))
 
-    # normalizatoin is performed over xy and yx together
+    # normalization is performed over xy and yx together
     if method == "minmax":
         # Set normalization range
         range_low, range_high = nrange
@@ -189,86 +230,96 @@ def scale_scorer(scorer, method="minmax", nrange=(0, 1)):
         score_diff = max(scores) - min(scores)
 
         scaled_scorer = {
-            pair: ((value[0] - mean) / score_diff, (value[1] - mean) / score_diff)
-            for pair, value in scorer.items()
+            pair: ((value[0] - mean) / score_diff, (value[1] - mean) / score_diff) for pair, value in scorer.items()
         }
     elif method == "stdev":
         mean = np.mean(scores)
         stdev = np.std(scores)
 
-        scaled_scorer = {
-            pair: ((value[0] - mean) / stdev, (value[1] - mean) / stdev)
-            for pair, value in scorer.items()
-        }
+        scaled_scorer = {pair: ((value[0] - mean) / stdev, (value[1] - mean) / stdev) for pair, value in scorer.items()}
     else:
         raise ValueError("Unknown scaling method.")
 
     return scaled_scorer
 
 
-def invert_scorer(scorer):
+def invert_scorer(scorer: dict) -> dict:
     """
     Inverts a scorer, so that the higher the affinity, the higher the score.
 
     It is recommended than only scorers in range [0..] are inverted.
+
+    Parameters
+    ----------
+    scorer : dict
+        A scoring dictionary.
+
+    Returns
+    -------
+    dict
+        An inverted version of the scorer.
     """
 
     # Collect the highest overall value
     scores = list(chain.from_iterable(scorer.values()))
     max_score = max(scores)
 
-    inverted_scorer = {
-        coocc: tuple([max_score - value for value in values])
-        for coocc, values in scorer.items()
-    }
+    inverted_scorer = {coocc: tuple([max_score - value for value in values]) for coocc, values in scorer.items()}
 
     return inverted_scorer
 
 
-def scorer2matrices(scorer):
+def scorer2matrices(scorer: dict) -> tuple:
     """
     Return the asymmetric matrices implied by a scorer and their alphabets.
 
-    :param dict scorer: A scoring dictionary.
+    Parameters
+    ----------
+    scorer : dict
+        A scoring dictionary.
 
-    :return np.array xy: A scoring matrix of `y` given `x`.
-    :return np.array yx: A scoring matrix of `x` given `y`.
-    :return list alphabet_x: The alphabet for matrix `x`.
-    :return list alphabet_y: The alphabet for matrix `y`.
+    Returns
+    -------
+    tuple
+        A tuple with the following elements: a scoring matrix of `y` given `x`,
+        a scoring matrix of `x` given `y`, the alphabet for matrix `x`, and
+        the alphabet for matrix `y`.
     """
 
-    alphabet_x, alphabet_y = utils.collect_alphabets(scorer)
+    alphabet_x, alphabet_y = common.collect_alphabets(list(scorer))
 
-    xy = np.array(
-        [np.array([scorer[(x, y)][0] for x in alphabet_x]) for y in alphabet_y]
-    )
-    yx = np.array(
-        [np.array([scorer[(x, y)][1] for y in alphabet_y]) for x in alphabet_x]
-    )
+    xy = np.array([np.array([scorer[(x, y)][0] for x in alphabet_x]) for y in alphabet_y])
+    yx = np.array([np.array([scorer[(x, y)][1] for y in alphabet_y]) for x in alphabet_x])
 
     return xy, yx, alphabet_x, alphabet_y
 
 
 class CatScorer:
     """
-    Class for computing catagorical co-occurrence scores.
+    Class for computing categorical co-occurrence scores.
     """
 
-    def __init__(self, cooccs):
+    def __init__(self, cooccs: dict):
         """
         Initialization function.
+
+        Parameters
+        ----------
+        cooccs : dict
+            A dictionary with co-occurrence pairs as keys and their
+            co-occurrence counts as values.
         """
 
-        # Store co-occs, observations, symbols and alphabets
+        # Store cooccs, observations, symbols and alphabets
         self.cooccs = cooccs
-        self.obs = utils.collect_observations(cooccs)
+        self.obs = common.collect_observations(list(cooccs))
 
         # Obtain the alphabets from the co-occurrence pairs
-        self.alphabet_x, self.alphabet_y = utils.collect_alphabets(self.cooccs)
+        self.alphabet_x, self.alphabet_y = common.collect_alphabets(list(self.cooccs))
 
         # Initialize the square and non-square contingency table as None
-        self._square_ct = None
-        self._nonsquare_ct = None
+        self._square_ct: Optional[dict] = None
+        self._nonsquare_ct: Optional[dict] = None
 
         # Initialize the scorers as None, in a lazy fashion
         self._mle = None
@@ -283,23 +334,22 @@ class CatScorer:
         self._cond_entropy = None
         self._tresoldi = None
 
-    def _compute_contingency_table(self, square):
+    def _compute_contingency_table(self, square: bool):
         """
         Internal method for computing and caching contingency tables.
 
-        :param bool square: Whether to compute a square (2x2) or non-square
-            (3x2) contingency table.
+        Parameters
+        ----------
+        square : bool
+            Whether to compute a square (2x2) or non-square (3x2) contingency
+            table.
         """
 
         if square and not self._square_ct:
-            self._square_ct = {
-                pair: utils.build_ct(self.obs[pair], True) for pair in self.obs
-            }
+            self._square_ct = {pair: common.build_ct(self.obs[pair], True) for pair in self.obs}
 
         if not square and not self._nonsquare_ct:
-            self._nonsquare_ct = {
-                pair: utils.build_ct(self.obs[pair], False) for pair in self.obs
-            }
+            self._nonsquare_ct = {pair: common.build_ct(self.obs[pair], False) for pair in self.obs}
 
     def mle(self):
         """
@@ -479,9 +529,7 @@ class CatScorer:
 
             for x in self.alphabet_x:
                 for y in self.alphabet_y:
-                    subset = [
-                        pair for pair in self.cooccs if pair[0] == x or pair[1] == y
-                    ]
+                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
                     X = [pair[0] for pair in subset]
                     Y = [pair[1] for pair in subset]
 
@@ -503,9 +551,7 @@ class CatScorer:
 
             for x in self.alphabet_x:
                 for y in self.alphabet_y:
-                    subset = [
-                        pair for pair in self.cooccs if pair[0] == x or pair[1] == y
-                    ]
+                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
                     X = [pair[0] for pair in subset]
                     Y = [pair[1] for pair in subset]
 

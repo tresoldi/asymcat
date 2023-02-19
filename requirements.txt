@@ -1,6 +1,7 @@
+freqprob
+matplotlib
 numpy
 pandas
 scipy
-matplotlib
 seaborn
 tabulate

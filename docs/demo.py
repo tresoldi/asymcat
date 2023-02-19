@@ -8,7 +8,7 @@ Original file is located at
 
 # Categorical Co-occurrences
 
-`catcoocc` is a library for facilitating the analysis of categorical co-occurrence by means of symmetric matrices, asymmetric matrices, and association rules. It is intended for usage on three main types of data: collections of pairwise sequences (both aligned and not), categorical fields in databases, and matrices of presence/absence (such as for investigation of species co-occurrence in biology). More than statistical significance, interested in effect size and strength of association.
+`asymcat` is a library for facilitating the analysis of categorical co-occurrence by means of symmetric matrices, asymmetric matrices, and association rules. It is intended for usage on three main types of data: collections of pairwise sequences (both aligned and not), categorical fields in databases, and matrices of presence/absence (such as for investigation of species co-occurrence in biology). More than statistical significance, interested in effect size and strength of association.
 
 For the purposes of the library, the following definitions are used:
 
@@ -24,9 +24,9 @@ For the purposes of the library, the following definitions are used:
 # Google CoLab requires the runtime to be restarted (CTRL+M) in order for it
 # to pick the new package (thus: run this cell, restart the runtime, and
 # run other cells)
-#!rm -rf catcoocc
+#!rm -rf asymcat
 #!git clone https://github.com/tresoldi/catcoocc.git
-#!pip3 install --force-reinstall --no-deps -e catcoocc/
+#!pip3 install --force-reinstall --no-deps -e asymcat/
 
 #from IPython.display import HTML, display
 
