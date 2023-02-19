@@ -15,7 +15,7 @@ import csv
 # Import Python standard libraries
 from collections import Counter
 from itertools import chain, combinations, product
-from typing import *
+from typing import Generator, List, Optional
 
 # Import 3rd party libraries
 import numpy as np

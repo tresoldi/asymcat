@@ -1,8 +1,5 @@
-import asymcat
-
-
 def main():
-    print("asymcat entry point")
+    raise NotImplementedError("This is a placeholder for the main function.")
 
 
 if __name__ == "__main__":

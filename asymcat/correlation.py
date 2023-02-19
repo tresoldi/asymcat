@@ -14,7 +14,7 @@ from collections import Counter
 import numpy as np
 
 # Import local modules
-from . import scorer
+from . import common, scorer
 
 
 def cramers_v(series_x, series_y):
@@ -22,7 +22,7 @@ def cramers_v(series_x, series_y):
 
     # Build a contingency table
     # TODO: use another library? pandas?
-    alphabet_x, alphabet_y = utils.collect_alphabets(cooccs)
+    alphabet_x, alphabet_y = common.collect_alphabets(cooccs)
     ct = []
     for x_val in alphabet_x:
         counter = Counter([y for x, y in cooccs if x == x_val])
