@@ -1,28 +1,38 @@
-# setup.py file for the `asymcat` package.
+#!/usr/bin/env python3
 
 """
-Standard setup.py file for the `asymcat` package.
+setup.py for the  `asymcat` package.
 """
 
-# Standard library imports
-from setuptools import setup, find_packages
-import pathlib
+# TODO: move the metadata to pyproject.toml
 
-# The directory containing this file
-LOCAL_PATH = pathlib.Path(__file__).parent
+# Import Python standard libraries
+from pathlib import Path
+import setuptools
 
-# The text of the README file
-README_FILE = (LOCAL_PATH / "README.md").read_text()
+ROOT_DIR = Path(__file__).parent
 
+# Get the long description from the README.md file
+with open(ROOT_DIR / 'README.md', 'r') as fh:
+    long_description = fh.read()
 
 # Load requirements, so they are listed in a single place
-with open(LOCAL_PATH / "requirements.txt", encoding="utf-8") as fp:
-    install_requires = [dep.strip() for dep in fp.readlines()]
+with open(ROOT_DIR / "requirements.txt") as fh:
+    REQUIREMENTS = [dep.strip() for dep in fh.readlines()]
 
-# This call to setup() does all the work
-setup(
-    author="Tiago Tresoldi",
-    author_email="tiago.tresoldi@lingfil.uu.se",
+DEV_REQUIREMENTS = [
+    'black == 22.*',
+    'build == 0.7.*',
+    'flake8 == 4.*',
+    'isort == 5.*',
+    'mypy >= 0.981',
+    'pytest == 7.*',
+    'pytest-cov == 4.*',
+    'twine == 4.*',
+]
+
+setuptools.setup(
+    author='Tiago Tresoldi',
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
@@ -31,30 +41,35 @@ setup(
         "Topic :: Scientific/Engineering :: Mathematics",
         "Topic :: Software Development :: Libraries",
     ],
-    description="A Python library for obtaining asymmetric measures of association between categorical variables in data exploration and description",
-    entry_points={"console_scripts": ["asymcat=asymcat.__main__:main", ]},
-    include_package_data=True,
-    install_requires=install_requires,
-    keywords=[
-        "categorical data analysis",
-        "measures of association",
-        "symmetric and asymmetric measures",
-        "categorical variables",
-        "co-occurrence association",
-        "presence/absence analysis",
-        "strength of association",
-        "direction of association"
-    ],
-    license="MIT",
-    long_description=README_FILE,
+    description=(
+"A Python library for obtaining asymmetric measures of association between categorical variables in data exploration and description"
+    ),
+    entry_points={
+        'console_scripts': [
+            'asymcat=asymcat.my_module:main',
+        ]
+    },
+    extras_require={
+        'dev': DEV_REQUIREMENTS,
+    },
+    install_requires=REQUIREMENTS,
+    license='MIT',
+    long_description=long_description,
     long_description_content_type="text/markdown",
-    name="asymcat",
-    packages=find_packages(where="src"),
-    package_dir={"": "src"},
-    python_requires=">=3.7",
-    test_suite='tests',
-    tests_require=[],
-    url="https://github.com/tresoldi/catcoocc",  # TODO: change upon PR
-    version="0.3",
-    zip_safe=False,
+    name='asymcat',
+    package_data={
+        'asymcat': [
+            'py.typed',
+        ]
+    },
+    packages=setuptools.find_packages(
+        exclude=[
+            'examples',
+            'test',
+        ]
+    ),
+    python_requires='>=3.8, <4',
+    url='http://github.com/tresoldi/asymcat',
+    version='0.3.0',  # Remember to sync with __init__.py
 )
+

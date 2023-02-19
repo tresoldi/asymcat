@@ -10,14 +10,16 @@ pre-computations from raw data.
 # TODO: add function for smoothing of co-occurrences after collect_cooccs()
 # TODO: add function for reading mushroom and pokemon data
 
+import csv
+
 # Import Python standard libraries
 from collections import Counter
 from itertools import chain, combinations, product
 from typing import *
-import csv
 
 # Import 3rd party libraries
 import numpy as np
+
 
 def collect_alphabets(cooccs: list) -> tuple:
     """
@@ -39,8 +41,9 @@ def collect_alphabets(cooccs: list) -> tuple:
 
     return sorted(set(alphabet_x)), sorted(set(alphabet_y))
 
+
 # TODO: Use lpngrams?
-def collect_ngrams(seq:list , order:int, pad:str)-> tuple:
+def collect_ngrams(seq: list, order: int, pad: str) -> Generator:
     """
     Function for yielding the ngrams of a sequence.
 
@@ -63,14 +66,14 @@ def collect_ngrams(seq:list , order:int, pad:str)-> tuple:
         The ngrams of the sequence.
     """
 
-    seq = tuple(chain((pad,) * (order - 1), seq, (pad,) * (order - 1)))
+    tuple_seq = tuple(chain((pad,) * (order - 1), seq, (pad,) * (order - 1)))
 
-    for ngram in zip(*[seq[i:] for i in range(order)]):
+    for ngram in zip(*[tuple_seq[i:] for i in range(order)]):
         yield ngram
 
 
-#TODO: should yield?
-def collect_cooccs(seqs:list, order:Optional[int]=None, pad:str="#")->list:
+# TODO: should yield?
+def collect_cooccs(seqs: list, order: Optional[int] = None, pad: str = "#") -> list:
     """
     Collects tuples of co-occurring elements in pairs of sequences.
 
@@ -121,21 +124,18 @@ def collect_cooccs(seqs:list, order:Optional[int]=None, pad:str="#")->list:
             raise ValueError("Sequence pair of different lengths.")
 
         # Collect the ngrams for each sequence in each pair
-        ngram_seqs = [
-            [collect_ngrams(seq_a, order, pad), collect_ngrams(seq_b, order, pad)]
-            for seq_a, seq_b in seqs
-        ]
+        ngram_seqs = [[collect_ngrams(seq_a, order, pad), collect_ngrams(seq_b, order, pad)] for seq_a, seq_b in seqs]
 
         # Decompose the list of ngrams in `ngram_seqs`, building new
         # corresponding pairs from where the co-occurrences will be
         # collected. This is done with a non-expansive itertools operation,
         # with no need to cast a list (as the iterable will be consumed
         # into a list below).
-        _seqs = chain(*[zip(*ngram_seq) for ngram_seq in ngram_seqs])
+        _seqs = list(chain(*[zip(*ngram_seq) for ngram_seq in ngram_seqs]))
 
     # From the list of sequence pairs, chain a list with all the co-occurring
     # pairs from the product of each pair.
-    coocc = chain(*[product(seq_a, seq_b) for seq_a, seq_b in _seqs])
+    coocc = list(chain(*[product(seq_a, seq_b) for seq_a, seq_b in _seqs]))
 
     # Remove `(pad, pad)` entries that will result form ngram collection;
     # the operation is performed even in case of no `order` (i.e., collection
@@ -212,7 +212,8 @@ def collect_observations(cooccs: list) -> dict:
     # use collect_alphabet() as we need the symbols as well, in order to
     # build `x_counter` and `y_counter`
     symbols_x, symbols_y = zip(*cooccs)
-    x_counter, y_counter = Counter(symbols_x), Counter(symbols_y)
+    x_counter: Counter = Counter(symbols_x)
+    y_counter: Counter = Counter(symbols_y)
     alphabet_x = set(symbols_x)
     alphabet_y = set(symbols_y)
 
@@ -234,8 +235,9 @@ def collect_observations(cooccs: list) -> dict:
 
     return obs
 
+
 # TODO: does it need to be np.array?
-def build_ct(observ, square: bool = True)-> np.array:
+def build_ct(observ, square: bool = True) -> list:
     """
     Build a contingency table from a dictionary of observations.
 
@@ -250,7 +252,7 @@ def build_ct(observ, square: bool = True)-> np.array:
         common.collect_observations().
     square : bool, optional
         Whether to return a square (2x2) or non-square (3x2) contingency table.
-        
+
     Returns
     -------
     cont_table : np.array
@@ -261,9 +263,7 @@ def build_ct(observ, square: bool = True)-> np.array:
     # for the functions consuming them and as it allows to use np methods
     # directly (such as .sum())
     if square:
-        cont_table = np.array(
-            [[observ["11"], observ["12"]], [observ["21"], observ["22"]]]
-        )
+        cont_table = np.array([[observ["11"], observ["12"]], [observ["21"], observ["22"]]])
     else:
         cont_table = np.array(
             [
@@ -272,10 +272,10 @@ def build_ct(observ, square: bool = True)-> np.array:
             ]
         )
 
-    return cont_table
+    return cont_table.tolist()
 
 
-def read_sequences(filename:str, cols:Optional[List[str]]=None, col_delim:str="\t", elem_delim:str=" "):
+def read_sequences(filename: str, cols: Optional[List[str]] = None, col_delim: str = "\t", elem_delim: str = " "):
     """
     Reads parallel sequences, returning them as a list of lists.
 
@@ -329,18 +329,10 @@ def read_sequences(filename:str, cols:Optional[List[str]]=None, col_delim:str="\
                     skip_header = False
                     continue
 
-                data.append(
-                    [
-                        column.split(elem_delim)
-                        for column in line.strip().split(col_delim)
-                    ]
-                )
+                data.append([column.split(elem_delim) for column in line.strip().split(col_delim)])
         else:
             reader = csv.DictReader(handler, delimiter=col_delim)
-            data = [
-                [row[col_name].split(elem_delim) for col_name in cols if row[col_name]]
-                for row in reader
-            ]
+            data = [[row[col_name].split(elem_delim) for col_name in cols if row[col_name]] for row in reader]
 
     # Remove incomplete rows
     # NOTE: Checking length is not really effective, but will allow easier
@@ -351,7 +343,7 @@ def read_sequences(filename:str, cols:Optional[List[str]]=None, col_delim:str="\
 
 
 # TODO: assuming one taxon per col and locations per row, allow to switch
-def read_pa_matrix(filename:str, delimiter:str="\t")-> Dict[str, List[str]]:
+def read_pa_matrix(filename: str, delimiter: str = "\t"):
     """
     Reads a presence-absence matrix, returning as equivalent sequences.
 
@@ -378,15 +370,9 @@ def read_pa_matrix(filename:str, delimiter:str="\t")-> Dict[str, List[str]]:
         reader = csv.DictReader(csvfile, delimiter=delimiter)
         for row in reader:
             location = row.pop("ID")
-            matrix[location] = sorted(
-                [taxon for taxon, observed in row.items() if observed == "1"]
-            )
+            matrix[location] = sorted([taxon for taxon, observed in row.items() if observed == "1"])
 
     # Make the corresponding sequence from the combinations
-    obs_combinations = list(
-        chain.from_iterable(
-            [combinations(observed, 2) for location, observed in matrix.items()]
-        )
-    )
+    obs_combinations = list(chain.from_iterable([combinations(observed, 2) for location, observed in matrix.items()]))
 
     return obs_combinations
