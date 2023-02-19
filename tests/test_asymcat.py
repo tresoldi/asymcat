@@ -8,7 +8,10 @@ Tests for the `asymcat` package.
 """
 
 # Import system libraries
-import pytest
+
+# Resource dir
+# TODO: move within tests
+from pathlib import Path
 
 # Import 3rd party libraries
 import numpy as np
@@ -16,9 +19,6 @@ import numpy as np
 # Import the library being tested
 import asymcat
 
-# Resource dir
-# TODO: move within tests
-from pathlib import Path
 RESOURCE_DIR = Path(__file__).parent.parent / "resources"
 
 # Small sample for text, derived from CMU (first entry is manually added)

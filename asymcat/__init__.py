@@ -16,6 +16,4 @@ __version__ = "0.3"  # sync with setup.py
 from asymcat import correlation, scorer
 from asymcat.common import *
 
-
-
 # TODO: build the __all__ for exporting
