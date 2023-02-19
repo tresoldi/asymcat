@@ -16,6 +16,10 @@ import numpy as np
 # Import the library being tested
 import asymcat
 
+# Resource dir
+# TODO: move within tests
+from pathlib import Path
+RESOURCE_DIR = Path(__file__).parent.parent / "resources"
 
 # Small sample for text, derived from CMU (first entry is manually added)
 sample_cmu = [
@@ -243,11 +247,11 @@ def test_scorers():
 
 def test_readers():
     # Read a sequences file
-    cmu_file = asymcat.RESOURCE_DIR / "cmudict.tsv"
+    cmu_file = RESOURCE_DIR / "cmudict.tsv"
     cmu = asymcat.read_sequences(cmu_file.as_posix())
 
     # Read presence/absence matrix
-    finches_file = asymcat.RESOURCE_DIR / "galapagos.tsv"
+    finches_file = RESOURCE_DIR / "galapagos.tsv"
     finches = asymcat.read_pa_matrix(finches_file.as_posix())
 
     # For assertion, just check length
