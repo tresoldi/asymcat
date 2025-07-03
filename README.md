@@ -131,7 +131,7 @@ A show-case example with a subset of the `mushroom` dataset is shown here:
 ```python
 import tabulate
 import asymcat
-from catcoocc.scorer import CatScorer
+from asymcat.scorer import CatScorer
 
 mushroom_data = asymcat.read_sequences("resources/mushroom-small.tsv")
 mushroom_cooccs = asymcat.collect_cooccs(mushroom_data)
