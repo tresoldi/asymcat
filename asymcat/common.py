@@ -11,12 +11,12 @@ pre-computations from raw data.
 # TODO: add function for reading mushroom and pokemon data
 
 import csv
+import os
 
 # Import Python standard libraries
 from collections import Counter
 from itertools import chain, combinations, product
-from typing import Generator, List, Optional, Union, Any
-import os
+from typing import Any, Generator, List, Optional, Union
 
 # Import 3rd party libraries
 import numpy as np
@@ -36,7 +36,7 @@ def collect_alphabets(cooccs: List[tuple]) -> tuple:
     alphabets : tuple
         A tuple of two elements, the sorted list of symbols in series `x` and
         the sorted list of symbols in series `y`.
-        
+
     Raises
     ------
     ValueError
@@ -46,10 +46,10 @@ def collect_alphabets(cooccs: List[tuple]) -> tuple:
     """
     if not isinstance(cooccs, list):
         raise TypeError(f"Expected list, got {type(cooccs).__name__}")
-    
+
     if not cooccs:
         raise ValueError("Empty co-occurrence list provided")
-    
+
     # Validate that all elements are tuples of length 2
     for i, coocc in enumerate(cooccs):
         if not isinstance(coocc, (tuple, list)) or len(coocc) != 2:
@@ -85,7 +85,7 @@ def collect_ngrams(seq: Union[List[Any], str], order: int, pad: str) -> Generato
     ------
     ngram : tuple
         The ngrams of the sequence.
-        
+
     Raises
     ------
     ValueError
@@ -95,13 +95,13 @@ def collect_ngrams(seq: Union[List[Any], str], order: int, pad: str) -> Generato
     """
     if not isinstance(seq, (list, tuple, str)):
         raise TypeError(f"Expected list, tuple, or string, got {type(seq).__name__}")
-    
+
     if not isinstance(order, int):
         raise TypeError(f"Order must be an integer, got {type(order).__name__}")
-    
+
     if order < 1:
         raise ValueError(f"Order must be at least 1, got {order}")
-    
+
     if not isinstance(pad, str):
         raise TypeError(f"Pad symbol must be a string, got {type(pad).__name__}")
 
@@ -112,7 +112,9 @@ def collect_ngrams(seq: Union[List[Any], str], order: int, pad: str) -> Generato
 
 
 # TODO: should yield?
-def collect_cooccs(seqs: List[Union[List[Union[List[Any], str]], tuple]], order: Optional[int] = None, pad: str = "#") -> List[tuple]:
+def collect_cooccs(
+    seqs: List[Union[List[Union[List[Any], str]], tuple]], order: Optional[int] = None, pad: str = "#"
+) -> List[tuple]:
     """
     Collects tuples of co-occurring elements in pairs of sequences.
 
@@ -144,7 +146,7 @@ def collect_cooccs(seqs: List[Union[List[Union[List[Any], str]], tuple]], order:
     -------
     coocc : List[tuple]
         A list of tuples of co-occurring elements.
-        
+
     Raises
     ------
     ValueError
@@ -154,21 +156,21 @@ def collect_cooccs(seqs: List[Union[List[Union[List[Any], str]], tuple]], order:
     """
     if not isinstance(seqs, list):
         raise TypeError(f"Expected list, got {type(seqs).__name__}")
-    
+
     if not seqs:
         raise ValueError("Empty sequence list provided")
-    
+
     if order is not None and (not isinstance(order, int) or order < 1):
         raise ValueError(f"Order must be a positive integer or None, got {order}")
-    
+
     if not isinstance(pad, str):
         raise TypeError(f"Pad symbol must be a string, got {type(pad).__name__}")
-    
+
     # Validate sequence structure
     for i, seq_pair in enumerate(seqs):
         if not isinstance(seq_pair, (list, tuple)) or len(seq_pair) != 2:
             raise ValueError(f"Invalid sequence pair at index {i}: expected list/tuple of length 2, got {seq_pair}")
-        
+
         seq_a, seq_b = seq_pair
         if not isinstance(seq_a, (list, tuple, str)) or not isinstance(seq_b, (list, tuple, str)):
             raise TypeError(f"Sequences at index {i} must be lists, tuples, or strings")
@@ -251,7 +253,7 @@ def collect_observations(cooccs: List[tuple]) -> dict:
     -------
     obs : dict
         A dictionary of observations per co-occurrence type.
-        
+
     Raises
     ------
     ValueError
@@ -261,10 +263,10 @@ def collect_observations(cooccs: List[tuple]) -> dict:
     """
     if not isinstance(cooccs, list):
         raise TypeError(f"Expected list, got {type(cooccs).__name__}")
-    
+
     if not cooccs:
         raise ValueError("Empty co-occurrence list provided")
-    
+
     # Validate co-occurrence structure
     for i, coocc in enumerate(cooccs):
         if not isinstance(coocc, (tuple, list)) or len(coocc) != 2:
@@ -362,7 +364,9 @@ def build_ct(observ, square: bool = True) -> list:
     return cont_table.tolist()
 
 
-def read_sequences(filename: str, cols: Optional[List[str]] = None, col_delim: str = "\t", elem_delim: str = " ") -> List[List[List[str]]]:
+def read_sequences(
+    filename: str, cols: Optional[List[str]] = None, col_delim: str = "\t", elem_delim: str = " "
+) -> List[List[List[str]]]:
     """
     Reads parallel sequences, returning them as a list of lists.
 
@@ -402,7 +406,7 @@ def read_sequences(filename: str, cols: Optional[List[str]] = None, col_delim: s
     -------
     data : List[List[List[str]]]
         A list of lists, where each list contains the data from a row.
-        
+
     Raises
     ------
     FileNotFoundError
@@ -414,16 +418,16 @@ def read_sequences(filename: str, cols: Optional[List[str]] = None, col_delim: s
     """
     if not isinstance(filename, str):
         raise TypeError(f"Filename must be a string, got {type(filename).__name__}")
-    
+
     if not os.path.exists(filename):
         raise FileNotFoundError(f"File not found: {filename}")
-    
+
     if not os.path.isfile(filename):
         raise ValueError(f"Path is not a file: {filename}")
-    
+
     if cols is not None and not isinstance(cols, list):
         raise TypeError(f"Columns must be a list or None, got {type(cols).__name__}")
-    
+
     if not isinstance(col_delim, str) or not isinstance(elem_delim, str):
         raise TypeError("Delimiters must be strings")
 
@@ -447,12 +451,12 @@ def read_sequences(filename: str, cols: Optional[List[str]] = None, col_delim: s
                     data = [[row[col_name].split(elem_delim) for col_name in cols if row[col_name]] for row in reader]
                 except KeyError as e:
                     raise ValueError(f"Column not found in file: {e}")
-    
+
     except UnicodeDecodeError as e:
         raise ValueError(f"File encoding error: {e}")
     except Exception as e:
         raise IOError(f"Error reading file {filename}: {e}")
-    
+
     if not data:
         raise ValueError(f"No valid data found in file: {filename}")
 
@@ -460,7 +464,7 @@ def read_sequences(filename: str, cols: Optional[List[str]] = None, col_delim: s
     # NOTE: Checking length is not really effective, but will allow easier
     # expansion in the future
     data = [row for row in data if len(row) == 2]
-    
+
     if not data:
         raise ValueError(f"No complete sequence pairs found in file: {filename}")
 
@@ -485,7 +489,7 @@ def read_pa_matrix(filename: str, delimiter: str = "\t") -> List[tuple]:
     -------
     obs_combinations : List[tuple]
         A list of tuples representing observed combinations.
-        
+
     Raises
     ------
     FileNotFoundError
@@ -495,10 +499,10 @@ def read_pa_matrix(filename: str, delimiter: str = "\t") -> List[tuple]:
     """
     if not isinstance(filename, str):
         raise TypeError(f"Filename must be a string, got {type(filename).__name__}")
-    
+
     if not os.path.exists(filename):
         raise FileNotFoundError(f"File not found: {filename}")
-    
+
     if not isinstance(delimiter, str):
         raise TypeError(f"Delimiter must be a string, got {type(delimiter).__name__}")
 
@@ -508,31 +512,34 @@ def read_pa_matrix(filename: str, delimiter: str = "\t") -> List[tuple]:
     try:
         with open(filename, encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile, delimiter=delimiter)
-            
+
             if "ID" not in reader.fieldnames:
                 raise ValueError("Missing required 'ID' column in presence-absence matrix")
-            
+
             for row_num, row in enumerate(reader, start=2):  # Start at 2 since header is row 1
                 try:
                     location = row.pop("ID")
                 except KeyError:
                     raise ValueError(f"Missing ID value in row {row_num}")
-                
+
                 if not location:
                     raise ValueError(f"Empty ID value in row {row_num}")
-                
+
                 # Validate presence-absence values
                 for taxon, observed in row.items():
                     if observed not in ("0", "1", ""):
-                        raise ValueError(f"Invalid presence-absence value '{observed}' for taxon '{taxon}' in row {row_num}. Expected '0', '1', or empty.")
-                
+                        raise ValueError(
+                            f"Invalid presence-absence value '{observed}' for taxon '{taxon}' in row {row_num}."
+                            " Expected '0', '1', or empty."
+                        )
+
                 matrix[location] = sorted([taxon for taxon, observed in row.items() if observed == "1"])
-    
+
     except UnicodeDecodeError as e:
         raise ValueError(f"File encoding error: {e}")
     except Exception as e:
         raise IOError(f"Error reading file {filename}: {e}")
-    
+
     if not matrix:
         raise ValueError(f"No valid data found in presence-absence matrix: {filename}")
 
