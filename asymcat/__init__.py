@@ -10,7 +10,7 @@ variables in data exploration and description.
 # Information on the package
 __author__ = "Tiago Tresoldi"
 __email__ = "tiago.tresoldi@lingfil.uu.se"
-__version__ = "0.3"  # sync with setup.py
+__version__ = "0.3.0"
 
 # Build the namespace
 from asymcat import correlation, scorer
