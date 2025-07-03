@@ -60,4 +60,12 @@ mypy:
 test:
 	$(VIRTUAL_BIN)/pytest
 
-.PHONY: help build coverage clean black black-check format format-check install isort isort-check lint mypy test
+## docs - Build the documentation
+docs:
+	cd docs && make html
+
+## docs-clean - Clean the documentation build
+docs-clean:
+	rm -rf docs/build/
+
+.PHONY: help build coverage clean black black-check format format-check install isort isort-check lint mypy test docs docs-clean
