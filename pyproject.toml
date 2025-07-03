@@ -37,11 +37,13 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "bandit[toml] == 1.7.*",
     "black == 22.*",
     "build == 0.7.*",
     "flake8 == 4.*",
     "isort == 5.*",
     "mypy >= 0.981",
+    "pre-commit >= 3.0.0",
     "pytest == 7.*",
     "pytest-cov == 4.*",
     "twine == 4.*",
@@ -67,3 +69,7 @@ skip-string-normalization = true
 
 [tool.isort]
 profile = "black"
+
+[tool.bandit]
+exclude_dirs = ["tests", "test"]
+skips = ["B101"]  # Skip assert_used test since assertions are acceptable in tests
