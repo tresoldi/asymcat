@@ -20,7 +20,7 @@ import math
 # Import Python standard libraries
 from collections import Counter
 from itertools import chain, product
-from typing import List, Optional
+from typing import Dict, List, Optional, Tuple, Union, Any
 
 # Import 3rd party libraries
 import numpy as np
@@ -30,15 +30,15 @@ import scipy.stats as ss  # type: ignore
 from . import common
 
 
-def conditional_entropy(x_symbols: list, y_symbols: list) -> float:
+def conditional_entropy(x_symbols: List[Any], y_symbols: List[Any]) -> float:
     """
     Computes the entropy of `x` given `y`.
 
     Parameters
     ----------
-    x_symbols : list
+    x_symbols : List[Any]
         A list of all observed `x` symbols.
-    y_symbols : list
+    y_symbols : List[Any]
         A list of all observed `y` symbols.
 
     Returns
@@ -134,15 +134,15 @@ def compute_pmi(p_x: float, p_y: float, p_xy: float, normalized: bool, limit: fl
     return pmi
 
 
-def compute_theil_u(x_symbols: list, y_symbols: list) -> float:
+def compute_theil_u(x_symbols: List[Any], y_symbols: List[Any]) -> float:
     """
     Compute the uncertainty coefficient Theil's U.
 
     Parameters
     ----------
-    x_symbols : list
+    x_symbols : List[Any]
         The list of observed symbols in series `x`.
-    y_symbols : list
+    y_symbols : List[Any]
         The list of observed symbols in series `y`.
 
     Returns
@@ -176,7 +176,7 @@ def compute_theil_u(x_symbols: list, y_symbols: list) -> float:
 # TODO: allow independent scaling over `x` and independent over `y` (currently doing all)
 # TODO: allow scaling withing percentile borders
 # TODO: see if we can vectorize numpy operations (now on dicts)
-def scale_scorer(scorer: dict, method: str = "minmax", nrange=(0, 1)) -> dict:
+def scale_scorer(scorer: Dict[Tuple[Any, Any], Tuple[float, float]], method: str = "minmax", nrange: Tuple[float, float] = (0, 1)) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
     """
     Scale a scorer.
 
@@ -243,7 +243,7 @@ def scale_scorer(scorer: dict, method: str = "minmax", nrange=(0, 1)) -> dict:
     return scaled_scorer
 
 
-def invert_scorer(scorer: dict) -> dict:
+def invert_scorer(scorer: Dict[Tuple[Any, Any], Tuple[float, float]]) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
     """
     Inverts a scorer, so that the higher the affinity, the higher the score.
 
@@ -269,7 +269,7 @@ def invert_scorer(scorer: dict) -> dict:
     return inverted_scorer
 
 
-def scorer2matrices(scorer: dict) -> tuple:
+def scorer2matrices(scorer: Dict[Tuple[Any, Any], Tuple[float, float]]) -> Tuple[np.ndarray, np.ndarray, List[Any], List[Any]]:
     """
     Return the asymmetric matrices implied by a scorer and their alphabets.
 
@@ -299,42 +299,106 @@ class CatScorer:
     Class for computing categorical co-occurrence scores.
     """
 
-    def __init__(self, cooccs: dict):
+    def __init__(self, cooccs: List[Tuple[Any, Any]]):
         """
         Initialization function.
 
         Parameters
         ----------
-        cooccs : dict
-            A dictionary with co-occurrence pairs as keys and their
-            co-occurrence counts as values.
+        cooccs : List[Tuple[Any, Any]]
+            A list of co-occurrence tuples.
         """
 
         # Store cooccs, observations, symbols and alphabets
-        self.cooccs = cooccs
-        self.obs = common.collect_observations(list(cooccs))
+        self.cooccs: List[Tuple[Any, Any]] = cooccs
+        self.obs: Dict[Tuple[Any, Any], Dict[str, int]] = common.collect_observations(cooccs)
 
         # Obtain the alphabets from the co-occurrence pairs
-        self.alphabet_x, self.alphabet_y = common.collect_alphabets(list(self.cooccs))
+        self.alphabet_x: List[Any]
+        self.alphabet_y: List[Any]
+        self.alphabet_x, self.alphabet_y = common.collect_alphabets(self.cooccs)
 
         # Initialize the square and non-square contingency table as None
-        self._square_ct: Optional[dict] = None
-        self._nonsquare_ct: Optional[dict] = None
+        self._square_ct: Optional[Dict[Tuple[Any, Any], List[List[float]]]] = None
+        self._nonsquare_ct: Optional[Dict[Tuple[Any, Any], List[List[float]]]] = None
 
         # Initialize the scorers as None, in a lazy fashion
-        self._mle = None
-        self._pmi = None
-        self._npmi = None
-        self._chi2 = None
-        self._chi2_nonsquare = None
-        self._cramersv = None
-        self._cramersv_nonsquare = None
-        self._fisher = None
-        self._theil_u = None
-        self._cond_entropy = None
-        self._tresoldi = None
+        self._mle: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._pmi: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._npmi: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._chi2: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._chi2_nonsquare: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._cramersv: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._cramersv_nonsquare: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._fisher: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._theil_u: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._cond_entropy: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._tresoldi: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
 
-    def _compute_contingency_table(self, square: bool):
+    def _compute_contingency_table_scorer(self, square: bool, computation_func, square_cache_attr: str, nonsquare_cache_attr: str) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+        """
+        Helper method to compute scorers based on contingency tables.
+        
+        Parameters
+        ----------
+        square : bool
+            Whether to compute square or non-square contingency table
+        computation_func : callable
+            Function to compute the score from contingency table
+        square_cache_attr : str
+            Name of the attribute to cache square results
+        nonsquare_cache_attr : str
+            Name of the attribute to cache non-square results
+            
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            The computed scorer dictionary
+        """
+        if square:
+            cache_attr = square_cache_attr
+            ct_attr = '_square_ct'
+        else:
+            cache_attr = nonsquare_cache_attr
+            ct_attr = '_nonsquare_ct'
+            
+        if not getattr(self, cache_attr):
+            # Compute the contingency table if necessary
+            self._compute_contingency_table(square)
+            
+            # Build the scorer
+            scorer = {}
+            ct_dict = getattr(self, ct_attr)
+            for pair in self.obs:
+                score = computation_func(ct_dict[pair])
+                scorer[pair] = (score, score)
+            
+            setattr(self, cache_attr, scorer)
+        
+        return getattr(self, cache_attr)
+
+    def _compute_probabilities(self, pair: Tuple[Any, Any]) -> Tuple[float, float, float]:
+        """
+        Helper method to compute probabilities p(x), p(y), p(xy) for a given pair.
+        
+        Parameters
+        ----------
+        pair : Tuple[Any, Any]
+            The symbol pair to compute probabilities for
+            
+        Returns
+        -------
+        Tuple[float, float, float]
+            Tuple of (p_x, p_y, p_xy) probabilities
+        """
+        obs = self.obs[pair]
+        total = obs["00"]
+        p_x = obs["10"] / total
+        p_y = obs["01"] / total  
+        p_xy = obs["11"] / total
+        return p_x, p_y, p_xy
+
+    def _compute_contingency_table(self, square: bool) -> None:
         """
         Internal method for computing and caching contingency tables.
 
@@ -351,7 +415,7 @@ class CatScorer:
         if not square and not self._nonsquare_ct:
             self._nonsquare_ct = {pair: common.build_ct(self.obs[pair], False) for pair in self.obs}
 
-    def mle(self):
+    def mle(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
         """
         Return an MLE scorer, computing it if necessary.
         """
@@ -368,12 +432,14 @@ class CatScorer:
 
         return self._mle
 
-    def pmi(self, normalized=False):
+    def pmi(self, normalized: bool = False) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
         """
         Return a PMI scorer.
 
-        :param bool normalize: Whether to return a normalized PMI or
-            not (default: False)
+        Parameters
+        ----------
+        normalized : bool
+            Whether to return a normalized PMI or not (default: False)
         """
 
         # Compute the non-normalized scorer, if necessary
@@ -383,10 +449,7 @@ class CatScorer:
 
             self._pmi = {}
             for pair in self.obs:
-                p_xy = self.obs[pair]["11"] / self.obs[pair]["00"]
-                p_x = self.obs[pair]["10"] / self.obs[pair]["00"]
-                p_y = self.obs[pair]["01"] / self.obs[pair]["00"]
-
+                p_x, p_y, p_xy = self._compute_probabilities(pair)
                 self._pmi[pair] = (
                     compute_pmi(p_x, p_y, p_xy, False, limit),
                     compute_pmi(p_y, p_x, p_xy, False, limit),
@@ -399,10 +462,7 @@ class CatScorer:
 
             self._npmi = {}
             for pair in self.obs:
-                p_xy = self.obs[pair]["11"] / self.obs[pair]["00"]
-                p_x = self.obs[pair]["10"] / self.obs[pair]["00"]
-                p_y = self.obs[pair]["01"] / self.obs[pair]["00"]
-
+                p_x, p_y, p_xy = self._compute_probabilities(pair)
                 self._npmi[pair] = (
                     compute_pmi(p_x, p_y, p_xy, True, limit),
                     compute_pmi(p_y, p_x, p_xy, True, limit),
@@ -416,83 +476,41 @@ class CatScorer:
 
         return ret
 
-    def chi2(self, square_ct=True):
+    def chi2(self, square_ct: bool = True) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
         """
         Return a Chi2 scorer.
 
-        :param bool square_ct: Whether to return the score over a squared or
+        Parameters
+        ----------
+        square_ct : bool
+            Whether to return the score over a squared or
             non squared contingency table (default: True)
         """
+        return self._compute_contingency_table_scorer(
+            square_ct,
+            lambda ct: ss.chi2_contingency(ct)[0],
+            '_chi2',
+            '_chi2_nonsquare'
+        )
 
-        # Compute the scorer over a square contingency table, if necessary
-        if square_ct and not self._chi2:
-            # Compute the square contingency table, if necessary
-            self._compute_contingency_table(True)
-
-            # Build the scorer
-            self._chi2 = {}
-            for pair in self.obs:
-                chi2 = ss.chi2_contingency(self._square_ct[pair])[0]
-                self._chi2[pair] = (chi2, chi2)
-
-        # Compute the scorer over a non-square contingency table, if necessary
-        if square_ct and not self._chi2_nonsquare:
-            # Compute the non square contingency table, if necessary
-            self._compute_contingency_table(False)
-
-            # Build the scorer
-            self._chi2_nonsquare = {}
-            for pair in self.obs:
-                chi2 = ss.chi2_contingency(self._nonsquare_ct[pair])[0]
-                self._chi2_nonsquare[pair] = (chi2, chi2)
-
-        # Select the scorer to return (this allows easier refactoring later)
-        if square_ct:
-            ret = self._chi2
-        else:
-            ret = self._chi2_nonsquare
-
-        return ret
-
-    def cramers_v(self, square_ct=True):
+    def cramers_v(self, square_ct: bool = True) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
         """
         Return a Cramér's V scorer.
 
-        :param bool square_ct: Whether to return the score over a squared or
+        Parameters
+        ----------
+        square_ct : bool
+            Whether to return the score over a squared or
             non squared contingency table (default: True)
         """
+        return self._compute_contingency_table_scorer(
+            square_ct,
+            compute_cramers_v,
+            '_cramersv',
+            '_cramersv_nonsquare'
+        )
 
-        # Compute the scorer over a square contingency table, if necessary
-        if square_ct and not self._cramersv:
-            # Compute the square contingency table, if necessary
-            self._compute_contingency_table(True)
-
-            # Build the scorer
-            self._cramersv = {}
-            for pair in self.obs:
-                cramersv = compute_cramers_v(self._square_ct[pair])
-                self._cramersv[pair] = (cramersv, cramersv)
-
-        # Compute the scorer over a non-square contingency table, if necessary
-        if square_ct and not self._cramersv_nonsquare:
-            # Compute the non square contingency table, if necessary
-            self._compute_contingency_table(False)
-
-            # Build the scorer
-            self._cramersv_nonsquare = {}
-            for pair in self.obs:
-                cramersv = compute_cramers_v(self._nonsquare_ct[pair])
-                self._cramersv_nonsquare[pair] = (cramersv, cramersv)
-
-        # Select the scorer to return (this allows easier refactoring later)
-        if square_ct:
-            ret = self._cramersv
-        else:
-            ret = self._cramersv_nonsquare
-
-        return ret
-
-    def fisher(self):
+    def fisher(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
         """
         Return a Fisher Exact Odds Ratio scorer.
 
@@ -517,19 +535,28 @@ class CatScorer:
 
         return self._fisher
 
-    def theil_u(self):
+    def theil_u(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
         """
         Return a Theil's U uncertainty scorer.
         """
 
-        # Compute theil u, if necessary; the code uses two nested loops
-        # instead of a product(x, y) to gain some speed
+        # Compute theil u, if necessary; optimize with numpy arrays when possible
         if not self._theil_u:
             self._theil_u = {}
-
+            
+            # Convert to numpy arrays for potentially faster filtering
+            import numpy as np
+            cooccs_array = np.array(self.cooccs)
+            
             for x in self.alphabet_x:
                 for y in self.alphabet_y:
-                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
+                    # Use numpy boolean indexing for faster filtering on large datasets
+                    if len(self.cooccs) > 1000:  # Only use numpy for larger datasets
+                        mask = (cooccs_array[:, 0] == x) | (cooccs_array[:, 1] == y)
+                        subset = cooccs_array[mask].tolist()
+                    else:
+                        subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
+                    
                     X = [pair[0] for pair in subset]
                     Y = [pair[1] for pair in subset]
 
@@ -541,7 +568,7 @@ class CatScorer:
 
         return self._theil_u
 
-    def cond_entropy(self):
+    def cond_entropy(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
         """
         Return a corrected conditional entropy scorer.
         """
@@ -555,7 +582,7 @@ class CatScorer:
                     X = [pair[0] for pair in subset]
                     Y = [pair[1] for pair in subset]
 
-                    # run theil's
+                    # run conditional entropy
                     self._cond_entropy[(x, y)] = (
                         conditional_entropy(Y, X),
                         conditional_entropy(X, Y),
@@ -563,7 +590,7 @@ class CatScorer:
 
         return self._cond_entropy
 
-    def tresoldi(self):
+    def tresoldi(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
         """
         Return a `tresoldi` asymmetric uncertainty scorer.
 
