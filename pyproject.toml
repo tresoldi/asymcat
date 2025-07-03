@@ -1,3 +1,65 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "asymcat"
+version = "0.3.0"
+description = "A Python library for obtaining asymmetric measures of association between categorical variables in data exploration and description"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Tiago Tresoldi"}
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Libraries",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "freqprob",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "scipy",
+    "seaborn",
+    "tabulate",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black == 22.*",
+    "build == 0.7.*",
+    "flake8 == 4.*",
+    "isort == 5.*",
+    "mypy >= 0.981",
+    "pytest == 7.*",
+    "pytest-cov == 4.*",
+    "twine == 4.*",
+]
+
+[project.urls]
+Homepage = "http://github.com/tresoldi/asymcat"
+Repository = "http://github.com/tresoldi/asymcat"
+
+[project.scripts]
+asymcat = "asymcat.__main__:main"
+
+[tool.setuptools.packages.find]
+exclude = ["examples*", "test*", "tests*"]
+
+[tool.setuptools.package-data]
+asymcat = ["py.typed"]
+
 [tool.black]
 preview = true
 line-length = 120
