@@ -268,7 +268,7 @@ def test_new_scoring_methods():
     toy_data = asymcat.read_sequences(toy_file.as_posix())
     toy_cooccs = asymcat.collect_cooccs(toy_data)
     toy_scorer = asymcat.scorer.CatScorer(toy_cooccs)
-    
+
     # Test 1: Mutual Information
     mi = toy_scorer.mutual_information()
     assert isinstance(mi, dict)
@@ -279,8 +279,8 @@ def test_new_scoring_methods():
         assert isinstance(mi_yx, (int, float))
         assert not np.isnan(mi_xy) and not np.isnan(mi_yx)
         assert mi_xy >= 0 and mi_yx >= 0  # MI is always non-negative
-    
-    # Test 2: Normalized Mutual Information  
+
+    # Test 2: Normalized Mutual Information
     nmi = toy_scorer.normalized_mutual_information()
     assert isinstance(nmi, dict)
     assert len(nmi) == len(mi)  # Same number of pairs
@@ -289,7 +289,7 @@ def test_new_scoring_methods():
         assert 0.0 <= nmi_xy <= 1.0
         assert 0.0 <= nmi_yx <= 1.0
         assert not np.isnan(nmi_xy) and not np.isnan(nmi_yx)
-    
+
     # Test 3: Jaccard Index
     jaccard = toy_scorer.jaccard_index()
     assert isinstance(jaccard, dict)
@@ -301,7 +301,7 @@ def test_new_scoring_methods():
         assert not np.isnan(j_xy) and not np.isnan(j_yx)
         # Jaccard is symmetric, so values should be equal
         assert abs(j_xy - j_yx) < 1e-10
-    
+
     # Test 4: Goodman-Kruskal Lambda
     gk_lambda = toy_scorer.goodman_kruskal_lambda()
     assert isinstance(gk_lambda, dict)
@@ -311,7 +311,7 @@ def test_new_scoring_methods():
         assert 0.0 <= lambda_xy <= 1.0
         assert 0.0 <= lambda_yx <= 1.0
         assert not np.isnan(lambda_xy) and not np.isnan(lambda_yx)
-    
+
     # Test 5: Log-Likelihood Ratio (both square and non-square)
     g2_square = toy_scorer.log_likelihood_ratio(square_ct=True)
     g2_nonsquare = toy_scorer.log_likelihood_ratio(square_ct=False)
@@ -327,22 +327,22 @@ def test_new_scoring_methods():
         g2ns_xy, g2ns_yx = g2_nonsquare[pair]
         assert g2ns_xy >= 0 and g2ns_yx >= 0
         assert not np.isnan(g2ns_xy) and not np.isnan(g2ns_yx)
-    
+
     # Test with larger dataset (mushroom-small)
     mushroom_file = RESOURCE_DIR / "mushroom-small.tsv"
     mushroom_data = asymcat.read_sequences(mushroom_file.as_posix())
     mushroom_cooccs = asymcat.collect_cooccs(mushroom_data)
     mushroom_scorer = asymcat.scorer.CatScorer(mushroom_cooccs)
-    
+
     # Test all methods work with larger dataset
     methods = [
         ('mutual_information', mushroom_scorer.mutual_information),
         ('normalized_mutual_information', mushroom_scorer.normalized_mutual_information),
         ('jaccard_index', mushroom_scorer.jaccard_index),
         ('goodman_kruskal_lambda', mushroom_scorer.goodman_kruskal_lambda),
-        ('log_likelihood_ratio', mushroom_scorer.log_likelihood_ratio)
+        ('log_likelihood_ratio', mushroom_scorer.log_likelihood_ratio),
     ]
-    
+
     for method_name, method_func in methods:
         result = method_func()
         assert isinstance(result, dict)
@@ -351,14 +351,13 @@ def test_new_scoring_methods():
         for pair, scores in result.items():
             assert len(scores) == 2  # (xy, yx) tuple
             assert all(np.isfinite(s) for s in scores)
-    
+
     # Test mathematical relationships and properties
     mi_result = mushroom_scorer.mutual_information()
     nmi_result = mushroom_scorer.normalized_mutual_information()
-    
+
     # Property: NMI should be <= 1 (it's normalized)
     for pair in mi_result:
-        mi_val = mi_result[pair][0]
         nmi_val = nmi_result[pair][0]
         assert nmi_val <= 1.0  # NMI is always <= 1 by definition
         assert nmi_val >= 0.0  # NMI is always >= 0
@@ -375,31 +374,31 @@ def test_new_methods_with_known_values():
     perfect_data = [[entry[0].split(), entry[1].split()] for entry in perfect_data]
     perfect_cooccs = asymcat.collect_cooccs(perfect_data)
     perfect_scorer = asymcat.scorer.CatScorer(perfect_cooccs)
-    
+
     # Test Jaccard Index with perfect correlation
     jaccard_perfect = perfect_scorer.jaccard_index()
     # For perfect 1:1 mapping, some pairs should have high Jaccard values
     assert any(max(scores) > 0.3 for scores in jaccard_perfect.values())
-    
+
     # Test MI with independent data
     # Create data where variables are independent
     independent_data = [["A B", "C D"], ["A B", "D C"], ["B A", "C D"], ["B A", "D C"]]
     independent_data = [[entry[0].split(), entry[1].split()] for entry in independent_data]
     independent_cooccs = asymcat.collect_cooccs(independent_data)
     independent_scorer = asymcat.scorer.CatScorer(independent_cooccs)
-    
+
     mi_independent = independent_scorer.mutual_information()
     # For independent variables, MI should be close to 0
     for pair, scores in mi_independent.items():
         # Allow some tolerance for finite sample effects
         assert all(abs(s) < 2.0 for s in scores)  # Should be low but not necessarily 0
-    
+
     # Test Lambda with deterministic relationships
     deterministic_data = [["A", "X"], ["A", "X"], ["B", "Y"], ["B", "Y"]]
     deterministic_data = [[entry[0].split(), entry[1].split()] for entry in deterministic_data]
     deterministic_cooccs = asymcat.collect_cooccs(deterministic_data)
     deterministic_scorer = asymcat.scorer.CatScorer(deterministic_cooccs)
-    
+
     lambda_det = deterministic_scorer.goodman_kruskal_lambda()
     # For deterministic relationships, some pairs should show high predictive power
     # The pairs that never co-occur should have high lambda values
@@ -417,26 +416,26 @@ def test_scoring_methods_consistency():
     cmu_data = asymcat.read_sequences(cmu_file.as_posix())
     cmu_cooccs = asymcat.collect_cooccs(cmu_data)
     cmu_scorer = asymcat.scorer.CatScorer(cmu_cooccs)
-    
+
     # Get both new and existing methods
     mi = cmu_scorer.mutual_information()
     g2 = cmu_scorer.log_likelihood_ratio()
     chi2 = cmu_scorer.chi2()
     tresoldi = cmu_scorer.tresoldi()
-    
+
     # Test: G² and Chi² should be correlated (both test independence)
     g2_values = [g2[p][0] for p in g2.keys()]
     chi2_values = [chi2[p][0] for p in chi2.keys() if p in g2]
-    
+
     if len(g2_values) > 2 and len(chi2_values) > 2:
         correlation = np.corrcoef(g2_values, chi2_values)[0, 1]
         # Should be positively correlated (both measure association)
         assert correlation > 0.3  # Allow for some differences in calculation
-    
+
     # Test: All methods should return same number of pairs
     assert len(mi) == len(g2)
     assert len(mi) == len(tresoldi)
-    
+
     # Test: Methods should be deterministic (same results on repeated calls)
     mi2 = cmu_scorer.mutual_information()
     for pair in mi:
@@ -452,16 +451,16 @@ def test_edge_cases_and_error_handling():
     minimal_data = [[entry[0].split(), entry[1].split()] for entry in minimal_data]
     minimal_cooccs = asymcat.collect_cooccs(minimal_data)
     minimal_scorer = asymcat.scorer.CatScorer(minimal_cooccs)
-    
+
     # All methods should work with minimal data
     methods = [
         minimal_scorer.mutual_information,
         minimal_scorer.normalized_mutual_information,
         minimal_scorer.jaccard_index,
         minimal_scorer.goodman_kruskal_lambda,
-        minimal_scorer.log_likelihood_ratio
+        minimal_scorer.log_likelihood_ratio,
     ]
-    
+
     for method in methods:
         result = method()
         assert isinstance(result, dict)
@@ -469,27 +468,27 @@ def test_edge_cases_and_error_handling():
         # Check no NaN or infinite values
         for scores in result.values():
             assert all(np.isfinite(s) for s in scores)
-    
+
     # Test caching behavior (methods should return same object on repeated calls)
     mi1 = minimal_scorer.mutual_information()
     mi2 = minimal_scorer.mutual_information()
     assert mi1 is mi2  # Should be the same cached object
-    
+
     # Test that computation functions handle edge cases
     from asymcat.scorer import (
+        compute_goodman_kruskal_lambda,
+        compute_jaccard_index,
+        compute_log_likelihood_ratio,
         compute_mutual_information,
         compute_normalized_mutual_information,
-        compute_jaccard_index,
-        compute_goodman_kruskal_lambda,
-        compute_log_likelihood_ratio
     )
-    
+
     # Test empty inputs
     assert compute_mutual_information([], []) == 0.0
     assert compute_normalized_mutual_information([], []) == 0.0
     assert compute_jaccard_index([], []) == 0.0
     assert compute_goodman_kruskal_lambda([], [], "y_given_x") == 0.0
-    
+
     # Test single contingency table
     single_ct = [[1, 0], [0, 1]]
     g2_single = compute_log_likelihood_ratio(single_ct)
@@ -506,18 +505,18 @@ def test_comprehensive_datasets():
         ("mushroom-small.tsv", "Mushroom dataset (small)"),
         ("cmudict.sample100.tsv", "CMU Dictionary sample"),
     ]
-    
+
     for filename, description in datasets:
         print(f"Testing {description}...")
         file_path = RESOURCE_DIR / filename
-        
+
         # Load and process data
         data = asymcat.read_sequences(file_path.as_posix())
         cooccs = asymcat.collect_cooccs(data)
         scorer = asymcat.scorer.CatScorer(cooccs)
-        
+
         print(f"  {len(cooccs)} co-occurrences, {len(scorer.alphabet_x)} x symbols, {len(scorer.alphabet_y)} y symbols")
-        
+
         # Test all new methods
         new_methods = [
             ("Mutual Information", scorer.mutual_information),
@@ -526,28 +525,28 @@ def test_comprehensive_datasets():
             ("Goodman-Kruskal Lambda", scorer.goodman_kruskal_lambda),
             ("Log-Likelihood Ratio", scorer.log_likelihood_ratio),
         ]
-        
+
         for method_name, method_func in new_methods:
             result = method_func()
-            
+
             # Basic sanity checks
             assert isinstance(result, dict)
             assert len(result) > 0
-            
+
             # Check mathematical properties
             for pair, scores in result.items():
                 assert len(scores) == 2
                 for score in scores:
                     assert np.isfinite(score), f"{method_name} produced non-finite value for {pair}"
-                    
+
                     # Method-specific bounds
                     if method_name in ["Normalized MI", "Jaccard Index", "Goodman-Kruskal Lambda"]:
                         assert 0.0 <= score <= 1.0, f"{method_name} value {score} out of [0,1] range"
                     elif method_name in ["Mutual Information", "Log-Likelihood Ratio"]:
                         assert score >= 0.0, f"{method_name} value {score} should be non-negative"
-        
+
         print(f"  ✓ All methods passed for {description}")
-    
+
     print("✅ Comprehensive dataset testing completed successfully!")
 
 
@@ -556,20 +555,20 @@ def test_performance_and_scalability():
     Test performance characteristics and scalability of new methods.
     """
     import time
-    
+
     # Test with the largest available dataset
     large_file = RESOURCE_DIR / "cmudict.sample1000.tsv"
     if large_file.exists():
         print("Testing performance with large dataset...")
-        
+
         start_time = time.time()
         data = asymcat.read_sequences(large_file.as_posix())
         cooccs = asymcat.collect_cooccs(data)
         scorer = asymcat.scorer.CatScorer(cooccs)
         load_time = time.time() - start_time
-        
+
         print(f"  Loaded {len(cooccs)} co-occurrences in {load_time:.2f}s")
-        
+
         # Test each method's performance
         methods = [
             ("MI", scorer.mutual_information),
@@ -578,25 +577,25 @@ def test_performance_and_scalability():
             ("Lambda", scorer.goodman_kruskal_lambda),
             ("G²", scorer.log_likelihood_ratio),
         ]
-        
+
         for method_name, method_func in methods:
             start_time = time.time()
             result = method_func()
             method_time = time.time() - start_time
-            
+
             print(f"  {method_name}: {len(result)} pairs in {method_time:.2f}s")
-            
+
             # Performance check: should complete within reasonable time
             assert method_time < 30.0, f"{method_name} took too long: {method_time:.2f}s"
-            
+
             # Verify caching works (second call should be much faster)
             start_time = time.time()
             result2 = method_func()
             cached_time = time.time() - start_time
-            
+
             assert result is result2, f"{method_name} caching not working"
             assert cached_time < 0.01, f"{method_name} cached call too slow: {cached_time:.4f}s"
-    
+
     print("✅ Performance testing completed successfully!")
 
 
@@ -609,7 +608,7 @@ def test_mathematical_properties():
     data = asymcat.read_sequences(data_file.as_posix())
     cooccs = asymcat.collect_cooccs(data)
     scorer = asymcat.scorer.CatScorer(cooccs)
-    
+
     # Get all results
     mi = scorer.mutual_information()
     nmi = scorer.normalized_mutual_information()
@@ -617,49 +616,49 @@ def test_mathematical_properties():
     gk_lambda = scorer.goodman_kruskal_lambda()
     g2 = scorer.log_likelihood_ratio()
     chi2 = scorer.chi2()
-    
+
     print("Testing mathematical properties...")
-    
+
     # Property 1: Symmetry where expected
     print("  Testing symmetry properties...")
     for pair in jaccard:
         j_xy, j_yx = jaccard[pair]
         assert abs(j_xy - j_yx) < 1e-10, f"Jaccard not symmetric for {pair}"
-    
+
     for pair in mi:
         mi_xy, mi_yx = mi[pair]
         assert abs(mi_xy - mi_yx) < 1e-10, f"MI not symmetric for {pair}"
-    
+
     # Property 2: Range constraints
     print("  Testing range constraints...")
     for pair in nmi:
         for val in nmi[pair]:
             assert 0.0 <= val <= 1.0, f"NMI out of range for {pair}: {val}"
-    
+
     for pair in gk_lambda:
         for val in gk_lambda[pair]:
             assert 0.0 <= val <= 1.0, f"Lambda out of range for {pair}: {val}"
-    
+
     # Property 3: Non-negativity
     print("  Testing non-negativity...")
     for pair in mi:
         for val in mi[pair]:
             assert val >= 0.0, f"MI negative for {pair}: {val}"
-    
+
     for pair in g2:
         for val in g2[pair]:
             assert val >= 0.0, f"G² negative for {pair}: {val}"
-    
+
     # Property 4: Correlation between related methods
     print("  Testing correlations between related methods...")
     g2_vals = [g2[p][0] for p in g2.keys()]
     chi2_vals = [chi2[p][0] for p in chi2.keys() if p in g2]
-    
+
     if len(g2_vals) > 5:
         correlation = np.corrcoef(g2_vals, chi2_vals)[0, 1]
         print(f"    G² vs Chi²: correlation = {correlation:.3f}")
-        assert correlation > 0.5, f"G² and Chi² should be strongly correlated"
-    
+        assert correlation > 0.5, "G² and Chi² should be strongly correlated"
+
     print("✅ Mathematical properties verified!")
 
 
