@@ -48,4 +48,4 @@ repos:
     rev: 1.7.8
     hooks:
       - id: bandit
-        args: ["-r", ".", "--skip", "B101", "--exclude", "tests/"]
+        args: ["-r", ".", "--skip", "B101", "--exclude", "tests/,docs/"]
