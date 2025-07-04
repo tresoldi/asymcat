@@ -125,7 +125,9 @@ def load_data(file_path: str, format_type: str, verbose: bool = False) -> Union[
     return data
 
 
-def compute_cooccurrences(data: Union[List[List[List[str]]], List[tuple]], ngrams: Optional[int], pad: str, verbose: bool = False) -> List[tuple]:
+def compute_cooccurrences(
+    data: Union[List[List[List[str]]], List[tuple]], ngrams: Optional[int], pad: str, verbose: bool = False
+) -> List[tuple]:
     """Compute co-occurrences from the data."""
     if verbose:
         if ngrams:

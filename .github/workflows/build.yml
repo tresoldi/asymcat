@@ -2,6 +2,10 @@ name: build
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -17,6 +21,69 @@ jobs:
         run: make install
       - name: Check format
         run: make format-check
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+      - name: Install Security Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[security]"
+      - name: Run Bandit Security Scan
+        run: |
+          bandit -r asymcat/ -f json -o bandit-report.json || true
+          bandit -r asymcat/ --exit-zero
+      - name: Run Safety Check
+        run: |
+          safety check --json --output safety-report.json || true
+          safety check
+      - name: Upload Security Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            safety-report.json
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit pip-licenses
+      - name: Audit Dependencies for Vulnerabilities
+        run: |
+          pip-audit --format=json --output=pip-audit-report.json . || true
+          pip-audit .
+      - name: Check Dependency Licenses
+        run: |
+          pip-licenses --format=json --output-file=licenses-report.json || true
+          pip-licenses --format=table
+      - name: Upload Dependency Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-reports
+          path: |
+            pip-audit-report.json
+            licenses-report.json
+
   test:
     runs-on: ubuntu-latest
     strategy:

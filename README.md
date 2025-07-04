@@ -123,6 +123,37 @@ The library can be installed as any standard Python library with `pip`:
 pip install asymcat
 ```
 
+### Development Installation
+
+For development work, you can install the library with optional dependency groups:
+
+```bash
+# Install with testing dependencies
+pip install "asymcat[test]"
+
+# Install with documentation dependencies
+pip install "asymcat[docs]"
+
+# Install with all development dependencies
+pip install "asymcat[dev]"
+
+# Install with all optional dependencies
+pip install "asymcat[all]"
+```
+
+Available dependency groups:
+- `test`: Testing framework and utilities
+- `lint`: Code formatting and linting tools
+- `typecheck`: Type checking tools
+- `security`: Security scanning tools
+- `dev-tools`: Development and build tools
+- `docs`: Documentation generation tools
+- `jupyter`: Jupyter notebook support
+- `performance`: Performance profiling tools
+- `viz`: Additional visualization libraries
+- `dev`: Core development dependencies (test, lint, typecheck, security, dev-tools)
+- `all`: All optional dependencies
+
 Detailed instructions on how to use the library can be found in
 the [official documentation]().
 
