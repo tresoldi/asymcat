@@ -1,0 +1,269 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v0.3.0, v1.0.0, etc.
+  workflow_dispatch:  # Allow manual triggers
+    inputs:
+      version:
+        description: 'Version to release (e.g., v0.3.1)'
+        required: true
+        type: string
+      test-pypi:
+        description: 'Upload to Test PyPI instead of PyPI'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  id-token: write  # For PyPI trusted publishing
+
+jobs:
+  validate-release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+      is-prerelease: ${{ steps.get-version.outputs.is-prerelease }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Get Version
+        id: get-version
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          
+          # Check if this is a pre-release (alpha, beta, rc)
+          if [[ $VERSION =~ (alpha|beta|rc|dev) ]]; then
+            echo "is-prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "is-prerelease=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+
+      - name: Install Build Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[dev-tools]"
+
+      - name: Validate Version Consistency
+        run: |
+          VERSION_TAG="${{ steps.get-version.outputs.version }}"
+          VERSION_NO_V="${VERSION_TAG#v}"
+          
+          # Check pyproject.toml version
+          PYPROJECT_VERSION=$(python -c "import tomllib; f=open('pyproject.toml','rb'); print(tomllib.load(f)['project']['version'])")
+          
+          # Check __init__.py version
+          INIT_VERSION=$(python -c "import asymcat; print(asymcat.__version__)")
+          
+          echo "Tag version: $VERSION_NO_V"
+          echo "pyproject.toml version: $PYPROJECT_VERSION"
+          echo "__init__.py version: $INIT_VERSION"
+          
+          if [[ "$VERSION_NO_V" != "$PYPROJECT_VERSION" ]]; then
+            echo "ERROR: Tag version ($VERSION_NO_V) does not match pyproject.toml version ($PYPROJECT_VERSION)"
+            exit 1
+          fi
+          
+          if [[ "$VERSION_NO_V" != "$INIT_VERSION" ]]; then
+            echo "ERROR: Tag version ($VERSION_NO_V) does not match __init__.py version ($INIT_VERSION)"
+            exit 1
+          fi
+          
+          echo "✅ All versions are consistent"
+
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: validate-release
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[test]"
+
+      - name: Run Tests
+        run: python -m pytest tests/ -v
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: validate-release
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+
+      - name: Install Security Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[security]"
+          pip install pip-audit
+
+      - name: Run Security Scans
+        run: |
+          bandit -r asymcat/
+          pip-audit .
+          safety scan
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [validate-release, run-tests, security-scan]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: 'pip'
+
+      - name: Install Build Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[dev-tools]"
+
+      - name: Build Package
+        run: |
+          python -m build
+
+      - name: Verify Build
+        run: |
+          python -m twine check dist/*
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 5
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [validate-release, build]
+    environment: 
+      name: ${{ github.event.inputs.test-pypi == 'true' && 'test-pypi' || 'pypi' }}
+      url: ${{ github.event.inputs.test-pypi == 'true' && 'https://test.pypi.org/p/asymcat' || 'https://pypi.org/p/asymcat' }}
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to Test PyPI
+        if: github.event.inputs.test-pypi == 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist/
+
+      - name: Publish to PyPI
+        if: github.event.inputs.test-pypi != 'true'
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [validate-release, publish]
+    if: github.event_name == 'push'  # Only for tag pushes, not manual triggers
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for changelog
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          VERSION="${{ needs.validate-release.outputs.version }}"
+          
+          # Get the previous tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          echo "## Changes in $VERSION" > RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          
+          if [[ -n "$PREV_TAG" ]]; then
+            echo "### Commits since $PREV_TAG:" >> RELEASE_NOTES.md
+            git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD >> RELEASE_NOTES.md
+          else
+            echo "### All commits:" >> RELEASE_NOTES.md
+            git log --pretty=format:"- %s (%h)" >> RELEASE_NOTES.md
+          fi
+          
+          echo "" >> RELEASE_NOTES.md
+          echo "### Package Files" >> RELEASE_NOTES.md
+          echo "" >> RELEASE_NOTES.md
+          for file in dist/*; do
+            echo "- $(basename $file)" >> RELEASE_NOTES.md
+          done
+          
+          # Store the release notes for the next step
+          cat RELEASE_NOTES.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.validate-release.outputs.version }}
+          name: Release ${{ needs.validate-release.outputs.version }}
+          body_path: RELEASE_NOTES.md
+          files: dist/*
+          prerelease: ${{ needs.validate-release.outputs.is-prerelease == 'true' }}
+          draft: false
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [validate-release, create-release]
+    if: always()
+    steps:
+      - name: Notify Success
+        if: needs.create-release.result == 'success'
+        run: |
+          echo "🎉 Release ${{ needs.validate-release.outputs.version }} published successfully!"
+          echo "📦 Available on PyPI: https://pypi.org/project/asymcat/"
+          echo "📋 GitHub Release: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.validate-release.outputs.version }}"
+
+      - name: Notify Failure
+        if: needs.create-release.result == 'failure'
+        run: |
+          echo "❌ Release ${{ needs.validate-release.outputs.version }} failed!"
+          echo "Check the workflow logs for details."
+          exit 1

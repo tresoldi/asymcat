@@ -36,23 +36,84 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "bandit[toml] == 1.7.*",
-    "black == 22.*",
-    "build == 0.7.*",
-    "flake8 == 4.*",
-    "isort == 5.*",
-    "mypy >= 0.981",
-    "pre-commit >= 3.0.0",
-    "pytest == 7.*",
-    "pytest-cov == 4.*",
-    "twine == 4.*",
+# Testing dependencies
+test = [
+    "pytest >= 7.0.0",
+    "pytest-cov >= 4.0.0",
+    "pytest-xdist >= 3.0.0",  # parallel test execution
+    "pytest-mock >= 3.10.0",  # improved mocking
 ]
+
+# Code quality and formatting
+lint = [
+    "black >= 23.0.0",
+    "isort >= 5.12.0",
+    "flake8 >= 6.0.0",
+    "flake8-docstrings >= 1.7.0",
+    "flake8-bugbear >= 23.0.0",
+]
+
+# Type checking
+typecheck = [
+    "mypy >= 1.5.0",
+    "types-tabulate >= 0.9.0",
+    "types-setuptools >= 68.0.0",
+]
+
+# Security scanning
+security = [
+    "bandit[toml] >= 1.7.0",
+    "safety >= 2.3.0",
+]
+
+# Development tools
+dev-tools = [
+    "pre-commit >= 3.4.0",
+    "build >= 0.10.0",
+    "twine >= 4.0.0",
+    "bump2version >= 1.0.0",
+]
+
+# Documentation
 docs = [
-    "sphinx >= 5.0.0",
-    "sphinx-rtd-theme >= 1.0.0",
-    "myst-parser >= 0.18.0",
-    "sphinx-autodoc-typehints >= 1.19.0",
+    "sphinx >= 7.0.0",
+    "sphinx-rtd-theme >= 1.3.0",
+    "myst-parser >= 2.0.0",
+    "sphinx-autodoc-typehints >= 1.24.0",
+    "sphinx-copybutton >= 0.5.0",
+    "sphinx-design >= 0.5.0",
+]
+
+# Jupyter and notebooks (for examples and tutorials)
+jupyter = [
+    "jupyter >= 1.0.0",
+    "jupyterlab >= 4.0.0",
+    "ipywidgets >= 8.0.0",
+    "notebook >= 7.0.0",
+]
+
+# Performance profiling and benchmarking
+performance = [
+    "pytest-benchmark >= 4.0.0",
+    "memory-profiler >= 0.61.0",
+    "line-profiler >= 4.0.0",
+]
+
+# Visualization extras (beyond core dependencies)
+viz = [
+    "plotly >= 5.15.0",
+    "bokeh >= 3.2.0",
+    "altair >= 5.0.0",
+]
+
+# All development dependencies combined
+dev = [
+    "asymcat[test,lint,typecheck,security,dev-tools]",
+]
+
+# All dependencies for comprehensive development environment
+all = [
+    "asymcat[test,lint,typecheck,security,dev-tools,docs,jupyter,performance,viz]",
 ]
 
 [project.urls]
