@@ -17,7 +17,7 @@ ASymCat is a Python library for analyzing asymmetric associations between catego
 - **Asymmetric measures**: Directional measures where X→Y ≠ Y→X (e.g., MLE, PMI, Theil's U)
 - **Symmetric measures**: Non-directional measures (e.g., Chi-square, Cramér's V)
 - **Scoring**: Converting co-occurrence counts to association strength measures
-- **Smoothing**: Probability estimation methods (MLE, Laplace, ELE) for handling sparse data
+- **Smoothing**: Probability estimation methods (MLE, Laplace, Lidstone) for handling sparse data
 
 ## Development Commands
 
@@ -84,7 +84,7 @@ python -m asymcat resources/toy.tsv --scorers mle pmi
 
 # Test with smoothing options
 python -m asymcat resources/toy.tsv --scorers mle pmi_smoothed --smoothing laplace
-python -m asymcat resources/toy.tsv --scorers mle --smoothing ele --smoothing-alpha 0.5
+python -m asymcat resources/toy.tsv --scorers mle --smoothing lidstone --smoothing-alpha 0.5
 ```
 
 ## Code Architecture
@@ -98,7 +98,7 @@ python -m asymcat resources/toy.tsv --scorers mle --smoothing ele --smoothing-al
 ### Core Classes
 - **CatScorer**: Main scoring engine with methods for each measure (mle(), pmi(), chi2(), etc.)
   - Constructor: `CatScorer(cooccs, smoothing_method='mle', smoothing_alpha=1.0)`
-  - Smoothing methods: 'mle', 'laplace', 'ele' (Expected Likelihood Estimation)
+  - Smoothing methods: 'mle', 'laplace', 'lidstone' (parameterized smoothing)
 - **New Methods**:
   - `pmi_smoothed()`: PMI with freqprob smoothing for numerical stability
   - `get_smoothed_probabilities()`: Returns all probability types with smoothing
@@ -133,7 +133,7 @@ Test markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slo
   - Smoothing particularly beneficial for rare category pairs
 - All scorers handle missing/zero co-occurrences gracefully
 - CLI supports multiple output formats (JSON, CSV, markdown tables)
-- CLI smoothing options: `--smoothing {mle,laplace,ele}` and `--smoothing-alpha FLOAT`
+- CLI smoothing options: `--smoothing {mle,laplace,lidstone}` and `--smoothing-alpha FLOAT`
 - New scorer: `pmi_smoothed()` uses freqprob for better numerical stability
 - Extensive type hints throughout codebase
 - N-gram analysis supported via `collect_ngrams()`

@@ -74,7 +74,7 @@ Examples:
     # Smoothing options (for freqprob integration)
     parser.add_argument(
         "--smoothing",
-        choices=["mle", "laplace", "ele"],
+        choices=["mle", "laplace", "lidstone"],
         default="mle",
         help="Smoothing method for probability estimation (default: mle)",
     )
@@ -82,7 +82,7 @@ Examples:
         "--smoothing-alpha",
         type=float,
         default=1.0,
-        help="Smoothing parameter (alpha for Laplace/ELE, default: 1.0)",
+        help="Smoothing parameter (alpha for Laplace/Lidstone, default: 1.0)",
     )
 
     # Scaling options
