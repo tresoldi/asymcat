@@ -70,7 +70,7 @@ Examples:
         default=["mle"],
         help="Scoring methods to compute (default: mle)",
     )
-    
+
     # Smoothing options (for freqprob integration)
     parser.add_argument(
         "--smoothing",
