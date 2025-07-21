@@ -46,6 +46,7 @@ Examples:
     scorer_choices = [
         "mle",
         "pmi",
+        "pmi_smoothed",
         "npmi",
         "chi2",
         "chi2_ns",
@@ -68,6 +69,20 @@ Examples:
         choices=scorer_choices,
         default=["mle"],
         help="Scoring methods to compute (default: mle)",
+    )
+    
+    # Smoothing options (for freqprob integration)
+    parser.add_argument(
+        "--smoothing",
+        choices=["mle", "laplace", "ele"],
+        default="mle",
+        help="Smoothing method for probability estimation (default: mle)",
+    )
+    parser.add_argument(
+        "--smoothing-alpha",
+        type=float,
+        default=1.0,
+        help="Smoothing parameter (alpha for Laplace/ELE, default: 1.0)",
     )
 
     # Scaling options
@@ -148,6 +163,7 @@ def get_scorer_methods(scorer: CatScorer, scorer_names: List[str]) -> Dict[str, 
     all_methods = {
         "mle": scorer.mle,
         "pmi": lambda: scorer.pmi(False),
+        "pmi_smoothed": lambda: scorer.pmi_smoothed(False),
         "npmi": lambda: scorer.pmi(True),
         "chi2": lambda: scorer.chi2(True),
         "chi2_ns": lambda: scorer.chi2(False),
@@ -183,13 +199,15 @@ def compute_scores(
     scale: Optional[str] = None,
     invert: bool = False,
     min_count: Optional[int] = None,
+    smoothing_method: str = "mle",
+    smoothing_alpha: float = 1.0,
     verbose: bool = False,
 ) -> Dict[str, Any]:
     """Compute the requested scores."""
     if verbose:
         print("Creating scorer and computing scores", file=sys.stderr)
 
-    scorer = CatScorer(cooccs)
+    scorer = CatScorer(cooccs, smoothing_method=smoothing_method, smoothing_alpha=smoothing_alpha)
     methods = get_scorer_methods(scorer, scorer_names)
 
     results = {}
@@ -308,6 +326,8 @@ def main():
             args.scale,
             args.invert,
             args.min_count,
+            args.smoothing,
+            args.smoothing_alpha,
             args.verbose,
         )
 
