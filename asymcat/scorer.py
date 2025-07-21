@@ -25,8 +25,7 @@ from typing import Any, Dict, List, Optional, Tuple
 # Import 3rd party libraries
 import numpy as np
 import scipy.stats as ss  # type: ignore
-import freqprob
-from freqprob import MLE, Laplace, ELE, BatchScorer
+from freqprob import ELE, MLE, Laplace
 
 # import local modules
 from . import common
@@ -505,7 +504,7 @@ def invert_scorer(scorer: Dict[Tuple[Any, Any], Tuple[float, float]]) -> Dict[Tu
 
 
 def scorer2matrices(
-    scorer: Dict[Tuple[Any, Any], Tuple[float, float]]
+    scorer: Dict[Tuple[Any, Any], Tuple[float, float]],
 ) -> Tuple[np.ndarray, np.ndarray, List[Any], List[Any]]:
     """
     Return the asymmetric matrices implied by a scorer and their alphabets.
@@ -559,11 +558,11 @@ class CatScorer:
         self.alphabet_x: List[Any]
         self.alphabet_y: List[Any]
         self.alphabet_x, self.alphabet_y = common.collect_alphabets(self.cooccs)
-        
+
         # Store smoothing configuration
         self.smoothing_method = smoothing_method.lower()
         self.smoothing_alpha = smoothing_alpha
-        
+
         # Store smoothing parameters - freqprob scorers will be created when needed
         # since they require frequency distributions which are computed per pair
         self._freqprob_scorer_class = None
@@ -575,7 +574,7 @@ class CatScorer:
             self._freqprob_scorer_class = ELE
         else:
             raise ValueError(f"Unsupported smoothing method: {smoothing_method}. Use 'mle', 'laplace', or 'ele'.")
-        
+
         # Cache for freqprob scorers per context
         self._freqprob_cache: Dict[str, Any] = {}
 
@@ -693,13 +692,13 @@ class CatScorer:
         # Compute the scorer, if necessary
         if not self._mle:
             self._mle = {}
-            
+
             for pair in product(self.alphabet_x, self.alphabet_y):
                 obs = self.obs[pair]
-                
+
                 # Use freqprob for robust probability estimation
                 # Create frequency distributions for conditional probabilities
-                
+
                 # P(X|Y) - distribution of X values given Y
                 if obs["01"] > 0:  # Y marginal count > 0
                     if self.smoothing_method == "mle":
@@ -707,74 +706,63 @@ class CatScorer:
                         xy_score = obs["11"] / obs["01"]
                     else:
                         # For smoothing methods, use freqprob which handles zeros better
-                        freq_dist_x_given_y = {
-                            pair[0]: obs["11"],
-                            f"NOT_{pair[0]}": obs["01"] - obs["11"]
-                        }
-                        
+                        freq_dist_x_given_y = {pair[0]: obs["11"], f"NOT_{pair[0]}": obs["01"] - obs["11"]}
+
                         if self.smoothing_method == "laplace":
                             scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y)
                         else:  # ELE
                             scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y, alpha=self.smoothing_alpha)
-                        
+
                         xy_score = math.exp(scorer_xy(pair[0]))
                 else:
                     xy_score = 0.0
-                
-                # P(Y|X) - distribution of Y values given X  
+
+                # P(Y|X) - distribution of Y values given X
                 if obs["10"] > 0:  # X marginal count > 0
                     if self.smoothing_method == "mle":
                         # For MLE, use simple division to avoid log(0) issues
                         yx_score = obs["11"] / obs["10"]
                     else:
                         # For smoothing methods, use freqprob which handles zeros better
-                        freq_dist_y_given_x = {
-                            pair[1]: obs["11"],
-                            f"NOT_{pair[1]}": obs["10"] - obs["11"]
-                        }
-                        
+                        freq_dist_y_given_x = {pair[1]: obs["11"], f"NOT_{pair[1]}": obs["10"] - obs["11"]}
+
                         if self.smoothing_method == "laplace":
                             scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x)
                         else:  # ELE
                             scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x, alpha=self.smoothing_alpha)
-                        
+
                         yx_score = math.exp(scorer_yx(pair[1]))
                 else:
                     yx_score = 0.0
-                    
+
                 self._mle[pair] = (xy_score, yx_score)
 
         return self._mle
-    
+
     def get_smoothed_probabilities(self) -> Dict[str, Dict[Tuple[Any, Any], float]]:
         """
         Return smoothed probability estimates using the configured freqprob method.
-        
+
         Returns
         -------
         Dict[str, Dict[Tuple[Any, Any], float]]
             Dictionary containing 'xy_given_y', 'yx_given_x', 'joint', 'marginal_x', 'marginal_y' probabilities.
         """
-        results = {
+        results: Dict[str, Dict[Tuple[Any, Any], float]] = {
             'xy_given_y': {},  # P(X|Y)
-            'yx_given_x': {},  # P(Y|X) 
-            'joint': {},       # P(X,Y)
+            'yx_given_x': {},  # P(Y|X)
+            'joint': {},  # P(X,Y)
             'marginal_x': {},  # P(X)
-            'marginal_y': {}   # P(Y)
+            'marginal_y': {},  # P(Y)
         }
-        
-        total_count = sum(obs["00"] for obs in self.obs.values())
-        
+
         # Create global frequency distributions
-        total_joint = sum(obs["11"] for obs in self.obs.values())
-        total_x = sum(obs["10"] for obs in self.obs.values()) 
-        total_y = sum(obs["01"] for obs in self.obs.values())
-        
+
         # Build frequency distributions
         joint_freqdist = {pair: obs["11"] for pair, obs in self.obs.items()}
         x_freqdist = {}
         y_freqdist = {}
-        
+
         for pair in product(self.alphabet_x, self.alphabet_y):
             obs = self.obs[pair]
             if pair[0] not in x_freqdist:
@@ -783,11 +771,11 @@ class CatScorer:
                 y_freqdist[pair[1]] = 0
             x_freqdist[pair[0]] += obs["10"]
             y_freqdist[pair[1]] += obs["01"]
-        
+
         # Create freqprob scorers
         if self.smoothing_method == "mle":
             joint_scorer = self._freqprob_scorer_class(joint_freqdist)
-            x_scorer = self._freqprob_scorer_class(x_freqdist) 
+            x_scorer = self._freqprob_scorer_class(x_freqdist)
             y_scorer = self._freqprob_scorer_class(y_freqdist)
         elif self.smoothing_method == "laplace":
             joint_scorer = self._freqprob_scorer_class(joint_freqdist)
@@ -797,41 +785,41 @@ class CatScorer:
             joint_scorer = self._freqprob_scorer_class(joint_freqdist, alpha=self.smoothing_alpha)
             x_scorer = self._freqprob_scorer_class(x_freqdist, alpha=self.smoothing_alpha)
             y_scorer = self._freqprob_scorer_class(y_freqdist, alpha=self.smoothing_alpha)
-        
+
         for pair in product(self.alphabet_x, self.alphabet_y):
             obs = self.obs[pair]
-            
+
             # Get smoothed probabilities (note: freqprob returns log probabilities by default)
             joint_prob = math.exp(joint_scorer(pair)) if pair in joint_freqdist else 0.0
             x_prob = math.exp(x_scorer(pair[0])) if pair[0] in x_freqdist else 0.0
             y_prob = math.exp(y_scorer(pair[1])) if pair[1] in y_freqdist else 0.0
-            
+
             results['joint'][pair] = joint_prob
             results['marginal_x'][pair[0]] = x_prob
             results['marginal_y'][pair[1]] = y_prob
-            
+
             # Conditional probabilities using Bayes' rule
             if obs["01"] > 0 and y_prob > 0:  # Y marginal count > 0
                 results['xy_given_y'][pair] = joint_prob / y_prob
             else:
                 results['xy_given_y'][pair] = 0.0
-                
+
             if obs["10"] > 0 and x_prob > 0:  # X marginal count > 0
                 results['yx_given_x'][pair] = joint_prob / x_prob
             else:
                 results['yx_given_x'][pair] = 0.0
-                
+
         return results
-    
+
     def pmi_smoothed(self, normalized: bool = False) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
         """
         Return a PMI scorer using freqprob smoothing for better numerical stability.
-        
+
         Parameters
         ----------
         normalized : bool
             Whether to return normalized PMI (NPMI) or standard PMI (default: False)
-            
+
         Returns
         -------
         Dict[Tuple[Any, Any], Tuple[float, float]]
@@ -839,17 +827,17 @@ class CatScorer:
         """
         probs = self.get_smoothed_probabilities()
         pmi_scores = {}
-        
+
         for pair in product(self.alphabet_x, self.alphabet_y):
             p_x = probs['marginal_x'].get(pair[0], 0.0)
-            p_y = probs['marginal_y'].get(pair[1], 0.0) 
+            p_y = probs['marginal_y'].get(pair[1], 0.0)
             p_xy = probs['joint'].get(pair, 0.0)
-            
+
             # PMI(X,Y) = log(P(X,Y) / (P(X) * P(Y)))
             if p_x > 0 and p_y > 0 and p_xy > 0:
                 pmi_xy = math.log(p_xy / (p_x * p_y))
                 pmi_yx = math.log(p_xy / (p_y * p_x))  # Symmetric for PMI
-                
+
                 if normalized:
                     # NPMI = PMI / -log(P(X,Y))
                     if p_xy > 0:
@@ -857,9 +845,9 @@ class CatScorer:
                         pmi_yx = pmi_yx / (-math.log(p_xy))
             else:
                 pmi_xy = pmi_yx = 0.0
-                
+
             pmi_scores[pair] = (pmi_xy, pmi_yx)
-            
+
         return pmi_scores
 
     def pmi(self, normalized: bool = False) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
@@ -1130,8 +1118,8 @@ class CatScorer:
             self._jaccard_index = {}
 
             # Pre-compute context sets for each symbol
-            x_contexts: Dict[Any, set] = {}  # symbol -> set of contexts where it appears
-            y_contexts: Dict[Any, set] = {}  # symbol -> set of contexts where it appears
+            x_contexts: Dict[Any, List[Any]] = {}  # symbol -> list of contexts where it appears
+            y_contexts: Dict[Any, List[Any]] = {}  # symbol -> list of contexts where it appears
 
             for i, (x, y) in enumerate(self.cooccs):
                 if x not in x_contexts:
@@ -1145,8 +1133,8 @@ class CatScorer:
             for x in self.alphabet_x:
                 for y in self.alphabet_y:
                     # Get contexts for each symbol
-                    contexts_x = x_contexts.get(x, [])
-                    contexts_y = y_contexts.get(y, [])
+                    contexts_x: List[Any] = x_contexts.get(x, [])
+                    contexts_y: List[Any] = y_contexts.get(y, [])
 
                     # Compute Jaccard index for both directions (though it's symmetric)
                     jaccard_xy = compute_jaccard_index(contexts_x, contexts_y)

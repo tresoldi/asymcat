@@ -7,7 +7,7 @@ Provides shared fixtures, markers, and configuration for the modernized test str
 import time
 import warnings
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import pytest
 
