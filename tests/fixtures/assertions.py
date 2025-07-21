@@ -4,10 +4,9 @@ Custom assertions and validation utilities for ASymCat tests.
 Provides domain-specific assertions that make tests more readable and maintainable.
 """
 
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
-import pytest
 
 
 def assert_valid_cooccurrences(cooccs: List[Tuple[Any, Any]]) -> None:

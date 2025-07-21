@@ -8,7 +8,7 @@ ASymCat is a Python library for analyzing asymmetric associations between catego
 
 **Core Architecture:**
 - `asymcat/common.py`: Data loading, preprocessing, and co-occurrence collection
-- `asymcat/scorer.py`: CatScorer class with all association measure implementations  
+- `asymcat/scorer.py`: CatScorer class with all association measure implementations
 - `asymcat/correlation.py`: Correlation analysis utilities
 - `asymcat/__main__.py`: Command-line interface implementation
 
@@ -26,7 +26,7 @@ ASymCat is a Python library for analyzing asymmetric associations between catego
 # Create virtual environment and install dev dependencies
 make install
 
-# Install with all optional features  
+# Install with all optional features
 pip install -e ".[all]"
 ```
 
@@ -38,7 +38,7 @@ make test
 pytest
 
 # Run with coverage report
-make coverage  
+make coverage
 # or
 pytest --cov=asymcat --cov-branch --cov-report=html
 
@@ -55,7 +55,7 @@ make format-check
 
 # Individual tools
 make black-check    # Code formatting check
-make isort-check    # Import sorting check  
+make isort-check    # Import sorting check
 make lint          # Flake8 linting
 make mypy          # Type checking
 
@@ -99,7 +99,7 @@ python -m asymcat resources/toy.tsv --scorers mle --smoothing ele --smoothing-al
 - **CatScorer**: Main scoring engine with methods for each measure (mle(), pmi(), chi2(), etc.)
   - Constructor: `CatScorer(cooccs, smoothing_method='mle', smoothing_alpha=1.0)`
   - Smoothing methods: 'mle', 'laplace', 'ele' (Expected Likelihood Estimation)
-- **New Methods**: 
+- **New Methods**:
   - `pmi_smoothed()`: PMI with freqprob smoothing for numerical stability
   - `get_smoothed_probabilities()`: Returns all probability types with smoothing
 - Each scoring method returns dict of `{(x,y): (xy_score, yx_score)}`
@@ -119,7 +119,7 @@ python -m asymcat resources/toy.tsv --scorers mle --smoothing ele --smoothing-al
 
 Tests are organized in `/tests` with:
 - `unit/`: Individual function/method tests
-- `integration/`: End-to-end workflow tests  
+- `integration/`: End-to-end workflow tests
 - `fixtures/`: Shared test data and utilities
 - `conftest.py`: Pytest configuration and fixtures
 
@@ -136,6 +136,6 @@ Test markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slo
 - CLI smoothing options: `--smoothing {mle,laplace,ele}` and `--smoothing-alpha FLOAT`
 - New scorer: `pmi_smoothed()` uses freqprob for better numerical stability
 - Extensive type hints throughout codebase
-- N-gram analysis supported via `collect_ngrams()` 
+- N-gram analysis supported via `collect_ngrams()`
 - Score transformation utilities: scaling, inversion, matrix conversion
 - Built-in example datasets in `/resources`
