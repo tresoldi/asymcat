@@ -25,7 +25,7 @@ from typing import Any, Dict, List, Optional, Tuple
 # Import 3rd party libraries
 import numpy as np
 import scipy.stats as ss  # type: ignore
-from freqprob import ELE, MLE, Laplace
+from freqprob import MLE, Laplace, Lidstone
 
 # import local modules
 from . import common
@@ -570,10 +570,10 @@ class CatScorer:
             self._freqprob_scorer_class = MLE
         elif self.smoothing_method == "laplace":
             self._freqprob_scorer_class = Laplace
-        elif self.smoothing_method == "ele":
-            self._freqprob_scorer_class = ELE
+        elif self.smoothing_method == "lidstone":
+            self._freqprob_scorer_class = Lidstone
         else:
-            raise ValueError(f"Unsupported smoothing method: {smoothing_method}. Use 'mle', 'laplace', or 'ele'.")
+            raise ValueError(f"Unsupported smoothing method: {smoothing_method}. Use 'mle', 'laplace', or 'lidstone'.")
 
         # Cache for freqprob scorers per context
         self._freqprob_cache: Dict[str, Any] = {}
@@ -710,8 +710,8 @@ class CatScorer:
 
                         if self.smoothing_method == "laplace":
                             scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y)
-                        else:  # ELE
-                            scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y, alpha=self.smoothing_alpha)
+                        else:  # Lidstone
+                            scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y, gamma=self.smoothing_alpha)
 
                         xy_score = math.exp(scorer_xy(pair[0]))
                 else:
@@ -728,8 +728,8 @@ class CatScorer:
 
                         if self.smoothing_method == "laplace":
                             scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x)
-                        else:  # ELE
-                            scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x, alpha=self.smoothing_alpha)
+                        else:  # Lidstone
+                            scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x, gamma=self.smoothing_alpha)
 
                         yx_score = math.exp(scorer_yx(pair[1]))
                 else:
@@ -781,10 +781,10 @@ class CatScorer:
             joint_scorer = self._freqprob_scorer_class(joint_freqdist)
             x_scorer = self._freqprob_scorer_class(x_freqdist)
             y_scorer = self._freqprob_scorer_class(y_freqdist)
-        else:  # ELE
-            joint_scorer = self._freqprob_scorer_class(joint_freqdist, alpha=self.smoothing_alpha)
-            x_scorer = self._freqprob_scorer_class(x_freqdist, alpha=self.smoothing_alpha)
-            y_scorer = self._freqprob_scorer_class(y_freqdist, alpha=self.smoothing_alpha)
+        else:  # Lidstone
+            joint_scorer = self._freqprob_scorer_class(joint_freqdist, gamma=self.smoothing_alpha)
+            x_scorer = self._freqprob_scorer_class(x_freqdist, gamma=self.smoothing_alpha)
+            y_scorer = self._freqprob_scorer_class(y_freqdist, gamma=self.smoothing_alpha)
 
         for pair in product(self.alphabet_x, self.alphabet_y):
             obs = self.obs[pair]

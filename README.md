@@ -60,6 +60,28 @@ Using ASymCat's asymmetric measures:
 
 This asymmetry reveals the **directional dependency** structure in your data.
 
+### Mathematical Visualization
+
+The following plot demonstrates how different measures capture asymmetric vs symmetric relationships:
+
+![Mathematical Example](docs/images/mathematical_example.png)
+
+**Key Insights:**
+- **MLE (Left)**: Shows clear asymmetry - P(Y|X) ≠ P(X|Y)
+- **PMI (Center)**: Symmetric measure - same value regardless of direction
+- **Theil's U (Right)**: Captures uncertainty reduction asymmetrically
+
+### Robust Probability Estimation
+
+ASymCat integrates the **freqprob library** for sophisticated probability estimation:
+
+![Smoothing Effects](docs/images/smoothing_effects.png)
+
+**Smoothing Benefits:**
+- **No Smoothing**: Many zero probabilities for rare events
+- **Laplace Smoothing**: Eliminates zeros by adding pseudo-counts
+- **Lidstone Smoothing**: Parameterized smoothing with adjustable strength
+
 ## 🔬 Available Measures
 
 ASymCat implements 15+ association measures, each capturing different aspects of categorical relationships:
@@ -147,9 +169,37 @@ asymcat sequences.tsv \
 
 # Multiple output formats
 asymcat data.tsv --scorers mle --table-format markdown > report.md
+
+# Advanced smoothing for sparse data
+asymcat data.tsv --scorers mle pmi_smoothed --smoothing laplace
+asymcat data.tsv --scorers mle --smoothing lidstone --smoothing-alpha 0.5
 ```
 
-## 📊 Real-World Example
+## 🌍 Real-World Applications
+
+### Species Co-occurrence Analysis
+
+Analyze ecological relationships in the Galápagos finch dataset:
+
+![Species Co-occurrence](docs/images/species_cooccurrence.png)
+
+**Ecological Insights:**
+- **Left**: Species distribution across islands shows habitat preferences
+- **Right**: Strongest associations reveal co-occurrence patterns and potential ecological dependencies
+- **Asymmetric relationships**: Some species predict others' presence better than vice versa
+
+### Linguistic Pattern Analysis
+
+Examine English orthography-phoneme relationships:
+
+![Linguistic Analysis](docs/images/linguistic_analysis.png)
+
+**Linguistic Discoveries:**
+- **Left**: Letter-sound correspondence strengths reveal systematic patterns
+- **Right**: Association matrix shows which letters map to which phonemes most reliably
+- **Predictive asymmetry**: Orthography often predicts phonetics better than the reverse
+
+## 📊 Detailed Example: Mushroom Classification
 
 Let's analyze mushroom characteristics to understand edibility prediction:
 
@@ -320,10 +370,12 @@ python -m asymcat --help         # Test CLI
 
 ## 📖 Documentation
 
-- **Full Documentation**: [Coming Soon]
+- **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Complete mathematical basis and derivations
+- **[Interactive Examples](docs/EXAMPLES_WITH_PLOTS.ipynb)**: Comprehensive Jupyter notebook with visualizations
+- **[Documentation Hub](docs/README.md)**: Complete guide to all documentation
+- **[Development Guide](CLAUDE.md)**: For contributors and Claude Code
+- **CLI Reference**: `asymcat --help` for command-line usage
 - **API Reference**: Auto-generated from docstrings
-- **Tutorials**: Jupyter notebooks in `/examples`
-- **CLI Reference**: `asymcat --help`
 
 ## 🔒 Security
 
