@@ -21,6 +21,8 @@ ASymCat is a Python library for analyzing asymmetric associations between catego
 
 ## Development Commands
 
+For a coding agent, always use the "env\_lingfil" environment from pyenv.
+
 ### Environment Setup
 ```bash
 # Create virtual environment and install dev dependencies
