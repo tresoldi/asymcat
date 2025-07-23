@@ -41,13 +41,16 @@ pytest
 
 # Run with coverage report
 make coverage
-# or
+# or (if pytest-cov is installed)
 pytest --cov=asymcat --cov-branch --cov-report=html
 
 # Run specific test categories
 pytest -m unit          # Unit tests only
 pytest -m integration   # Integration tests only
 pytest -m slow          # Slow tests only
+
+# Quick testing
+make quick-test         # Run essential tests quickly
 ```
 
 ### Code Quality
@@ -65,6 +68,9 @@ make mypy          # Type checking
 make format        # Runs black, isort, lint, mypy
 make black         # Auto-format code
 make isort         # Auto-sort imports
+
+# Security checks
+make security      # Run bandit and safety scans
 ```
 
 ### Build and Release
@@ -82,11 +88,20 @@ make docs-clean
 ```bash
 # Test CLI functionality
 python -m asymcat --help
-python -m asymcat resources/toy.tsv --scorers mle pmi
+make cli-help  # Alternative using Makefile
 
-# Test with smoothing options
+# Basic usage examples
+python -m asymcat resources/toy.tsv --scorers mle pmi
+python -m asymcat resources/galapagos.tsv --format pa-matrix --scorers chi2 fisher
+
+# Advanced features
 python -m asymcat resources/toy.tsv --scorers mle pmi_smoothed --smoothing laplace
 python -m asymcat resources/toy.tsv --scorers mle --smoothing lidstone --smoothing-alpha 0.5
+python -m asymcat resources/toy.tsv --scorers mle --sort-by yx --top 5
+python -m asymcat resources/toy.tsv --scorers all --output-format json --output results.json
+
+# Test CLI with Makefile
+make cli-test  # Comprehensive CLI testing
 ```
 
 ## Code Architecture
