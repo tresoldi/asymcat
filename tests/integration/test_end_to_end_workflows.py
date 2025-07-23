@@ -127,7 +127,9 @@ class TestCompleteWorkflows:
         }
 
         for measure_name, scores in measures.items():
-            assert_valid_scores(scores)
+            # Fisher exact test can produce infinite values for perfect associations
+            allow_inf = (measure_name == 'fisher')
+            assert_valid_scores(scores, allow_infinite=allow_inf)
             assert len(scores) > 0, f"No scores for {measure_name}"
 
         # Step 4: Compare measures (all should analyze same pairs)
