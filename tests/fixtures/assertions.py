@@ -28,16 +28,19 @@ def assert_valid_cooccurrences(cooccs: List[Tuple[Any, Any]]) -> None:
         assert len(coocc) == 2, f"Co-occurrence {i} must have exactly 2 elements"
 
 
-def assert_valid_scores(scores: Dict[Tuple[Any, Any], Tuple[float, float]]) -> None:
+def assert_valid_scores(scores: Dict[Tuple[Any, Any], Tuple[float, float]], allow_infinite: bool = False) -> None:
     """
     Assert that scoring results are in the expected format.
 
     Args:
         scores: Dictionary mapping symbol pairs to (xy, yx) score tuples
+        allow_infinite: Whether to allow infinite values (e.g., for Fisher exact test)
 
     Example:
         >>> scores = {('a', 'b'): (0.5, 0.7)}
         >>> assert_valid_scores(scores)  # Passes
+        >>> fisher_scores = {('a', 'b'): (float('inf'), float('inf'))}
+        >>> assert_valid_scores(fisher_scores, allow_infinite=True)  # Passes
     """
     assert isinstance(scores, dict), "Scores must be a dictionary"
     assert len(scores) > 0, "Scores dictionary cannot be empty"
@@ -47,8 +50,14 @@ def assert_valid_scores(scores: Dict[Tuple[Any, Any], Tuple[float, float]]) -> N
         assert len(pair) == 2, f"Key {pair} must have exactly 2 elements"
         assert isinstance(xy, (int, float)), f"X→Y score for {pair} must be numeric"
         assert isinstance(yx, (int, float)), f"Y→X score for {pair} must be numeric"
-        assert np.isfinite(xy), f"X→Y score for {pair} must be finite"
-        assert np.isfinite(yx), f"Y→X score for {pair} must be finite"
+        
+        if not allow_infinite:
+            assert np.isfinite(xy), f"X→Y score for {pair} must be finite"
+            assert np.isfinite(yx), f"Y→X score for {pair} must be finite"
+        else:
+            # Allow infinite but not NaN values
+            assert not np.isnan(xy), f"X→Y score for {pair} cannot be NaN"
+            assert not np.isnan(yx), f"Y→X score for {pair} cannot be NaN"
 
 
 def assert_scores_in_range(
@@ -89,7 +98,12 @@ def assert_scores_symmetric(scores: Dict[Tuple[Any, Any], Tuple[float, float]], 
         >>> assert_scores_symmetric(scores)  # Passes
     """
     for pair, (xy, yx) in scores.items():
-        assert abs(xy - yx) < tolerance, f"Scores for {pair} not symmetric: {xy} vs {yx}"
+        # Handle infinite values specially
+        if np.isinf(xy) and np.isinf(yx):
+            # Both infinite with same sign means symmetric
+            assert np.sign(xy) == np.sign(yx), f"Infinite scores for {pair} have different signs: {xy} vs {yx}"
+        else:
+            assert abs(xy - yx) < tolerance, f"Scores for {pair} not symmetric: {xy} vs {yx}"
 
 
 def assert_scores_asymmetric(scores: Dict[Tuple[Any, Any], Tuple[float, float]], min_difference: float = 1e-6) -> None:

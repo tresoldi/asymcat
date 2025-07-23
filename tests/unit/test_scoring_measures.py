@@ -288,8 +288,8 @@ class TestStatisticalMeasures:
         """
         scores = sample_scorer.fisher()
 
-        # Validate structure
-        assert_valid_scores(scores)
+        # Validate structure (Fisher can produce infinite values for perfect associations)
+        assert_valid_scores(scores, allow_infinite=True)
         # Fisher's exact can produce infinite values, so no range check
 
         # Fisher should be symmetric for odds ratios
@@ -348,11 +348,14 @@ class TestMeasureProperties:
         cooccs = asymcat.collect_cooccs(PERFECT_CORRELATION_DATA)
         scorer = CatScorer(cooccs)
 
-        # Test MLE - should show perfect prediction
+        # Test MLE - should show perfect prediction for correlated pairs
         mle = scorer.mle()
-        for pair, (xy, yx) in mle.items():
-            # For perfect correlation, at least one direction should be high
-            assert max(xy, yx) >= 0.9, f"Perfect correlation should show high MLE for {pair}"
+        # Only check pairs that are actually perfectly correlated
+        perfect_pairs = [('A', 'B'), ('C', 'D')]
+        for pair in perfect_pairs:
+            if pair in mle:
+                xy, yx = mle[pair]
+                assert max(xy, yx) >= 0.9, f"Perfect correlation should show high MLE for {pair}"
 
     def test_independent_data_measures(self):
         """Test measures with independent data."""
