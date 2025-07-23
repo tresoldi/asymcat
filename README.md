@@ -8,436 +8,356 @@
 
 ASymCat is a comprehensive Python library for analyzing **asymmetric associations** between categorical variables. Unlike traditional symmetric measures that treat relationships as bidirectional, ASymCat provides directional measures that reveal which variable predicts which, making it invaluable for understanding causal relationships, dependencies, and information flow in categorical data.
 
+## 🚀 Key Features
+
+- **17+ Association Measures**: From basic MLE to advanced information-theoretic measures
+- **Directional Analysis**: X→Y vs Y→X asymmetric relationship quantification  
+- **Robust Smoothing**: FreqProb integration for numerical stability
+- **Multiple Data Formats**: Sequences, presence-absence matrices, n-grams
+- **CLI Interface**: Production-ready command-line tool with rich output formats
+- **Scalable Architecture**: Optimized for large datasets with efficient algorithms
+- **Comprehensive Testing**: 75+ tests ensuring reliability and accuracy
+
 ## 🎯 Why Asymmetric Measures Matter
 
 Traditional measures like Pearson's χ² or Cramér's V treat associations as symmetric: the relationship between X and Y is the same as between Y and X. However, many real-world relationships are inherently directional:
 
-- **Language Evolution**: Sound changes may be predictable in one direction but not the other
-- **Species Co-occurrence**: Presence of species A may predict species B, but not vice versa
-- **Market Analysis**: Product A sales may predict product B sales directionally
-- **Medical Diagnosis**: Symptoms may predict conditions more reliably than conditions predict symptoms
+- **Linguistics**: Phoneme transitions may be predictable in one direction but not the other
+- **Ecology**: Species presence may predict other species asymmetrically  
+- **Market Research**: Product purchases may show directional dependencies
+- **Medical Analysis**: Symptoms may predict conditions more reliably than vice versa
 
 ASymCat quantifies these directional relationships, revealing hidden patterns that symmetric measures miss.
 
-## 🧬 Scientific Foundation
-
-### Asymmetric vs. Symmetric Association
-
-Consider this example from categorical data analysis:
-
-| Observation | Variable X | Variable Y |
-|-------------|------------|------------|
-| 1           | A          | c          |
-| 2           | A          | d          |
-| 3           | A          | c          |
-| 4           | B          | g          |
-| 5           | B          | g          |
-| 6           | B          | f          |
-
-**Key Insight**: While you cannot perfectly predict Y from X, you can perfectly predict X from Y:
-- If Y = c or d, then X = A (100% certainty)
-- If Y = f or g, then X = B (100% certainty)
-- But if X = A, Y could be c or d (uncertainty)
-- If X = B, Y could be f or g (uncertainty)
-
-### Asymmetric Analysis Results
-
-Using ASymCat's asymmetric measures:
-
-**X given Y (Perfect Prediction)**:
-| Y → X | A    | B    |
-|-------|------|------|
-| c     | 1.00 | 0.00 |
-| d     | 1.00 | 0.00 |
-| f     | 0.00 | 1.00 |
-| g     | 0.00 | 1.00 |
-
-**Y given X (Uncertain Prediction)**:
-| X → Y | c    | d    | f    | g    |
-|-------|------|------|------|------|
-| A     | 0.67 | 0.33 | 0.00 | 0.00 |
-| B     | 0.00 | 0.00 | 0.33 | 0.67 |
-
-This asymmetry reveals the **directional dependency** structure in your data.
-
-### Mathematical Visualization
-
-The following plot demonstrates how different measures capture asymmetric vs symmetric relationships:
-
-![Mathematical Example](docs/images/mathematical_example.png)
-
-**Key Insights:**
-- **MLE (Left)**: Shows clear asymmetry - P(Y|X) ≠ P(X|Y)
-- **PMI (Center)**: Symmetric measure - same value regardless of direction
-- **Theil's U (Right)**: Captures uncertainty reduction asymmetrically
-
-### Robust Probability Estimation
-
-ASymCat integrates the **freqprob library** for sophisticated probability estimation:
-
-![Smoothing Effects](docs/images/smoothing_effects.png)
-
-**Smoothing Benefits:**
-- **No Smoothing**: Many zero probabilities for rare events
-- **Laplace Smoothing**: Eliminates zeros by adding pseudo-counts
-- **Lidstone Smoothing**: Parameterized smoothing with adjustable strength
-
-## 🔬 Available Measures
-
-ASymCat implements 15+ association measures, each capturing different aspects of categorical relationships:
-
-### Information-Theoretic Measures
-- **Mutual Information (MI)**: Measures shared information between variables
-- **Normalized MI**: MI scaled to [0,1] range for comparability
-- **Pointwise Mutual Information (PMI)**: Local association strength for specific value pairs
-- **Conditional Entropy**: Uncertainty in one variable given another
-- **Theil's U**: Uncertainty coefficient, ideal for linguistic and social science data
-
-### Statistical Association Measures
-- **Maximum Likelihood Estimation (MLE)**: Direct probabilistic association
-- **Chi-square (χ²)**: Both 2×2 and 3×2 contingency table variants
-- **Cramér's V**: Normalized chi-square, both squared and non-squared versions
-- **Fisher's Exact Test**: Exact probabilities for small samples
-- **Log-Likelihood Ratio (G²)**: Alternative to chi-square for nested models
-
-### Similarity-Based Measures
-- **Jaccard Index**: Set similarity between variable contexts
-- **Goodman-Kruskal Lambda (λ)**: Proportional reduction in prediction error
-
-### Specialized Measures
-- **Tresoldi Score**: Novel measure combining MLE and PMI, optimized for historical linguistics
-- **Custom Scalers**: Transform any measure using minmax, standardization, or custom scaling
-
-## 🚀 Quick Start
-
-### Installation
-
-```bash
-# Standard installation
-pip install asymcat
-
-# With all optional features
-pip install "asymcat[all]"
-
-# Development installation
-pip install "asymcat[dev]"
-```
-
-### Basic Usage
+## 📊 Quick Example
 
 ```python
 import asymcat
 
 # Load your categorical data
-data = asymcat.read_sequences("your_data.tsv")  # Tab-separated format
+data = asymcat.read_sequences("data.tsv")  # or read_pa_matrix() for binary data
+
+# Collect co-occurrences  
 cooccs = asymcat.collect_cooccs(data)
-scorer = asymcat.scorer.CatScorer(cooccs)
 
-# Compute asymmetric associations
-mle_scores = scorer.mle()                    # Maximum likelihood
-pmi_scores = scorer.pmi()                    # Pointwise mutual information
-theil_scores = scorer.theil_u()              # Theil's uncertainty coefficient
-jaccard_scores = scorer.jaccard_index()      # Jaccard similarity
+# Create scorer and analyze
+scorer = asymcat.CatScorer(cooccs)
 
-# Each score returns (X→Y, Y→X) directional measures
-for pair, (xy, yx) in mle_scores.items():
-    print(f"{pair[0]} → {pair[1]}: {xy:.3f}")
-    print(f"{pair[1]} → {pair[0]}: {yx:.3f}")
+# Get asymmetric measures
+mle_scores = scorer.mle()           # Maximum likelihood estimation
+pmi_scores = scorer.pmi()           # Pointwise mutual information  
+chi2_scores = scorer.chi2()         # Chi-square with smoothing
+fisher_scores = scorer.fisher()     # Fisher exact test
+
+# Each returns {(x, y): (x→y_score, y→x_score)}
+print(f"A→B: {mle_scores[('A', 'B')][0]:.3f}")
+print(f"B→A: {mle_scores[('A', 'B')][1]:.3f}")
 ```
 
-### Command-Line Interface
+## 🛠️ Installation
 
-ASymCat provides a powerful CLI for non-programmatic analysis:
-
-```bash
-# Basic analysis
-asymcat data.tsv --scorers mle pmi theil_u
-
-# Advanced analysis with filtering and output
-asymcat data.tsv \
-  --scorers all \
-  --top 10 \
-  --min-count 5 \
-  --output results.json \
-  --verbose
-
-# N-gram analysis
-asymcat sequences.tsv \
-  --ngrams 3 \
-  --scorers tresoldi mutual_information \
-  --output-format csv
-
-# Multiple output formats
-asymcat data.tsv --scorers mle --table-format markdown > report.md
-
-# Advanced smoothing for sparse data
-asymcat data.tsv --scorers mle pmi_smoothed --smoothing laplace
-asymcat data.tsv --scorers mle --smoothing lidstone --smoothing-alpha 0.5
-```
-
-## 🌍 Real-World Applications
-
-### Species Co-occurrence Analysis
-
-Analyze ecological relationships in the Galápagos finch dataset:
-
-![Species Co-occurrence](docs/images/species_cooccurrence.png)
-
-**Ecological Insights:**
-- **Left**: Species distribution across islands shows habitat preferences
-- **Right**: Strongest associations reveal co-occurrence patterns and potential ecological dependencies
-- **Asymmetric relationships**: Some species predict others' presence better than vice versa
-
-### Linguistic Pattern Analysis
-
-Examine English orthography-phoneme relationships:
-
-![Linguistic Analysis](docs/images/linguistic_analysis.png)
-
-**Linguistic Discoveries:**
-- **Left**: Letter-sound correspondence strengths reveal systematic patterns
-- **Right**: Association matrix shows which letters map to which phonemes most reliably
-- **Predictive asymmetry**: Orthography often predicts phonetics better than the reverse
-
-## 📊 Detailed Example: Mushroom Classification
-
-Let's analyze mushroom characteristics to understand edibility prediction:
-
-```python
-import asymcat
-import pandas as pd
-
-# Load mushroom data (edibility vs. cap shape)
-data = asymcat.read_sequences("resources/mushroom-small.tsv")
-cooccs = asymcat.collect_cooccs(data)
-scorer = asymcat.scorer.CatScorer(cooccs)
-
-# Compute multiple measures
-results = {
-    'MLE': scorer.mle(),
-    'Theil_U': scorer.theil_u(),
-    'Mutual_Info': scorer.mutual_information(),
-    'Tresoldi': scorer.tresoldi()
-}
-
-# Analyze edible mushrooms with bell-shaped caps
-pair = ('edible', 'bell')
-print("Edible ↔ Bell-shaped caps:")
-for measure, scores in results.items():
-    xy, yx = scores[pair]
-    print(f"  {measure}: edible→bell={xy:.3f}, bell→edible={yx:.3f}")
-```
-
-Output:
-```
-Edible ↔ Bell-shaped caps:
-  MLE: edible→bell=0.385, bell→edible=1.000
-  Theil_U: edible→bell=0.000, bell→edible=1.000
-  Mutual_Info: edible→bell=0.000, bell→edible=0.000
-  Tresoldi: edible→bell=0.596, bell→edible=1.000
-```
-
-**Interpretation**: Bell-shaped caps perfectly predict edibility (bell→edible=1.000), but edible mushrooms don't reliably predict bell shape (edible→bell=0.385). This asymmetric relationship suggests bell-shaped caps are a strong indicator of edible mushrooms.
-
-## 📈 Data Input Formats
-
-### Sequential Data (TSV format)
-```
-Orthography    Phonetics
-d o g          d ɔ g
-c a t          k æ t
-h o u s e      h aʊ s
-```
-
-### Presence-Absence Matrices
-```
-ID         Species_A  Species_B  Species_C
-Island_1   1          0          1
-Island_2   1          1          0
-Island_3   0          1          1
-```
-
-### Programmatic Data
-```python
-# List of sequence pairs
-data = [
-    [['d', 'o', 'g'], ['d', 'ɔ', 'g']],
-    [['c', 'a', 't'], ['k', 'æ', 't']],
-    [['h', 'o', 'u', 's', 'e'], ['h', 'aʊ', 's']]
-]
-
-# Process directly
-cooccs = asymcat.collect_cooccs(data)
-```
-
-## 🛠️ Advanced Features
-
-### N-gram Analysis
-```python
-# Analyze 3-gram patterns in sequences
-data = asymcat.read_sequences("sequences.tsv")
-trigram_cooccs = asymcat.collect_cooccs(data, order=3, pad="#")
-scorer = asymcat.scorer.CatScorer(trigram_cooccs)
-```
-
-### Score Transformation
-```python
-# Scale scores to different ranges
-scores = scorer.mle()
-normalized = asymcat.scorer.scale_scorer(scores, method="minmax")  # [0,1]
-standardized = asymcat.scorer.scale_scorer(scores, method="stdev") # z-scores
-inverted = asymcat.scorer.invert_scorer(normalized)                # 1-score
-```
-
-### Matrix Operations
-```python
-# Convert scores to matrices for visualization/analysis
-scores = scorer.tresoldi()
-xy_matrix, yx_matrix, x_labels, y_labels = asymcat.scorer.scorer2matrices(scores)
-
-# Use with matplotlib, seaborn, etc.
-import seaborn as sns
-sns.heatmap(xy_matrix, xticklabels=y_labels, yticklabels=x_labels)
-```
-
-## 🎓 Use Cases by Field
-
-### Computational Linguistics
-- **Historical linguistics**: Sound change directionality
-- **Phonotactics**: Consonant-vowel co-occurrence patterns
-- **Morphology**: Affix dependency relationships
-- **Syntax**: Word order asymmetries
-
-### Ecology & Evolution
-- **Species co-occurrence**: Predator-prey relationships
-- **Habitat preference**: Environmental factor dependencies
-- **Evolutionary patterns**: Trait correlation directionality
-- **Biogeography**: Range overlap asymmetries
-
-### Social Sciences
-- **Market research**: Product purchase dependencies
-- **Sociology**: Social network influence patterns
-- **Psychology**: Behavioral correlation directionality
-- **Economics**: Economic indicator relationships
-
-### Data Science
-- **Feature engineering**: Variable dependency discovery
-- **Causal inference**: Directional relationship identification
-- **Anomaly detection**: Asymmetric pattern recognition
-- **Recommendation systems**: User-item preference asymmetries
-
-## 📚 Installation Options
-
-### Core Installation
+### From PyPI (Recommended)
 ```bash
 pip install asymcat
 ```
 
-### Development Installation
-```bash
-# Individual feature groups
-pip install "asymcat[test]"        # Testing tools
-pip install "asymcat[docs]"        # Documentation building
-pip install "asymcat[lint]"        # Code quality tools
-pip install "asymcat[security]"    # Security scanning
-pip install "asymcat[jupyter]"     # Jupyter notebook support
-pip install "asymcat[viz]"         # Additional visualization
-pip install "asymcat[performance]" # Profiling tools
-
-# Combined installations
-pip install "asymcat[dev]"         # Core development tools
-pip install "asymcat[all]"         # Everything
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### Development Setup
+### From Source
 ```bash
 git clone https://github.com/tresoldi/asymcat.git
 cd asymcat
-pip install -e ".[dev]"
-pre-commit install
+pip install -e ".[all]"  # Install with all optional dependencies
 ```
 
-### Running Tests
+### Dependencies
+- **Core**: numpy, pandas, scipy, matplotlib, seaborn, tabulate, freqprob
+- **Development**: pytest, black, isort, flake8, mypy
+- **Documentation**: sphinx, sphinx-rtd-theme, myst-parser
+- **Optional**: jupyter, plotly, bokeh, altair (for enhanced visualization)
+
+## 🎮 Usage
+
+### Python API
+
+#### Basic Analysis
+```python
+import asymcat
+
+# Load data (TSV format: tab-separated sequences)
+data = asymcat.read_sequences("linguistic_data.tsv")
+cooccs = asymcat.collect_cooccs(data)
+
+# Create scorer with smoothing
+scorer = asymcat.CatScorer(cooccs, smoothing_method="laplace", smoothing_alpha=1.0)
+
+# Compute multiple measures
+results = {
+    'mle': scorer.mle(),
+    'pmi': scorer.pmi(),
+    'chi2': scorer.chi2(),
+    'fisher': scorer.fisher(),
+    'theil_u': scorer.theil_u(),
+}
+
+# Analyze directional relationships
+for measure, scores in results.items():
+    for (x, y), (xy_score, yx_score) in scores.items():
+        if xy_score > yx_score:
+            print(f"{measure}: {x}→{y} stronger than {y}→{x}")
+```
+
+#### Advanced Features
+```python
+# N-gram analysis
+ngram_cooccs = asymcat.collect_cooccs(data, order=2, pad="#")
+ngram_scorer = asymcat.CatScorer(ngram_cooccs)
+
+# Matrix generation for visualization
+xy_matrix, yx_matrix, x_labels, y_labels = asymcat.scorer.scorer2matrices(
+    ngram_scorer.pmi()
+)
+
+# Score transformations
+scaled_scores = asymcat.scorer.scale_scorer(scores, method="minmax")
+inverted_scores = asymcat.scorer.invert_scorer(scaled_scores)
+```
+
+### Command Line Interface
+
+The CLI provides production-ready access to all functionality:
+
+#### Basic Usage
 ```bash
-pytest tests/                     # Run test suite
-pytest --cov=asymcat tests/      # With coverage
-python -m asymcat --help         # Test CLI
+# Analyze with multiple measures
+asymcat data.tsv --scorers mle pmi chi2 --output results.json
+
+# Presence-absence matrix analysis  
+asymcat species_data.tsv --format pa-matrix --scorers fisher theil_u
+
+# Advanced options
+asymcat sequences.tsv \
+  --scorers all \
+  --smoothing laplace \
+  --smoothing-alpha 0.5 \
+  --sort-by yx \
+  --top 10 \
+  --output-format csv \
+  --output top_associations.csv
 ```
 
-## 📖 Documentation
+#### Output Formats
+```bash
+# JSON output
+asymcat data.tsv --scorers mle pmi --output-format json
 
-- **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Complete mathematical basis and derivations
-- **[Interactive Examples](docs/EXAMPLES_WITH_PLOTS.ipynb)**: Comprehensive Jupyter notebook with visualizations
-- **[Documentation Hub](docs/README.md)**: Complete guide to all documentation
-- **[Development Guide](AGENTS.md)**: For contributors and 
-- **CLI Reference**: `asymcat --help` for command-line usage
-- **API Reference**: Auto-generated from docstrings
+# CSV for further analysis
+asymcat data.tsv --scorers chi2 --output-format csv --precision 6
 
-## 🔒 Security
+# Formatted tables
+asymcat data.tsv --scorers fisher --table-format markdown
+```
 
-ASymCat includes comprehensive security scanning:
-- **Dependency Vulnerability Scanning**: Daily automated checks
-- **Code Security Analysis**: Bandit, CodeQL integration
-- **License Compliance**: Automated license compatibility checks
+#### N-gram Analysis
+```bash
+# Bigram analysis
+asymcat text_data.tsv --ngrams 2 --pad "#" --scorers tresoldi
 
-Report security issues to [tiago.tresoldi@lingfil.uu.se](mailto:tiago.tresoldi@lingfil.uu.se)
+# Filter by minimum co-occurrence count
+asymcat large_dataset.tsv --min-count 5 --scorers mle pmi
+```
 
-## 📊 Performance
+## 📈 Association Measures
 
-ASymCat is optimized for both small exploratory analyses and large-scale research:
+ASymCat implements 17+ association measures organized by type:
 
-- **Memory Efficient**: Sparse matrix representations for large datasets
-- **Parallel Processing**: Multi-core support for intensive computations
-- **Caching**: Intelligent result caching for repeated analyses
-- **Scalable**: Tested with datasets up to 100K+ co-occurrence pairs
+### Probabilistic Measures
+- **MLE**: Maximum Likelihood Estimation - P(X|Y) and P(Y|X)
+- **Jaccard Index**: Set overlap with asymmetric interpretation
 
-## 🌟 Related Projects
+### Information-Theoretic Measures  
+- **PMI**: Pointwise Mutual Information (log P(X,Y)/P(X)P(Y))
+- **PMI Smoothed**: Numerically stable PMI with FreqProb smoothing
+- **NPMI**: Normalized PMI [-1, 1] range
+- **Mutual Information**: Average information shared
+- **Conditional Entropy**: Information remaining after observing condition
 
-- **[pyitlib](https://github.com/pafoster/pyitlib)**: Information theory measures in Python
-- **[dython](https://github.com/shakedzy/dython)**: Data analysis tools with association measures
-- **[GoodmanKruskal (R)](https://cran.r-project.org/web/packages/GoodmanKruskal/)**: R implementation of λ and τ measures
-- **[cooccur (R)](https://cran.r-project.org/web/packages/cooccur/)**: Species co-occurrence analysis
+### Statistical Measures
+- **Chi-Square**: Pearson's χ² with optional smoothing
+- **Cramér's V**: Normalized chi-square association
+- **Fisher Exact**: Exact odds ratios for small samples
+- **Log-Likelihood Ratio**: G² statistic
 
-## 📄 Citation
+### Specialized Measures
+- **Theil's U**: Uncertainty coefficient (entropy-based)
+- **Tresoldi**: Custom measure designed for sequence alignment
+- **Goodman-Kruskal λ**: Proportional reduction in error
+
+## 🔬 Scientific Applications
+
+### Linguistics & Language Evolution
+```python
+# Analyze phoneme transitions
+phoneme_data = asymcat.read_sequences("phoneme_alignments.tsv")
+cooccs = asymcat.collect_cooccs(phoneme_data)
+scorer = asymcat.CatScorer(cooccs)
+
+# Asymmetric sound change analysis
+tresoldi_scores = scorer.tresoldi()  # Optimized for linguistic alignment
+```
+
+### Ecology & Species Analysis
+```python
+# Species co-occurrence from presence-absence data
+species_data = asymcat.read_pa_matrix("galapagos_species.tsv")
+scorer = asymcat.CatScorer(species_data)
+
+# Ecological associations
+fisher_scores = scorer.fisher()  # Exact tests for species relationships
+```
+
+### Market Research & Business Analytics
+```python
+# Product purchase associations
+purchase_data = asymcat.read_sequences("customer_transactions.tsv")
+cooccs = asymcat.collect_cooccs(purchase_data)
+scorer = asymcat.CatScorer(cooccs, smoothing_method="lidstone", smoothing_alpha=0.5)
+
+# Market basket analysis
+chi2_scores = scorer.chi2()  # Statistical significance testing
+```
+
+## 🎯 Data Formats
+
+### Sequence Data (TSV)
+```
+# linguistic_data.tsv
+sound_from	sound_to
+p a t a	B A T A
+k a t a	G A T A
+```
+
+### Presence-Absence Matrix (TSV)
+```
+# species_data.tsv
+site	species_A	species_B	species_C
+island_1	1	0	1
+island_2	1	1	0
+```
+
+### N-gram Support
+```python
+# Automatic n-gram extraction
+bigrams = asymcat.collect_cooccs(data, order=2, pad="#")
+trigrams = asymcat.collect_cooccs(data, order=3, pad="#")
+```
+
+## 🔧 Development
+
+### Setup Development Environment
+```bash
+git clone https://github.com/tresoldi/asymcat.git
+cd asymcat
+
+# Install development dependencies
+make install  # Creates venv and installs with [dev] extras
+
+# Run tests
+make test
+make coverage
+
+# Code quality
+make format     # Auto-format with black, isort
+make lint       # Check with flake8
+make mypy       # Type checking
+```
+
+### Testing
+```bash
+# Full test suite (75+ tests)
+pytest
+
+# Specific categories
+pytest tests/unit/           # Unit tests only  
+pytest tests/integration/    # Integration tests only
+pytest -m slow              # Performance tests
+
+# Quick development testing
+make quick-test
+```
+
+### CLI Development
+```bash
+# Test CLI functionality
+make cli-test
+make cli-help
+
+# Security scanning
+make security
+```
+
+## 📚 Documentation
+
+- **[Developer Guide](DEVELOPER.md)**: Comprehensive guide for contributors
+- **[Jupyter Examples](docs/examples/)**: Academic notebooks with detailed analysis
+- **[API Documentation](https://asymcat.readthedocs.io/)**: Complete API reference
+- **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Theory and formulas
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Developer Guide](DEVELOPER.md) for:
+
+- Setting up the development environment
+- Code style guidelines and testing requirements
+- Submitting bug reports and feature requests
+- Contributing new association measures or improvements
+
+### Quick Start for Contributors
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make changes and add tests
+4. Run the test suite: `make test`
+5. Submit a pull request
+
+## 📖 Citation
 
 If you use ASymCat in your research, please cite:
 
 ```bibtex
-@software{tresoldi2024asymcat,
-  title        = {ASymCat: Asymmetric Categorical Association Analysis},
-  author       = {Tresoldi, Tiago},
-  year         = {2024},
-  version      = {0.3.0},
-  url          = {https://github.com/tresoldi/asymcat},
-  publisher    = {GitHub},
+@software{tresoldi_asymcat_2024,
+  title = {ASymCat: Asymmetric Categorical Association Analysis},
+  author = {Tresoldi, Tiago},
+  year = {2024},
+  url = {https://github.com/tresoldi/asymcat},
+  version = {0.3.0}
 }
 ```
 
-## 👨‍💻 Author & Funding
+## 🏆 Acknowledgments
 
-**Tiago Tresoldi** ([tiago.tresoldi@lingfil.uu.se](mailto:tiago.tresoldi@lingfil.uu.se))
-- Uppsala University, Department of Linguistics and Philology
+- **FreqProb Library**: Robust probability estimation and smoothing
+- **SciPy Community**: Statistical foundations
+- **Linguistic Community**: Inspiration from historical linguistics applications
 
-**Funding**:
-- [Cultural Evolution of Texts](https://github.com/evotext/) project
-- [Riksbankens Jubileumsfond](https://www.rj.se/) (grant [MXM19-1087:1](https://www.rj.se/en/anslag/2019/cultural-evolution-of-texts/))
-- [European Research Council](https://erc.europa.eu/) (grant [#715618](https://cordis.europa.eu/project/rcn/206320/factsheet/en), [Computer-Assisted Language Comparison](https://digling.org/calc/))
+## 📄 License
 
-## 📜 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Released under the [MIT License](LICENSE).
+## 🚀 What's New in v0.3.0
+
+- ✅ **Modern Test Suite**: 75+ comprehensive tests with full parametrization
+- ✅ **Enhanced CLI**: New sorting, filtering, and output format options  
+- ✅ **FreqProb Integration**: Improved numerical stability and smoothing
+- ✅ **Performance Optimizations**: Faster computation for large datasets
+- ✅ **Better Documentation**: Comprehensive guides and examples
+- ✅ **Type Safety**: Full type annotations throughout codebase
+
+## 🔮 Roadmap
+
+- **Statistical Significance**: P-value calculations for all measures
+- **Confidence Intervals**: Uncertainty quantification
+- **GPU Acceleration**: CUDA support for massive datasets
+- **Interactive Dashboards**: Web-based exploration tools
+- **Extended Measures**: Additional domain-specific association metrics
 
 ---
 
-<div align="center">
-
-**[🏠 Homepage](https://github.com/tresoldi/asymcat)** •
-**[📚 Documentation](https://github.com/tresoldi/asymcat)** •
-**[🐛 Issues](https://github.com/tresoldi/asymcat/issues)** •
-**[💬 Discussions](https://github.com/tresoldi/asymcat/discussions)**
-
-</div>
+**[⭐ Star us on GitHub](https://github.com/tresoldi/asymcat)** if you find ASymCat useful!
