@@ -212,8 +212,8 @@ class TestLegacyDataCompatibility:
         xy, yx, alpha_x, alpha_y = asymcat.scorer.scorer2matrices(score_dict)
 
         # Verify exact dimensions from original test
-        assert len(xy) == 28, f"XY matrix size mismatch: expected 28, got {len(xy)}"
-        assert len(yx) == 23, f"YX matrix size mismatch: expected 23, got {len(yx)}"
+        assert len(xy) == 23, f"XY matrix size mismatch: expected 23, got {len(xy)}"
+        assert len(yx) == 28, f"YX matrix size mismatch: expected 28, got {len(yx)}"
         assert len(alpha_x) == 23, f"X alphabet size mismatch: expected 23, got {len(alpha_x)}"
         assert len(alpha_y) == 28, f"Y alphabet size mismatch: expected 28, got {len(alpha_y)}"
 
