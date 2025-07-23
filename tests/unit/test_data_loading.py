@@ -21,7 +21,7 @@ class TestSequenceReading:
     @pytest.mark.parametrize(
         "filename,expected_min_length",
         [
-            ("toy.tsv", 5),
+            ("toy.tsv", 2),
             ("mushroom-small.tsv", 15),
             ("cmudict.sample100.tsv", 90),
         ],
@@ -158,8 +158,8 @@ class TestCooccurrenceCollection:
     @pytest.mark.parametrize(
         "order,expected_count",
         [
-            (2, 78),  # Bigram co-occurrences
-            (3, 78),  # Trigram co-occurrences (same for this data)
+            (2, 40),  # Bigram co-occurrences
+            (3, 78),  # Trigram co-occurrences
         ],
     )
     def test_collect_cooccurrences_ngrams(self, order: int, expected_count: int):

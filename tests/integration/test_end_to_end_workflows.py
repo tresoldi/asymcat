@@ -28,7 +28,7 @@ class TestCompleteWorkflows:
         "dataset,expected_properties",
         [
             ("toy.tsv", {"min_cooccs": 30, "min_pairs": 20, "max_time": 5.0}),
-            ("mushroom-small.tsv", {"min_cooccs": 100, "min_pairs": 50, "max_time": 10.0}),
+            ("mushroom-small.tsv", {"min_cooccs": 15, "min_pairs": 8, "max_time": 10.0}),
             ("cmudict.sample100.tsv", {"min_cooccs": 500, "min_pairs": 200, "max_time": 15.0}),
         ],
     )

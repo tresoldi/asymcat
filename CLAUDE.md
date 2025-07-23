@@ -141,3 +141,35 @@ Test markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slo
 - N-gram analysis supported via `collect_ngrams()`
 - Score transformation utilities: scaling, inversion, matrix conversion
 - Built-in example datasets in `/resources`
+
+## Current Project Status (January 2025)
+
+**Architecture**: Well-structured Python library at version 0.3.0 with comprehensive modernization:
+- 15+ association measures (PMI, MLE, Chi-square, Cramér's V, Theil's U, etc.)
+- Both CLI interface and Python API
+- Recent integration of freqprob 0.3.1 for robust probability estimation and smoothing
+- Modern test structure with unit/integration separation
+
+**Recent Major Updates**:
+- Comprehensive documentation enhancement with mathematical foundations
+- FreqProb integration for numerical stability in probability calculations
+- CLI functionality expansion with multiple output formats
+- Modern test architecture replacing legacy test structure
+- Scientific documentation with visualization examples
+
+**Development Environment**:
+- Requires "env_lingfil" pyenv environment
+- Dependencies: scipy, numpy, pandas, matplotlib, seaborn, tabulate, freqprob
+- Virtual environment setup via `make install` (creates `venv/` directory)
+
+**Known Issues**:
+- Some test failures related to score direction validation (X→Y vs Y→X)
+- Edge cases in data loading and matrix conversion operations
+- Statistical measure implementations need validation
+- Legacy test deprecation warnings present
+
+**Priority Areas**:
+1. Fix asymmetric measure score direction issues
+2. Resolve data loading edge cases  
+3. Validate statistical measure implementations
+4. Complete test modernization migration

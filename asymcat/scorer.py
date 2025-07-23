@@ -524,8 +524,8 @@ def scorer2matrices(
 
     alphabet_x, alphabet_y = common.collect_alphabets(list(scorer))
 
-    xy = np.array([np.array([scorer[(x, y)][0] for x in alphabet_x]) for y in alphabet_y])
-    yx = np.array([np.array([scorer[(x, y)][1] for y in alphabet_y]) for x in alphabet_x])
+    xy = np.array([np.array([scorer[(x, y)][0] for y in alphabet_y]) for x in alphabet_x])
+    yx = np.array([np.array([scorer[(x, y)][1] for x in alphabet_x]) for y in alphabet_y])
 
     return xy, yx, alphabet_x, alphabet_y
 
