@@ -200,3 +200,18 @@ Test markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slo
 4. ✅ **Completed test modernization migration**
 5. ✅ Enhanced CLI functionality with new features
 6. ✅ Updated workflow commands for better development experience
+
+## Jupyter Notebook Guidelines
+
+**IMPORTANT**: All Jupyter notebooks in this repository should always be executed with their cell outputs committed to the repository. This ensures:
+
+- Documentation examples are always up-to-date and working
+- Users can see expected outputs without running notebooks locally
+- CI/CD can validate that notebook examples work correctly
+- Tutorial content remains current with library changes
+
+**Workflow for Jupyter notebooks**:
+1. Always execute all cells before committing
+2. Ensure all outputs are saved and visible
+3. Test notebooks in a clean environment to verify reproducibility
+4. Update notebook outputs when library code changes affect results
