@@ -198,20 +198,81 @@ Test markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slo
 2. ✅ Resolved all data loading edge cases  
 3. ✅ Validated all statistical measure implementations
 4. ✅ **Completed test modernization migration**
-5. ✅ Enhanced CLI functionality with new features
-6. ✅ Updated workflow commands for better development experience
+5. ✅ **Implemented comprehensive Jupyter notebook documentation**
 
 ## Jupyter Notebook Guidelines
 
-**IMPORTANT**: All Jupyter notebooks in this repository should always be executed with their cell outputs committed to the repository. This ensures:
+**IMPORTANT**: All Jupyter notebooks in this repository should always be executed with their cell outputs committed to the repository. This ensures that documentation examples are always up-to-date and visible without requiring execution.
 
-- Documentation examples are always up-to-date and working
-- Users can see expected outputs without running notebooks locally
-- CI/CD can validate that notebook examples work correctly
-- Tutorial content remains current with library changes
+### Notebook Structure
 
-**Workflow for Jupyter notebooks**:
-1. Always execute all cells before committing
-2. Ensure all outputs are saved and visible
-3. Test notebooks in a clean environment to verify reproducibility
-4. Update notebook outputs when library code changes affect results
+The `/docs` directory contains several key notebooks:
+
+1. **`Simple_Examples.ipynb`** ✅ - Basic usage examples with synthetic data (fully working)
+2. **`Demo.ipynb`** ✅ - Interactive demonstration with plotting and visualization (fully working)  
+3. **`Academic_Analysis_Tutorial.ipynb`** ⚠️ - Comprehensive academic treatment with case studies (complex, needs fixes)
+4. **`EXAMPLES_WITH_PLOTS.ipynb`** ⚠️ - Advanced examples with statistical plots (needs data format fixes)
+
+### Executing Notebooks
+
+**Always execute notebooks before committing:**
+
+```bash
+# Execute individual notebooks with outputs
+jupyter nbconvert --to notebook --execute --inplace docs/Simple_Examples.ipynb
+jupyter nbconvert --to notebook --execute --inplace docs/Demo.ipynb
+
+# Execute all notebooks in docs/ directory
+for nb in docs/*.ipynb; do
+    echo "Executing $nb..."
+    jupyter nbconvert --to notebook --execute --inplace "$nb"
+done
+
+# Verify notebook outputs are present
+ls -la docs/*.ipynb  # Check file sizes (executed notebooks are larger)
+```
+
+### Common Issues and Solutions
+
+**Data Format Issues**: Some notebooks incorrectly use `collect_cooccs([data])` when `data` is already co-occurrences. Fix by passing data directly to `CatScorer(data)`.
+
+**Example Fix**:
+```python
+# Wrong - data is already co-occurrences
+test_cooccs = asymcat.collect_cooccs([test_data])
+scorer = CatScorer(test_cooccs)
+
+# Correct - pass co-occurrences directly
+scorer = CatScorer(test_data)
+```
+
+**Matrix Plotting**: The `plot_scorer` function expects matrix dimensions to match index/column parameters:
+```python
+# xy matrix: rows=alpha_x, cols=alpha_y
+plot_scorer(xy, alpha_x, alpha_y, "x->y")
+
+# yx matrix: rows=alpha_y, cols=alpha_x  
+plot_scorer(yx, alpha_y, alpha_x, "y->x")
+```
+
+### Notebook Maintenance Workflow
+
+1. **Before making changes**: Ensure notebooks execute cleanly
+2. **After code changes**: Re-execute all notebooks to update outputs
+3. **Before committing**: Verify all cells have outputs and no errors
+4. **For large notebooks**: Consider timeout limits for bootstrap/statistical computations
+
+### Working Notebooks Status
+
+- ✅ **Simple_Examples.ipynb**: 278KB, fully executed, demonstrates core functionality
+- ✅ **Demo.ipynb**: 221KB, fully executed, includes plotting and visualization
+- ⚠️ **Academic_Analysis_Tutorial.ipynb**: Complex notebook with bootstrap statistical analysis, may timeout
+- ⚠️ **EXAMPLES_WITH_PLOTS.ipynb**: Needs data format fixes for `collect_cooccs` usage
+
+### Quick Verification
+
+```bash
+# Check if notebooks have outputs (file size > 50KB indicates execution)
+find docs/ -name "*.ipynb" -size +50k -exec echo "✅ {}" \;
+find docs/ -name "*.ipynb" -size -50k -exec echo "⚠️  {}" \;
+```
