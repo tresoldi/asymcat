@@ -192,6 +192,7 @@ Test markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slo
 - Test suite fully modernized and passing ✅
 - Score direction validation fixed ✅
 - Data loading edge cases resolved ✅
+- Jupyter notebook execution issues fixed ✅
 
 **Recent Achievements**:
 1. ✅ Fixed asymmetric measure score direction issues
@@ -199,6 +200,7 @@ Test markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slo
 3. ✅ Validated all statistical measure implementations
 4. ✅ **Completed test modernization migration**
 5. ✅ **Implemented comprehensive Jupyter notebook documentation**
+6. ✅ **Fixed all Jupyter notebook execution issues with committed outputs**
 
 ## Jupyter Notebook Guidelines
 
@@ -266,8 +268,8 @@ plot_scorer(yx, alpha_y, alpha_x, "y->x")
 
 - ✅ **Simple_Examples.ipynb**: 278KB, fully executed, demonstrates core functionality
 - ✅ **Demo.ipynb**: 221KB, fully executed, includes plotting and visualization
-- ⚠️ **Academic_Analysis_Tutorial.ipynb**: Complex notebook with bootstrap statistical analysis, may timeout
-- ⚠️ **EXAMPLES_WITH_PLOTS.ipynb**: Needs data format fixes for `collect_cooccs` usage
+- ✅ **Academic_Analysis_Tutorial.ipynb**: 33KB, executed, comprehensive academic treatment with statistical validation
+- ✅ **EXAMPLES_WITH_PLOTS.ipynb**: 39KB, executed, advanced examples with smoothing and visualization
 
 ### Quick Verification
 
