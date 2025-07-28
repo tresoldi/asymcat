@@ -18,7 +18,7 @@ from . import common, scorer
 
 
 def cramers_v(series_x, series_y):
-    cooccs = list(zip(series_x, series_y))
+    cooccs = list(zip(series_x, series_y, strict=False))
 
     # Build a contingency table
     # TODO: use another library? pandas?

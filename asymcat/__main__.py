@@ -9,8 +9,9 @@ analyzing categorical co-occurrence associations.
 import argparse
 import json
 import sys
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any
 
 import tabulate  # type: ignore
 
@@ -124,7 +125,7 @@ Examples:
     return parser
 
 
-def load_data(file_path: str, format_type: str, verbose: bool = False) -> Union[List[List[List[str]]], List[tuple]]:
+def load_data(file_path: str, format_type: str, verbose: bool = False) -> list[list[list[str]]] | list[tuple]:
     """Load data from the input file."""
     if verbose:
         print(f"Loading data from {file_path} (format: {format_type})", file=sys.stderr)
@@ -147,8 +148,8 @@ def load_data(file_path: str, format_type: str, verbose: bool = False) -> Union[
 
 
 def compute_cooccurrences(
-    data: Union[List[List[List[str]]], List[tuple]], ngrams: Optional[int], pad: str, verbose: bool = False
-) -> List[tuple]:
+    data: list[list[list[str]]] | list[tuple], ngrams: int | None, pad: str, verbose: bool = False
+) -> list[tuple]:
     """Compute co-occurrences from the data."""
     if verbose:
         if ngrams:
@@ -164,7 +165,7 @@ def compute_cooccurrences(
     return cooccs
 
 
-def get_scorer_methods(scorer: CatScorer, scorer_names: List[str]) -> Dict[str, Callable[..., Any]]:
+def get_scorer_methods(scorer: CatScorer, scorer_names: list[str]) -> dict[str, Callable[..., Any]]:
     """Get the requested scoring methods from the scorer."""
     all_methods = {
         "mle": scorer.mle,
@@ -200,15 +201,15 @@ def get_scorer_methods(scorer: CatScorer, scorer_names: List[str]) -> Dict[str, 
 
 
 def compute_scores(
-    cooccs: List[tuple],
-    scorer_names: List[str],
-    scale: Optional[str] = None,
+    cooccs: list[tuple],
+    scorer_names: list[str],
+    scale: str | None = None,
     invert: bool = False,
-    min_count: Optional[int] = None,
+    min_count: int | None = None,
     smoothing_method: str = "mle",
     smoothing_alpha: float = 1.0,
     verbose: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Compute the requested scores."""
     if verbose:
         print("Creating scorer and computing scores", file=sys.stderr)
@@ -249,11 +250,11 @@ def compute_scores(
 
 
 def format_output(
-    results: Dict[str, Any],
+    results: dict[str, Any],
     output_format: str,
     table_format: str,
     precision: int,
-    top: Optional[int] = None,
+    top: int | None = None,
     sort_by: str = "xy",
 ) -> str:
     """Format the results for output."""
@@ -298,14 +299,14 @@ def format_output(
 
         # Build table headers
         headers = ["pair"]
-        for scorer_name in results.keys():
+        for scorer_name in results:
             headers.extend([f"{scorer_name}_xy", f"{scorer_name}_yx"])
 
         # Build table rows
         table_data = []
         for pair in sorted_pairs:
             row = [str(pair)]
-            for scorer_name in results.keys():
+            for scorer_name in results:
                 if pair in results[scorer_name]:
                     score_xy, score_yx = results[scorer_name][pair]
                     row.extend([f"{score_xy:.{precision}f}", f"{score_yx:.{precision}f}"])
@@ -372,7 +373,7 @@ def main():
 
         # Write output
         if args.output:
-            with open(args.output, 'w', encoding='utf-8') as f:
+            with open(args.output, "w", encoding="utf-8") as f:
                 f.write(output)
             if args.verbose:
                 print(f"Results written to {args.output}", file=sys.stderr)
