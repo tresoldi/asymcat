@@ -19,8 +19,8 @@ jobs:
           cache: 'pip'
       - name: Install Dependencies
         run: make install
-      - name: Check format
-        run: make format-check
+      - name: Check code quality with ruff
+        run: make ruff-check
 
   security:
     runs-on: ubuntu-latest

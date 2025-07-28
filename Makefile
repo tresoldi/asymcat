@@ -25,36 +25,31 @@ clean:
 	find . -name '*.pyc' -delete
 	find . -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
 
-## black - Runs the Black Python formatter against the project
-black:
-	$(PYTHON) -m black $(PROJECT_NAME)/ $(TEST_DIR)/
+## format - Auto-format code with ruff
+format:
+	$(PYTHON) -m ruff format $(PROJECT_NAME)/ $(TEST_DIR)/
 
-## black-check - Checks if the project is formatted correctly against the Black rules
-black-check:
-	$(PYTHON) -m black $(PROJECT_NAME)/ $(TEST_DIR)/ --check
+## format-check - Check code formatting and linting with ruff
+format-check:
+	$(PYTHON) -m ruff check $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(PYTHON) -m ruff format --check $(PROJECT_NAME)/ $(TEST_DIR)/
 
-## format - Runs all formatting tools against the project
-format: black isort lint mypy
-
-## format-check - Checks if the project is formatted correctly against all formatting rules
-format-check: black-check isort-check lint mypy
+## ruff-check - Check code quality with ruff (alias for format-check)
+ruff-check: format-check
 
 ## install - Install the project locally
 install:
 	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
 	$(VIRTUAL_BIN)/pip install -e ."[dev]"
 
-## isort - Sorts imports throughout the project
-isort:
-	$(PYTHON) -m isort $(PROJECT_NAME)/ $(TEST_DIR)/
-
-## isort-check - Checks that imports throughout the project are sorted correctly
-isort-check:
-	$(PYTHON) -m isort $(PROJECT_NAME)/ $(TEST_DIR)/ --check-only
-
-## lint - Lint the project
+## lint - Lint the project (ruff check)
 lint:
-	$(PYTHON) -m flake8 $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(PYTHON) -m ruff check $(PROJECT_NAME)/ $(TEST_DIR)/
+
+## ruff-fix - Auto-fix issues with ruff
+ruff-fix:
+	$(PYTHON) -m ruff check --fix $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(PYTHON) -m ruff format $(PROJECT_NAME)/ $(TEST_DIR)/
 
 ## mypy - Run mypy type checking on the project
 mypy:
@@ -94,4 +89,4 @@ security:
 	$(PYTHON) -m bandit -r $(PROJECT_NAME)/ || echo "Install bandit for security scanning: pip install bandit"
 	$(PYTHON) -m safety check || echo "Install safety for vulnerability scanning: pip install safety"
 
-.PHONY: help build coverage clean black black-check format format-check install isort isort-check lint mypy test docs docs-clean cli-test cli-help quick-test security
+.PHONY: help build coverage clean format format-check ruff-check install lint ruff-fix mypy test docs docs-clean cli-test cli-help quick-test security

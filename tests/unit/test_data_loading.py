@@ -4,8 +4,6 @@ Tests for data loading and preprocessing functionality.
 Demonstrates how to load different types of categorical data into ASymCat.
 """
 
-from typing import List
-
 import pytest
 
 import asymcat
@@ -131,7 +129,7 @@ class TestCooccurrenceCollection:
             ([[["a", "b", "c"], ["x", "y", "z"]]], {"min_cooccs": 9, "contains": [("a", "x"), ("c", "z")]}),
         ],
     )
-    def test_collect_cooccurrences_basic(self, test_data: List, expected_properties: dict):
+    def test_collect_cooccurrences_basic(self, test_data: list, expected_properties: dict):
         """
         Test basic co-occurrence collection.
 
@@ -145,9 +143,9 @@ class TestCooccurrenceCollection:
         assert_valid_cooccurrences(cooccs)
 
         # Check expected properties
-        assert (
-            len(cooccs) >= expected_properties["min_cooccs"]
-        ), f"Should have at least {expected_properties['min_cooccs']} co-occurrences"
+        assert len(cooccs) >= expected_properties["min_cooccs"], (
+            f"Should have at least {expected_properties['min_cooccs']} co-occurrences"
+        )
 
         # Check that expected pairs are present
         cooccs_set = set(cooccs)
@@ -231,7 +229,7 @@ class TestUtilityFunctions:
 
         assert len(ngrams) == len(expected_ngrams), f"Should generate {len(expected_ngrams)} {order}-grams"
 
-        for i, (actual, expected) in enumerate(zip(ngrams, expected_ngrams)):
+        for i, (actual, expected) in enumerate(zip(ngrams, expected_ngrams, strict=False)):
             assert actual == expected, f"N-gram {i}: expected {expected}, got {actual}"
 
     def test_collect_ngrams_error_handling(self):

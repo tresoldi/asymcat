@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # Note: includes code modified from
 # - https://stackoverflow.com/questions/46498455/categorical-features-correlation/46498792
 # - https://towardsdatascience.com/the-search-for-categorical-correlation-a1cf7f1888c9
@@ -20,7 +18,7 @@ import math
 # Import Python standard libraries
 from collections import Counter
 from itertools import chain, product
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any
 
 # Import 3rd party libraries
 import numpy as np
@@ -31,7 +29,7 @@ from freqprob import MLE, Laplace, Lidstone
 from . import common
 
 
-def conditional_entropy(x_symbols: List[Any], y_symbols: List[Any]) -> float:
+def conditional_entropy(x_symbols: list[Any], y_symbols: list[Any]) -> float:
     """
     Computes the entropy of `x` given `y`.
 
@@ -52,7 +50,7 @@ def conditional_entropy(x_symbols: List[Any], y_symbols: List[Any]) -> float:
     # parts, particularly in the scorers, it is worth repeating the code
     # here to have a more general function.
     y_counter = Counter(y_symbols)
-    xy_counter = Counter(list(zip(x_symbols, y_symbols)))
+    xy_counter = Counter(list(zip(x_symbols, y_symbols, strict=False)))
     population = sum(y_counter.values())
 
     # Compute the entropy and return
@@ -65,7 +63,7 @@ def conditional_entropy(x_symbols: List[Any], y_symbols: List[Any]) -> float:
     return entropy
 
 
-def compute_cramers_v(cont_table: List[List[float]]) -> float:
+def compute_cramers_v(cont_table: list[list[float]]) -> float:
     """
     Compute Cramer's V from a contingency table.
 
@@ -135,7 +133,7 @@ def compute_pmi(p_x: float, p_y: float, p_xy: float, normalized: bool, limit: fl
     return pmi
 
 
-def compute_theil_u(x_symbols: List[Any], y_symbols: List[Any]) -> float:
+def compute_theil_u(x_symbols: list[Any], y_symbols: list[Any]) -> float:
     """
     Compute the uncertainty coefficient Theil's U.
 
@@ -174,7 +172,7 @@ def compute_theil_u(x_symbols: List[Any], y_symbols: List[Any]) -> float:
     return theil_u
 
 
-def compute_mutual_information(x_symbols: List[Any], y_symbols: List[Any]) -> float:
+def compute_mutual_information(x_symbols: list[Any], y_symbols: list[Any]) -> float:
     """
     Compute the mutual information between X and Y.
 
@@ -199,7 +197,7 @@ def compute_mutual_information(x_symbols: List[Any], y_symbols: List[Any]) -> fl
         return 0.0
 
     # Count joint and marginal frequencies
-    xy_counter = Counter(list(zip(x_symbols, y_symbols)))
+    xy_counter = Counter(list(zip(x_symbols, y_symbols, strict=False)))
     x_counter = Counter(x_symbols)
     y_counter = Counter(y_symbols)
 
@@ -219,7 +217,7 @@ def compute_mutual_information(x_symbols: List[Any], y_symbols: List[Any]) -> fl
     return mi
 
 
-def compute_normalized_mutual_information(x_symbols: List[Any], y_symbols: List[Any]) -> float:
+def compute_normalized_mutual_information(x_symbols: list[Any], y_symbols: list[Any]) -> float:
     """
     Compute the normalized mutual information between X and Y.
 
@@ -248,7 +246,7 @@ def compute_normalized_mutual_information(x_symbols: List[Any], y_symbols: List[
     mi = compute_mutual_information(x_symbols, y_symbols)
 
     # Compute joint entropy H(X,Y)
-    xy_counter = Counter(list(zip(x_symbols, y_symbols)))
+    xy_counter = Counter(list(zip(x_symbols, y_symbols, strict=False)))
     population = len(x_symbols)
 
     joint_entropy = 0.0
@@ -264,7 +262,7 @@ def compute_normalized_mutual_information(x_symbols: List[Any], y_symbols: List[
     return mi / joint_entropy
 
 
-def compute_jaccard_index(x_contexts: List[Any], y_contexts: List[Any]) -> float:
+def compute_jaccard_index(x_contexts: list[Any], y_contexts: list[Any]) -> float:
     """
     Compute the Jaccard Index between two sets of contexts.
 
@@ -294,7 +292,7 @@ def compute_jaccard_index(x_contexts: List[Any], y_contexts: List[Any]) -> float
     return intersection / union
 
 
-def compute_goodman_kruskal_lambda(x_symbols: List[Any], y_symbols: List[Any], direction: str = "y_given_x") -> float:
+def compute_goodman_kruskal_lambda(x_symbols: list[Any], y_symbols: list[Any], direction: str = "y_given_x") -> float:
     """
     Compute Goodman and Kruskal's Lambda for asymmetric association.
 
@@ -358,7 +356,7 @@ def compute_goodman_kruskal_lambda(x_symbols: List[Any], y_symbols: List[Any], d
     return max(0.0, lambda_val)  # Ensure non-negative
 
 
-def compute_log_likelihood_ratio(cont_table: List[List[float]]) -> float:
+def compute_log_likelihood_ratio(cont_table: list[list[float]]) -> float:
     """
     Compute the Log-Likelihood Ratio (G²) from a contingency table.
 
@@ -409,8 +407,8 @@ def compute_log_likelihood_ratio(cont_table: List[List[float]]) -> float:
 # TODO: allow scaling withing percentile borders
 # TODO: see if we can vectorize numpy operations (now on dicts)
 def scale_scorer(
-    scorer: Dict[Tuple[Any, Any], Tuple[float, float]], method: str = "minmax", nrange: Tuple[float, float] = (0, 1)
-) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    scorer: dict[tuple[Any, Any], tuple[float, float]], method: str = "minmax", nrange: tuple[float, float] = (0, 1)
+) -> dict[tuple[Any, Any], tuple[float, float]]:
     """
     Scale a scorer.
 
@@ -480,7 +478,7 @@ def scale_scorer(
     return scaled_scorer
 
 
-def invert_scorer(scorer: Dict[Tuple[Any, Any], Tuple[float, float]]) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+def invert_scorer(scorer: dict[tuple[Any, Any], tuple[float, float]]) -> dict[tuple[Any, Any], tuple[float, float]]:
     """
     Inverts a scorer, so that the higher the affinity, the higher the score.
 
@@ -509,8 +507,8 @@ def invert_scorer(scorer: Dict[Tuple[Any, Any], Tuple[float, float]]) -> Dict[Tu
 
 
 def scorer2matrices(
-    scorer: Dict[Tuple[Any, Any], Tuple[float, float]],
-) -> Tuple[np.ndarray, np.ndarray, List[Any], List[Any]]:
+    scorer: dict[tuple[Any, Any], tuple[float, float]],
+) -> tuple[np.ndarray, np.ndarray, list[Any], list[Any]]:
     """
     Return the asymmetric matrices implied by a scorer and their alphabets.
 
@@ -540,7 +538,7 @@ class CatScorer:
     Class for computing categorical co-occurrence scores.
     """
 
-    def __init__(self, cooccs: List[Tuple[Any, Any]], smoothing_method: str = "mle", smoothing_alpha: float = 1.0):
+    def __init__(self, cooccs: list[tuple[Any, Any]], smoothing_method: str = "mle", smoothing_alpha: float = 1.0):
         """
         Initialization function.
 
@@ -556,12 +554,12 @@ class CatScorer:
         """
 
         # Store cooccs, observations, symbols and alphabets
-        self.cooccs: List[Tuple[Any, Any]] = cooccs
-        self.obs: Dict[Tuple[Any, Any], Dict[str, int]] = common.collect_observations(cooccs)
+        self.cooccs: list[tuple[Any, Any]] = cooccs
+        self.obs: dict[tuple[Any, Any], dict[str, int]] = common.collect_observations(cooccs)
 
         # Obtain the alphabets from the co-occurrence pairs
-        self.alphabet_x: List[Any]
-        self.alphabet_y: List[Any]
+        self.alphabet_x: list[Any]
+        self.alphabet_y: list[Any]
         self.alphabet_x, self.alphabet_y = common.collect_alphabets(self.cooccs)
 
         # Store smoothing configuration
@@ -570,7 +568,7 @@ class CatScorer:
 
         # Store smoothing parameters - freqprob scorers will be created when needed
         # since they require frequency distributions which are computed per pair
-        self._freqprob_scorer_class: Optional[Union[Type[MLE], Type[Laplace], Type[Lidstone]]] = None
+        self._freqprob_scorer_class: type[MLE] | type[Laplace] | type[Lidstone] | None = None
         if self.smoothing_method == "mle":
             self._freqprob_scorer_class = MLE
         elif self.smoothing_method == "laplace":
@@ -581,34 +579,34 @@ class CatScorer:
             raise ValueError(f"Unsupported smoothing method: {smoothing_method}. Use 'mle', 'laplace', or 'lidstone'.")
 
         # Cache for freqprob scorers per context
-        self._freqprob_cache: Dict[str, Any] = {}
+        self._freqprob_cache: dict[str, Any] = {}
 
         # Initialize the square and non-square contingency table as None
-        self._square_ct: Optional[Dict[Tuple[Any, Any], List[List[float]]]] = None
-        self._nonsquare_ct: Optional[Dict[Tuple[Any, Any], List[List[float]]]] = None
+        self._square_ct: dict[tuple[Any, Any], list[list[float]]] | None = None
+        self._nonsquare_ct: dict[tuple[Any, Any], list[list[float]]] | None = None
 
         # Initialize the scorers as None, in a lazy fashion
-        self._mle: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._pmi: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._npmi: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._chi2: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._chi2_nonsquare: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._cramersv: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._cramersv_nonsquare: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._fisher: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._theil_u: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._cond_entropy: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._tresoldi: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._mutual_information: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._normalized_mutual_information: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._jaccard_index: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._goodman_kruskal_lambda: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._log_likelihood_ratio: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
-        self._log_likelihood_ratio_nonsquare: Optional[Dict[Tuple[Any, Any], Tuple[float, float]]] = None
+        self._mle: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._pmi: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._npmi: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._chi2: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._chi2_nonsquare: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._cramersv: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._cramersv_nonsquare: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._fisher: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._theil_u: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._cond_entropy: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._tresoldi: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._mutual_information: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._normalized_mutual_information: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._jaccard_index: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._goodman_kruskal_lambda: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._log_likelihood_ratio: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._log_likelihood_ratio_nonsquare: dict[tuple[Any, Any], tuple[float, float]] | None = None
 
     def _compute_contingency_table_scorer(
         self, square: bool, computation_func, square_cache_attr: str, nonsquare_cache_attr: str
-    ) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    ) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Helper method to compute scorers based on contingency tables.
 
@@ -630,10 +628,10 @@ class CatScorer:
         """
         if square:
             cache_attr = square_cache_attr
-            ct_attr = '_square_ct'
+            ct_attr = "_square_ct"
         else:
             cache_attr = nonsquare_cache_attr
-            ct_attr = '_nonsquare_ct'
+            ct_attr = "_nonsquare_ct"
 
         if not getattr(self, cache_attr):
             # Compute the contingency table if necessary
@@ -650,7 +648,7 @@ class CatScorer:
 
         return getattr(self, cache_attr)
 
-    def _compute_probabilities(self, pair: Tuple[Any, Any]) -> Tuple[float, float, float]:
+    def _compute_probabilities(self, pair: tuple[Any, Any]) -> tuple[float, float, float]:
         """
         Helper method to compute probabilities p(x), p(y), p(xy) for a given pair.
 
@@ -688,7 +686,7 @@ class CatScorer:
         if not square and not self._nonsquare_ct:
             self._nonsquare_ct = {pair: common.build_ct(self.obs[pair], False) for pair in self.obs}
 
-    def mle(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def mle(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return an MLE scorer, computing it if necessary.
         Uses freqprob for robust probability estimation with optional smoothing.
@@ -716,9 +714,7 @@ class CatScorer:
                         if self._freqprob_scorer_class is None:
                             raise ValueError("Freqprob scorer class not initialized")
 
-                        if self.smoothing_method == "mle":
-                            scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y)
-                        elif self.smoothing_method == "laplace":
+                        if self.smoothing_method == "mle" or self.smoothing_method == "laplace":
                             scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y)
                         else:  # Lidstone
                             scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y, self.smoothing_alpha)
@@ -739,9 +735,7 @@ class CatScorer:
                         if self._freqprob_scorer_class is None:
                             raise ValueError("Freqprob scorer class not initialized")
 
-                        if self.smoothing_method == "mle":
-                            scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x)
-                        elif self.smoothing_method == "laplace":
+                        if self.smoothing_method == "mle" or self.smoothing_method == "laplace":
                             scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x)
                         else:  # Lidstone
                             scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x, self.smoothing_alpha)
@@ -754,7 +748,7 @@ class CatScorer:
 
         return self._mle
 
-    def get_smoothed_probabilities(self) -> Dict[str, Dict[Tuple[Any, Any], float]]:
+    def get_smoothed_probabilities(self) -> dict[str, dict[tuple[Any, Any], float]]:
         """
         Return smoothed probability estimates using the configured freqprob method.
 
@@ -763,12 +757,12 @@ class CatScorer:
         Dict[str, Dict[Tuple[Any, Any], float]]
             Dictionary containing 'xy_given_y', 'yx_given_x', 'joint', 'marginal_x', 'marginal_y' probabilities.
         """
-        results: Dict[str, Dict[Tuple[Any, Any], float]] = {
-            'xy_given_y': {},  # P(X|Y)
-            'yx_given_x': {},  # P(Y|X)
-            'joint': {},  # P(X,Y)
-            'marginal_x': {},  # P(X)
-            'marginal_y': {},  # P(Y)
+        results: dict[str, dict[tuple[Any, Any], float]] = {
+            "xy_given_y": {},  # P(X|Y)
+            "yx_given_x": {},  # P(Y|X)
+            "joint": {},  # P(X,Y)
+            "marginal_x": {},  # P(X)
+            "marginal_y": {},  # P(Y)
         }
 
         # Create global frequency distributions
@@ -776,9 +770,9 @@ class CatScorer:
         # Build frequency distributions - cast keys to work with freqprob API
         from typing import cast
 
-        joint_freqdist = cast(Dict[Any, int], {pair: obs["11"] for pair, obs in self.obs.items()})
-        x_freqdist: Dict[Any, int] = {}
-        y_freqdist: Dict[Any, int] = {}
+        joint_freqdist = cast(dict[Any, int], {pair: obs["11"] for pair, obs in self.obs.items()})
+        x_freqdist: dict[Any, int] = {}
+        y_freqdist: dict[Any, int] = {}
 
         for pair in product(self.alphabet_x, self.alphabet_y):
             obs = self.obs[pair]
@@ -793,11 +787,7 @@ class CatScorer:
         if self._freqprob_scorer_class is None:
             raise ValueError("Freqprob scorer class not initialized")
 
-        if self.smoothing_method == "mle":
-            joint_scorer = self._freqprob_scorer_class(joint_freqdist)
-            x_scorer = self._freqprob_scorer_class(x_freqdist)
-            y_scorer = self._freqprob_scorer_class(y_freqdist)
-        elif self.smoothing_method == "laplace":
+        if self.smoothing_method == "mle" or self.smoothing_method == "laplace":
             joint_scorer = self._freqprob_scorer_class(joint_freqdist)
             x_scorer = self._freqprob_scorer_class(x_freqdist)
             y_scorer = self._freqprob_scorer_class(y_freqdist)
@@ -814,24 +804,24 @@ class CatScorer:
             x_prob = math.exp(x_scorer(pair[0])) if pair[0] in x_freqdist else 0.0
             y_prob = math.exp(y_scorer(pair[1])) if pair[1] in y_freqdist else 0.0
 
-            results['joint'][pair] = joint_prob
-            results['marginal_x'][pair[0]] = x_prob
-            results['marginal_y'][pair[1]] = y_prob
+            results["joint"][pair] = joint_prob
+            results["marginal_x"][pair[0]] = x_prob
+            results["marginal_y"][pair[1]] = y_prob
 
             # Conditional probabilities using Bayes' rule
             if obs["01"] > 0 and y_prob > 0:  # Y marginal count > 0
-                results['xy_given_y'][pair] = joint_prob / y_prob
+                results["xy_given_y"][pair] = joint_prob / y_prob
             else:
-                results['xy_given_y'][pair] = 0.0
+                results["xy_given_y"][pair] = 0.0
 
             if obs["10"] > 0 and x_prob > 0:  # X marginal count > 0
-                results['yx_given_x'][pair] = joint_prob / x_prob
+                results["yx_given_x"][pair] = joint_prob / x_prob
             else:
-                results['yx_given_x'][pair] = 0.0
+                results["yx_given_x"][pair] = 0.0
 
         return results
 
-    def pmi_smoothed(self, normalized: bool = False) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def pmi_smoothed(self, normalized: bool = False) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a PMI scorer using freqprob smoothing for better numerical stability.
 
@@ -849,9 +839,9 @@ class CatScorer:
         pmi_scores = {}
 
         for pair in product(self.alphabet_x, self.alphabet_y):
-            p_x = probs['marginal_x'].get(pair[0], 0.0)
-            p_y = probs['marginal_y'].get(pair[1], 0.0)
-            p_xy = probs['joint'].get(pair, 0.0)
+            p_x = probs["marginal_x"].get(pair[0], 0.0)
+            p_y = probs["marginal_y"].get(pair[1], 0.0)
+            p_xy = probs["joint"].get(pair, 0.0)
 
             # PMI(X,Y) = log(P(X,Y) / (P(X) * P(Y)))
             if p_x > 0 and p_y > 0 and p_xy > 0:
@@ -870,7 +860,7 @@ class CatScorer:
 
         return pmi_scores
 
-    def pmi(self, normalized: bool = False) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def pmi(self, normalized: bool = False) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a PMI scorer.
 
@@ -916,7 +906,7 @@ class CatScorer:
 
         return ret
 
-    def chi2(self, square_ct: bool = True) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def chi2(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Chi2 scorer.
 
@@ -927,10 +917,10 @@ class CatScorer:
             non squared contingency table (default: True)
         """
         return self._compute_contingency_table_scorer(
-            square_ct, lambda ct: ss.chi2_contingency(ct)[0], '_chi2', '_chi2_nonsquare'
+            square_ct, lambda ct: ss.chi2_contingency(ct)[0], "_chi2", "_chi2_nonsquare"
         )
 
-    def cramers_v(self, square_ct: bool = True) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def cramers_v(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Cramér's V scorer.
 
@@ -940,9 +930,9 @@ class CatScorer:
             Whether to return the score over a squared or
             non squared contingency table (default: True)
         """
-        return self._compute_contingency_table_scorer(square_ct, compute_cramers_v, '_cramersv', '_cramersv_nonsquare')
+        return self._compute_contingency_table_scorer(square_ct, compute_cramers_v, "_cramersv", "_cramersv_nonsquare")
 
-    def fisher(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def fisher(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Fisher Exact Odds Ratio scorer.
 
@@ -968,7 +958,7 @@ class CatScorer:
 
         return self._fisher
 
-    def theil_u(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def theil_u(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Theil's U uncertainty scorer.
         """
@@ -1002,7 +992,7 @@ class CatScorer:
 
         return self._theil_u
 
-    def cond_entropy(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def cond_entropy(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a corrected conditional entropy scorer.
         """
@@ -1024,7 +1014,7 @@ class CatScorer:
 
         return self._cond_entropy
 
-    def tresoldi(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def tresoldi(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a `tresoldi` asymmetric uncertainty scorer.
 
@@ -1055,7 +1045,7 @@ class CatScorer:
 
         return self._tresoldi
 
-    def mutual_information(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def mutual_information(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Mutual Information scorer.
 
@@ -1090,7 +1080,7 @@ class CatScorer:
 
         return self._mutual_information
 
-    def normalized_mutual_information(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def normalized_mutual_information(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Normalized Mutual Information scorer.
 
@@ -1125,7 +1115,7 @@ class CatScorer:
 
         return self._normalized_mutual_information
 
-    def jaccard_index(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def jaccard_index(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Jaccard Index scorer.
 
@@ -1141,8 +1131,8 @@ class CatScorer:
             self._jaccard_index = {}
 
             # Pre-compute context sets for each symbol
-            x_contexts: Dict[Any, List[Any]] = {}  # symbol -> list of contexts where it appears
-            y_contexts: Dict[Any, List[Any]] = {}  # symbol -> list of contexts where it appears
+            x_contexts: dict[Any, list[Any]] = {}  # symbol -> list of contexts where it appears
+            y_contexts: dict[Any, list[Any]] = {}  # symbol -> list of contexts where it appears
 
             for i, (x, y) in enumerate(self.cooccs):
                 if x not in x_contexts:
@@ -1156,8 +1146,8 @@ class CatScorer:
             for x in self.alphabet_x:
                 for y in self.alphabet_y:
                     # Get contexts for each symbol
-                    contexts_x: List[Any] = x_contexts.get(x, [])
-                    contexts_y: List[Any] = y_contexts.get(y, [])
+                    contexts_x: list[Any] = x_contexts.get(x, [])
+                    contexts_y: list[Any] = y_contexts.get(y, [])
 
                     # Compute Jaccard index for both directions (though it's symmetric)
                     jaccard_xy = compute_jaccard_index(contexts_x, contexts_y)
@@ -1167,7 +1157,7 @@ class CatScorer:
 
         return self._jaccard_index
 
-    def goodman_kruskal_lambda(self) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def goodman_kruskal_lambda(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Goodman-Kruskal Lambda scorer.
 
@@ -1202,7 +1192,7 @@ class CatScorer:
 
         return self._goodman_kruskal_lambda
 
-    def log_likelihood_ratio(self, square_ct: bool = True) -> Dict[Tuple[Any, Any], Tuple[float, float]]:
+    def log_likelihood_ratio(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Log-Likelihood Ratio (G²) scorer.
 
@@ -1221,5 +1211,5 @@ class CatScorer:
             Dictionary mapping symbol pairs to (G²(X,Y), G²(Y,X)) tuples.
         """
         return self._compute_contingency_table_scorer(
-            square_ct, compute_log_likelihood_ratio, '_log_likelihood_ratio', '_log_likelihood_ratio_nonsquare'
+            square_ct, compute_log_likelihood_ratio, "_log_likelihood_ratio", "_log_likelihood_ratio_nonsquare"
         )

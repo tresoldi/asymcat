@@ -100,77 +100,77 @@ class TestLegacyDataCompatibility:
 
         # Validate structure for all measures
         measures = {
-            'mle': mle,
-            'pmi': pmi,
-            'npmi': npmi,
-            'chi2': chi2,
-            'chi2_ns': chi2_ns,
-            'cramersv': cramersv,
-            'cramersv_ns': cramersv_ns,
-            'fisher': fisher,
-            'theil_u': theil_u,
-            'cond_entropy': cond_entropy,
-            'tresoldi': tresoldi,
+            "mle": mle,
+            "pmi": pmi,
+            "npmi": npmi,
+            "chi2": chi2,
+            "chi2_ns": chi2_ns,
+            "cramersv": cramersv,
+            "cramersv_ns": cramersv_ns,
+            "fisher": fisher,
+            "theil_u": theil_u,
+            "cond_entropy": cond_entropy,
+            "tresoldi": tresoldi,
         }
 
         for measure_name, scores in measures.items():
             # Fisher exact test can produce infinite values for perfect associations
-            allow_inf = measure_name == 'fisher'
+            allow_inf = measure_name == "fisher"
             assert_valid_scores(scores, allow_infinite=allow_inf)
 
         # Test exact values against original test expectations
         expected_values = {
             ("ONE", "1"): {
-                'mle': (1.0, 1.0),
-                'pmi': (5.680172609017068, 5.680172609017068),
-                'npmi': (1.0, 1.0),
-                'chi2': (609.5807658175393, 609.5807658175393),
-                'chi2_ns': (879.0, 879.0),
-                'cramersv': (0.8325526903114843, 0.8325526903114843),
-                'cramersv_ns': (0.7065025023855139, 0.7065025023855139),
-                'fisher': (np.inf, np.inf),
-                'theil_u': (1.0, 1.0),
-                'cond_entropy': (0.0, 0.0),
-                'tresoldi': (1.0, 1.0),
+                "mle": (1.0, 1.0),
+                "pmi": (5.680172609017068, 5.680172609017068),
+                "npmi": (1.0, 1.0),
+                "chi2": (609.5807658175393, 609.5807658175393),
+                "chi2_ns": (879.0, 879.0),
+                "cramersv": (0.8325526903114843, 0.8325526903114843),
+                "cramersv_ns": (0.7065025023855139, 0.7065025023855139),
+                "fisher": (np.inf, np.inf),
+                "theil_u": (1.0, 1.0),
+                "cond_entropy": (0.0, 0.0),
+                "tresoldi": (1.0, 1.0),
             },
             ("A", "b"): {
-                'mle': (0.11320754716981132, 0.06521739130434782),
-                'pmi': (0.07846387631207004, 0.07846387631207004),
-                'npmi': (0.015733602612959818, 0.015733602612959818),
-                'chi2': (0.0, 0.0),
-                'chi2_ns': (0.043927505580845905, 0.043927505580845905),
-                'cramersv': (0.0, 0.0),
-                'cramersv_ns': (0.0, 0.0),
-                'fisher': (1.0984661058881742, 1.0984661058881742),
-                'theil_u': (0.21299752425693524, 0.3356184612000498),
-                'cond_entropy': (1.86638224482290279, 0.9999327965500219),
-                'tresoldi': (0.10466500171366895, 0.0926310345228265),
+                "mle": (0.11320754716981132, 0.06521739130434782),
+                "pmi": (0.07846387631207004, 0.07846387631207004),
+                "npmi": (0.015733602612959818, 0.015733602612959818),
+                "chi2": (0.0, 0.0),
+                "chi2_ns": (0.043927505580845905, 0.043927505580845905),
+                "cramersv": (0.0, 0.0),
+                "cramersv_ns": (0.0, 0.0),
+                "fisher": (1.0984661058881742, 1.0984661058881742),
+                "theil_u": (0.21299752425693524, 0.3356184612000498),
+                "cond_entropy": (1.86638224482290279, 0.9999327965500219),
+                "tresoldi": (0.10466500171366895, 0.0926310345228265),
             },
             ("S", "s"): {
-                'mle': (0.17142857142857143, 0.13953488372093023),
-                'pmi': (1.2539961897302558, 1.2539961897302558),
-                'npmi': (0.2514517336476095, 0.2514517336476095),
-                'chi2': (9.176175043924879, 9.176175043924879),
-                'chi2_ns': (11.758608367318205, 11.758608367318205),
-                'cramersv': (0.09649345638896019, 0.09649345638896019),
-                'cramersv_ns': (0.07452170854897658, 0.07452170854897658),
-                'fisher': (4.512581547064306, 4.512581547064306),
-                'theil_u': (0.22071631715993364, 0.2841291022637977),
-                'cond_entropy': (1.5938047875022765, 1.137346966185816),
-                'tresoldi': (1.2062725270739942, 1.2150117159149825),
+                "mle": (0.17142857142857143, 0.13953488372093023),
+                "pmi": (1.2539961897302558, 1.2539961897302558),
+                "npmi": (0.2514517336476095, 0.2514517336476095),
+                "chi2": (9.176175043924879, 9.176175043924879),
+                "chi2_ns": (11.758608367318205, 11.758608367318205),
+                "cramersv": (0.09649345638896019, 0.09649345638896019),
+                "cramersv_ns": (0.07452170854897658, 0.07452170854897658),
+                "fisher": (4.512581547064306, 4.512581547064306),
+                "theil_u": (0.22071631715993364, 0.2841291022637977),
+                "cond_entropy": (1.5938047875022765, 1.137346966185816),
+                "tresoldi": (1.2062725270739942, 1.2150117159149825),
             },
             ("H", "i"): {
-                'mle': (0.0, 0.0),
-                'pmi': (-6.502790045915624, -6.502790045915624),
-                'npmi': (-0.4796427489634758, -0.4796427489634758),
-                'chi2': (0.09374177071030182, 0.09374177071030182),
-                'chi2_ns': (0.8057902693787795, 0.8057902693787795),
-                'cramersv': (0.0, 0.0),
-                'cramersv_ns': (0.0, 0.0),
-                'fisher': (0.0, 0.0),
-                'theil_u': (0.3866999152200347, 0.34435838354803283),
-                'cond_entropy': (1.0887395664391526, 1.3070160180503212),
-                'tresoldi': (-6.502790045915624, -6.502790045915624),
+                "mle": (0.0, 0.0),
+                "pmi": (-6.502790045915624, -6.502790045915624),
+                "npmi": (-0.4796427489634758, -0.4796427489634758),
+                "chi2": (0.09374177071030182, 0.09374177071030182),
+                "chi2_ns": (0.8057902693787795, 0.8057902693787795),
+                "cramersv": (0.0, 0.0),
+                "cramersv_ns": (0.0, 0.0),
+                "fisher": (0.0, 0.0),
+                "theil_u": (0.3866999152200347, 0.34435838354803283),
+                "cond_entropy": (1.0887395664391526, 1.3070160180503212),
+                "tresoldi": (-6.502790045915624, -6.502790045915624),
             },
         }
 
@@ -187,16 +187,16 @@ class TestLegacyDataCompatibility:
                     if np.isinf(expected_xy):
                         assert np.isinf(actual_xy), f"{measure_name}[{pair}] X→Y: expected inf, got {actual_xy}"
                     else:
-                        assert np.allclose(
-                            [actual_xy], [expected_xy], rtol=1e-05, atol=1e-08
-                        ), f"{measure_name}[{pair}] X→Y: expected {expected_xy}, got {actual_xy}"
+                        assert np.allclose([actual_xy], [expected_xy], rtol=1e-05, atol=1e-08), (
+                            f"{measure_name}[{pair}] X→Y: expected {expected_xy}, got {actual_xy}"
+                        )
 
                     if np.isinf(expected_yx):
                         assert np.isinf(actual_yx), f"{measure_name}[{pair}] Y→X: expected inf, got {actual_yx}"
                     else:
-                        assert np.allclose(
-                            [actual_yx], [expected_yx], rtol=1e-05, atol=1e-08
-                        ), f"{measure_name}[{pair}] Y→X: expected {expected_yx}, got {actual_yx}"
+                        assert np.allclose([actual_yx], [expected_yx], rtol=1e-05, atol=1e-08), (
+                            f"{measure_name}[{pair}] Y→X: expected {expected_yx}, got {actual_yx}"
+                        )
 
     def test_original_matrix_generation(self):
         """Test matrix generation produces original expected dimensions."""
@@ -230,36 +230,36 @@ class TestLegacyDataCompatibility:
         expected_minmax = (0.15476857281060225, 0.15476857281060225)
         actual_minmax = scaled_minmax["H", "i"]
 
-        assert np.allclose(
-            actual_minmax, expected_minmax, rtol=1e-05, atol=1e-08
-        ), f"Minmax scaling mismatch: expected {expected_minmax}, got {actual_minmax}"
+        assert np.allclose(actual_minmax, expected_minmax, rtol=1e-05, atol=1e-08), (
+            f"Minmax scaling mismatch: expected {expected_minmax}, got {actual_minmax}"
+        )
 
         # Test mean scaling
         scaled_mean = asymcat.scorer.scale_scorer(score_dict, method="mean")
         expected_mean = (-0.36871270234063913, -0.36871270234063913)
         actual_mean = scaled_mean["H", "i"]
 
-        assert np.allclose(
-            actual_mean, expected_mean, rtol=1e-05, atol=1e-08
-        ), f"Mean scaling mismatch: expected {expected_mean}, got {actual_mean}"
+        assert np.allclose(actual_mean, expected_mean, rtol=1e-05, atol=1e-08), (
+            f"Mean scaling mismatch: expected {expected_mean}, got {actual_mean}"
+        )
 
         # Test standard deviation scaling
         scaled_stdev = asymcat.scorer.scale_scorer(score_dict, method="stdev")
         expected_stdev = (-1.3465717087048406, -1.3465717087048406)
         actual_stdev = scaled_stdev["H", "i"]
 
-        assert np.allclose(
-            actual_stdev, expected_stdev, rtol=1e-05, atol=1e-08
-        ), f"Stdev scaling mismatch: expected {expected_stdev}, got {actual_stdev}"
+        assert np.allclose(actual_stdev, expected_stdev, rtol=1e-05, atol=1e-08), (
+            f"Stdev scaling mismatch: expected {expected_stdev}, got {actual_stdev}"
+        )
 
         # Test inversion
         inverted = asymcat.scorer.invert_scorer(scaled_minmax)
         expected_inverted = (0.8452314271893977, 0.8452314271893977)
         actual_inverted = inverted["H", "i"]
 
-        assert np.allclose(
-            actual_inverted, expected_inverted, rtol=1e-05, atol=1e-08
-        ), f"Inversion mismatch: expected {expected_inverted}, got {actual_inverted}"
+        assert np.allclose(actual_inverted, expected_inverted, rtol=1e-05, atol=1e-08), (
+            f"Inversion mismatch: expected {expected_inverted}, got {actual_inverted}"
+        )
 
 
 class TestLegacyFileReading:
@@ -335,11 +335,11 @@ class TestLegacyNewMethods:
 
         # Test new methods with original validation logic
         new_methods = [
-            ('mutual_information', scorer.mutual_information),
-            ('normalized_mutual_information', scorer.normalized_mutual_information),
-            ('jaccard_index', scorer.jaccard_index),
-            ('goodman_kruskal_lambda', scorer.goodman_kruskal_lambda),
-            ('log_likelihood_ratio', scorer.log_likelihood_ratio),
+            ("mutual_information", scorer.mutual_information),
+            ("normalized_mutual_information", scorer.normalized_mutual_information),
+            ("jaccard_index", scorer.jaccard_index),
+            ("goodman_kruskal_lambda", scorer.goodman_kruskal_lambda),
+            ("log_likelihood_ratio", scorer.log_likelihood_ratio),
         ]
 
         for method_name, method_func in new_methods:
@@ -349,25 +349,25 @@ class TestLegacyNewMethods:
 
             # Validate specific properties as in original tests
             for pair, (xy, yx) in scores.items():
-                if method_name == 'mutual_information':
+                if method_name == "mutual_information":
                     assert xy >= 0 and yx >= 0, f"MI should be non-negative for {pair}"
                     assert not np.isnan(xy) and not np.isnan(yx), f"MI should not be NaN for {pair}"
 
-                elif method_name == 'normalized_mutual_information':
+                elif method_name == "normalized_mutual_information":
                     assert 0.0 <= xy <= 1.0, f"NMI should be in [0,1] for {pair}: {xy}"
                     assert 0.0 <= yx <= 1.0, f"NMI should be in [0,1] for {pair}: {yx}"
 
-                elif method_name == 'jaccard_index':
+                elif method_name == "jaccard_index":
                     assert 0.0 <= xy <= 1.0, f"Jaccard should be in [0,1] for {pair}: {xy}"
                     assert 0.0 <= yx <= 1.0, f"Jaccard should be in [0,1] for {pair}: {yx}"
                     # Jaccard should be symmetric
                     assert abs(xy - yx) < 1e-10, f"Jaccard should be symmetric for {pair}"
 
-                elif method_name == 'goodman_kruskal_lambda':
+                elif method_name == "goodman_kruskal_lambda":
                     assert 0.0 <= xy <= 1.0, f"Lambda should be in [0,1] for {pair}: {xy}"
                     assert 0.0 <= yx <= 1.0, f"Lambda should be in [0,1] for {pair}: {yx}"
 
-                elif method_name == 'log_likelihood_ratio':
+                elif method_name == "log_likelihood_ratio":
                     assert xy >= 0 and yx >= 0, f"G² should be non-negative for {pair}"
                     assert np.isfinite(xy) and np.isfinite(yx), f"G² should be finite for {pair}"
 
