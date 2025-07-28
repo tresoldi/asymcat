@@ -4,7 +4,7 @@ Custom assertions and validation utilities for ASymCat tests.
 Provides domain-specific assertions that make tests more readable and maintainable.
 """
 
-from typing import Any, Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 

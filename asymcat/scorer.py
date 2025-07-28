@@ -20,7 +20,7 @@ import math
 # Import Python standard libraries
 from collections import Counter
 from itertools import chain, product
-from typing import Any, Dict, List, Optional, Tuple, Union, Type
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 # Import 3rd party libraries
 import numpy as np
@@ -464,13 +464,16 @@ def scale_scorer(
         score_diff = max(scores) - min(scores)
 
         scaled_scorer = {
-            pair: (float((value[0] - mean) / score_diff), float((value[1] - mean) / score_diff)) for pair, value in scorer.items()
+            pair: (float((value[0] - mean) / score_diff), float((value[1] - mean) / score_diff))
+            for pair, value in scorer.items()
         }
     elif method == "stdev":
         mean = np.mean(scores)
         stdev = np.std(scores)
 
-        scaled_scorer = {pair: (float((value[0] - mean) / stdev), float((value[1] - mean) / stdev)) for pair, value in scorer.items()}
+        scaled_scorer = {
+            pair: (float((value[0] - mean) / stdev), float((value[1] - mean) / stdev)) for pair, value in scorer.items()
+        }
     else:
         raise ValueError("Unknown scaling method.")
 
@@ -498,7 +501,9 @@ def invert_scorer(scorer: Dict[Tuple[Any, Any], Tuple[float, float]]) -> Dict[Tu
     scores = list(chain.from_iterable(scorer.values()))
     max_score = max(scores)
 
-    inverted_scorer = {coocc: (float(max_score - values[0]), float(max_score - values[1])) for coocc, values in scorer.items()}
+    inverted_scorer = {
+        coocc: (float(max_score - values[0]), float(max_score - values[1])) for coocc, values in scorer.items()
+    }
 
     return inverted_scorer
 
@@ -710,7 +715,7 @@ class CatScorer:
 
                         if self._freqprob_scorer_class is None:
                             raise ValueError("Freqprob scorer class not initialized")
-                        
+
                         if self.smoothing_method == "mle":
                             scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y)
                         elif self.smoothing_method == "laplace":
@@ -733,7 +738,7 @@ class CatScorer:
 
                         if self._freqprob_scorer_class is None:
                             raise ValueError("Freqprob scorer class not initialized")
-                        
+
                         if self.smoothing_method == "mle":
                             scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x)
                         elif self.smoothing_method == "laplace":
@@ -770,6 +775,7 @@ class CatScorer:
 
         # Build frequency distributions - cast keys to work with freqprob API
         from typing import cast
+
         joint_freqdist = cast(Dict[Any, int], {pair: obs["11"] for pair, obs in self.obs.items()})
         x_freqdist: Dict[Any, int] = {}
         y_freqdist: Dict[Any, int] = {}
@@ -786,7 +792,7 @@ class CatScorer:
         # Create freqprob scorers
         if self._freqprob_scorer_class is None:
             raise ValueError("Freqprob scorer class not initialized")
-            
+
         if self.smoothing_method == "mle":
             joint_scorer = self._freqprob_scorer_class(joint_freqdist)
             x_scorer = self._freqprob_scorer_class(x_freqdist)
@@ -903,10 +909,10 @@ class CatScorer:
         # Select the scorer to return (this allows easier refactoring later)
         if not normalized:
             ret = self._pmi
-            assert ret is not None, "PMI should have been computed"
+            assert ret is not None, "PMI should have been computed"  # nosec
         else:
             ret = self._npmi
-            assert ret is not None, "NPMI should have been computed"
+            assert ret is not None, "NPMI should have been computed"  # nosec
 
         return ret
 
@@ -954,7 +960,7 @@ class CatScorer:
 
         # Compute the scorer, if necessary
         if not self._fisher:
-            assert self._square_ct is not None, "Square contingency table should have been computed"
+            assert self._square_ct is not None, "Square contingency table should have been computed"  # nosec
             self._fisher = {}
             for pair in self.obs:
                 fisher = ss.fisher_exact(self._square_ct[pair])[0]
