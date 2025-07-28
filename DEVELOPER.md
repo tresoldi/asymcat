@@ -32,7 +32,7 @@ make format-check
 
 ### Prerequisites
 
-- Python 3.8+ (recommended: Python 3.11+)
+- Python 3.10+ (recommended: Python 3.11+)
 - Git
 - Make (for automated workflows)
 - Optional: pyenv for Python version management
@@ -1736,17 +1736,17 @@ lookup_dict = {k: v for k, v in pairs}  # O(1) lookups
 ```python
 # Use version-compatible imports
 try:
-    from typing import TypedDict  # Python 3.8+
+    from typing import TypedDict  # Python 3.10+
 except ImportError:
     from typing_extensions import TypedDict
 
 # Check version requirements
 import sys
-if sys.version_info < (3, 8):
-    raise RuntimeError("Python 3.8+ required")
+if sys.version_info < (3, 10):
+    raise RuntimeError("Python 3.10+ required")
 
 # Use compatible syntax
-# Python 3.8+: walrus operator
+# Python 3.10+: walrus operator (available since 3.8, but we require 3.10+)
 if (n := len(data)) > 100:
     process_large_data(data)
 
