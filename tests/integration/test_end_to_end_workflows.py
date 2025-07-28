@@ -54,7 +54,7 @@ class TestCompleteWorkflows:
         assert len(data) > 0, "No data loaded"
 
         # Step 2: Collect co-occurrences
-        cooccs = asymcat.collect_cooccs(data)
+        cooccs = asymcat.collect_cooccs(data)  # type: ignore[arg-type]
         assert_valid_cooccurrences(cooccs)
         assert len(cooccs) >= expected_properties["min_cooccs"], f"Too few co-occurrences: {len(cooccs)}"
 

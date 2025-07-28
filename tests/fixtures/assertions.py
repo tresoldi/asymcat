@@ -4,7 +4,7 @@ Custom assertions and validation utilities for ASymCat tests.
 Provides domain-specific assertions that make tests more readable and maintainable.
 """
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Optional
 
 import numpy as np
 
@@ -61,7 +61,7 @@ def assert_valid_scores(scores: Dict[Tuple[Any, Any], Tuple[float, float]], allo
 
 
 def assert_scores_in_range(
-    scores: Dict[Tuple[Any, Any], Tuple[float, float]], min_val: float = None, max_val: float = None
+    scores: Dict[Tuple[Any, Any], Tuple[float, float]], min_val: Optional[float] = None, max_val: Optional[float] = None
 ) -> None:
     """
     Assert that scores fall within expected ranges.

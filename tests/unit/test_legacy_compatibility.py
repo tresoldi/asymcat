@@ -330,7 +330,7 @@ class TestLegacyNewMethods:
 
         # Load and process data
         data = asymcat.read_sequences(str(file_path))
-        cooccs = asymcat.collect_cooccs(data)
+        cooccs = asymcat.collect_cooccs(data)  # type: ignore[arg-type]
         scorer = asymcat.scorer.CatScorer(cooccs)
 
         # Test new methods with original validation logic
@@ -343,7 +343,7 @@ class TestLegacyNewMethods:
         ]
 
         for method_name, method_func in new_methods:
-            scores = method_func()
+            scores = method_func()  # type: ignore[operator]
             assert_valid_scores(scores)
             assert len(scores) >= min_pairs, f"Too few pairs in {method_name}: {len(scores)}"
 

@@ -136,7 +136,7 @@ def load_data(file_path: str, format_type: str, verbose: bool = False) -> Union[
     if format_type == "sequences":
         data = asymcat.read_sequences(file_path)
     elif format_type == "pa-matrix":
-        data = asymcat.read_pa_matrix(file_path)
+        data = asymcat.read_pa_matrix(file_path)  # type: ignore[assignment]
     else:
         raise ValueError(f"Unknown format: {format_type}")
 
@@ -156,7 +156,7 @@ def compute_cooccurrences(
         else:
             print("Computing full-sequence co-occurrences", file=sys.stderr)
 
-    cooccs = asymcat.collect_cooccs(data, order=ngrams, pad=pad)
+    cooccs = asymcat.collect_cooccs(data, order=ngrams, pad=pad)  # type: ignore[arg-type]
 
     if verbose:
         print(f"Found {len(cooccs)} co-occurrences", file=sys.stderr)
@@ -164,7 +164,7 @@ def compute_cooccurrences(
     return cooccs
 
 
-def get_scorer_methods(scorer: CatScorer, scorer_names: List[str]) -> Dict[str, Callable]:
+def get_scorer_methods(scorer: CatScorer, scorer_names: List[str]) -> Dict[str, Callable[..., Any]]:
     """Get the requested scoring methods from the scorer."""
     all_methods = {
         "mle": scorer.mle,
@@ -187,7 +187,7 @@ def get_scorer_methods(scorer: CatScorer, scorer_names: List[str]) -> Dict[str, 
     }
 
     if "all" in scorer_names:
-        return all_methods
+        return all_methods  # type: ignore[return-value]
 
     methods = {}
     for name in scorer_names:
@@ -196,7 +196,7 @@ def get_scorer_methods(scorer: CatScorer, scorer_names: List[str]) -> Dict[str, 
         else:
             raise ValueError(f"Unknown scorer: {name}")
 
-    return methods
+    return methods  # type: ignore[return-value]
 
 
 def compute_scores(
