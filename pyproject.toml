@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=64", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "asymcat"
@@ -121,11 +121,101 @@ Repository = "http://github.com/tresoldi/asymcat"
 [project.scripts]
 asymcat = "asymcat.__main__:main"
 
-[tool.setuptools.packages.find]
-exclude = ["examples*", "test*", "tests*"]
+[tool.hatch.build.targets.wheel]
+packages = ["asymcat"]
 
-[tool.setuptools.package-data]
-asymcat = ["py.typed"]
+[tool.hatch.build.targets.sdist]
+include = [
+    "asymcat/",
+    "docs/",
+    "resources/",
+    "scripts/",
+    "tests/",
+    "README.md",
+    "LICENSE",
+    "AUTHORS.md",
+    "CHANGELOG.md",
+    "pyproject.toml",
+    "requirements.txt",
+    "Makefile",
+    "CLAUDE.md",
+    "DEVELOPER.md",
+]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"docs" = "docs"
+"resources" = "resources"
+"scripts" = "scripts"
+
+[tool.hatch.version]
+path = "asymcat/__init__.py"
+
+[tool.hatch.envs.default]
+dependencies = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-xdist>=3.0.0",
+    "pytest-mock>=3.10.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+    "bandit[toml]>=1.7.0",
+    "safety>=2.3.0",
+]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "pytest --cov=asymcat --cov-branch --cov-report=html --cov-report=term {args:tests}"
+format = ["black {args:.}", "isort {args:.}"]
+format-check = ["black --check {args:.}", "isort --check-only {args:.}"]
+lint = "flake8 {args:asymcat tests}"
+typecheck = "mypy {args:asymcat}"
+security = ["bandit -r asymcat/", "safety check"]
+all-checks = ["format-check", "lint", "typecheck", "security", "test-cov"]
+
+[tool.hatch.envs.docs]
+dependencies = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=2.0.0",
+    "sphinx-autodoc-typehints>=1.24.0",
+    "sphinx-copybutton>=0.5.0",
+    "sphinx-design>=0.5.0",
+]
+
+[tool.hatch.envs.docs.scripts]
+build = "sphinx-build -b html docs/source docs/build"
+clean = "rm -rf docs/build"
+serve = "python -m http.server 8000 -d docs/build"
+
+[tool.hatch.envs.notebooks]
+dependencies = [
+    "jupyter>=1.0.0",
+    "jupyterlab>=4.0.0",
+    "ipywidgets>=8.0.0",
+    "notebook>=7.0.0",
+    "nbconvert>=7.0.0",
+]
+
+[tool.hatch.envs.notebooks.scripts]
+execute-all = """
+for notebook in docs/*.ipynb; do
+    echo "Executing: $notebook"
+    jupyter nbconvert --to notebook --execute --inplace "$notebook"
+done
+"""
+check-outputs = """
+for notebook in docs/*.ipynb; do
+    size=$(stat --format="%s" "$notebook" 2>/dev/null || stat -f%z "$notebook")
+    if [ "$size" -lt 30000 ]; then
+        echo "❌ $notebook: $size bytes (missing outputs)"
+        exit 1
+    else
+        echo "✅ $notebook: $size bytes (has outputs)"
+    fi
+done
+"""
 
 [tool.black]
 preview = true

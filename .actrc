@@ -1,0 +1,23 @@
+# Act configuration file for local GitHub Actions testing
+# This ensures we use the same Ubuntu version and setup as GitHub Actions
+
+# Use the same Ubuntu image as GitHub Actions (ubuntu-latest = ubuntu-22.04)
+-P ubuntu-latest=catthehacker/ubuntu:act-22.04
+
+# Use medium runner image for better compatibility
+-P ubuntu-22.04=catthehacker/ubuntu:act-22.04
+
+# Set default platform
+--platform ubuntu-latest
+
+# Verbose output for debugging
+--verbose
+
+# Use Docker network for better isolation
+--network bridge
+
+# Reuse containers for faster subsequent runs
+--reuse
+
+# Set container architecture
+--container-architecture linux/amd64
