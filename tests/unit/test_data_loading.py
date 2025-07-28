@@ -172,7 +172,7 @@ class TestCooccurrenceCollection:
         seqs = [("abcde", "ABCDE"), ("fgh", "FGH"), ("i", "I"), ("jkl", "JKL")]
 
         # Collect n-gram co-occurrences
-        cooccs = asymcat.collect_cooccs(seqs, order=order, pad="#")
+        cooccs = asymcat.collect_cooccs(seqs, order=order, pad="#")  # type: ignore[arg-type]
 
         # Validate structure
         assert_valid_cooccurrences(cooccs)

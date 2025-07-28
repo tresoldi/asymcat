@@ -20,7 +20,7 @@ import math
 # Import Python standard libraries
 from collections import Counter
 from itertools import chain, product
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union, Type
 
 # Import 3rd party libraries
 import numpy as np
@@ -464,13 +464,13 @@ def scale_scorer(
         score_diff = max(scores) - min(scores)
 
         scaled_scorer = {
-            pair: ((value[0] - mean) / score_diff, (value[1] - mean) / score_diff) for pair, value in scorer.items()
+            pair: (float((value[0] - mean) / score_diff), float((value[1] - mean) / score_diff)) for pair, value in scorer.items()
         }
     elif method == "stdev":
         mean = np.mean(scores)
         stdev = np.std(scores)
 
-        scaled_scorer = {pair: ((value[0] - mean) / stdev, (value[1] - mean) / stdev) for pair, value in scorer.items()}
+        scaled_scorer = {pair: (float((value[0] - mean) / stdev), float((value[1] - mean) / stdev)) for pair, value in scorer.items()}
     else:
         raise ValueError("Unknown scaling method.")
 
@@ -498,7 +498,7 @@ def invert_scorer(scorer: Dict[Tuple[Any, Any], Tuple[float, float]]) -> Dict[Tu
     scores = list(chain.from_iterable(scorer.values()))
     max_score = max(scores)
 
-    inverted_scorer = {coocc: tuple([max_score - value for value in values]) for coocc, values in scorer.items()}
+    inverted_scorer = {coocc: (float(max_score - values[0]), float(max_score - values[1])) for coocc, values in scorer.items()}
 
     return inverted_scorer
 
@@ -565,7 +565,7 @@ class CatScorer:
 
         # Store smoothing parameters - freqprob scorers will be created when needed
         # since they require frequency distributions which are computed per pair
-        self._freqprob_scorer_class = None
+        self._freqprob_scorer_class: Optional[Union[Type[MLE], Type[Laplace], Type[Lidstone]]] = None
         if self.smoothing_method == "mle":
             self._freqprob_scorer_class = MLE
         elif self.smoothing_method == "laplace":
@@ -708,10 +708,15 @@ class CatScorer:
                         # For smoothing methods, use freqprob which handles zeros better
                         freq_dist_x_given_y = {pair[0]: obs["11"], f"NOT_{pair[0]}": obs["01"] - obs["11"]}
 
-                        if self.smoothing_method == "laplace":
+                        if self._freqprob_scorer_class is None:
+                            raise ValueError("Freqprob scorer class not initialized")
+                        
+                        if self.smoothing_method == "mle":
+                            scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y)
+                        elif self.smoothing_method == "laplace":
                             scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y)
                         else:  # Lidstone
-                            scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y, gamma=self.smoothing_alpha)
+                            scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y, self.smoothing_alpha)
 
                         xy_score = math.exp(scorer_xy(pair[0]))
                 else:
@@ -726,10 +731,15 @@ class CatScorer:
                         # For smoothing methods, use freqprob which handles zeros better
                         freq_dist_y_given_x = {pair[1]: obs["11"], f"NOT_{pair[1]}": obs["10"] - obs["11"]}
 
-                        if self.smoothing_method == "laplace":
+                        if self._freqprob_scorer_class is None:
+                            raise ValueError("Freqprob scorer class not initialized")
+                        
+                        if self.smoothing_method == "mle":
+                            scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x)
+                        elif self.smoothing_method == "laplace":
                             scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x)
                         else:  # Lidstone
-                            scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x, gamma=self.smoothing_alpha)
+                            scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x, self.smoothing_alpha)
 
                         yx_score = math.exp(scorer_yx(pair[1]))
                 else:
@@ -758,10 +768,11 @@ class CatScorer:
 
         # Create global frequency distributions
 
-        # Build frequency distributions
-        joint_freqdist = {pair: obs["11"] for pair, obs in self.obs.items()}
-        x_freqdist = {}
-        y_freqdist = {}
+        # Build frequency distributions - cast keys to work with freqprob API
+        from typing import cast
+        joint_freqdist = cast(Dict[Any, int], {pair: obs["11"] for pair, obs in self.obs.items()})
+        x_freqdist: Dict[Any, int] = {}
+        y_freqdist: Dict[Any, int] = {}
 
         for pair in product(self.alphabet_x, self.alphabet_y):
             obs = self.obs[pair]
@@ -773,6 +784,9 @@ class CatScorer:
             y_freqdist[pair[1]] += obs["01"]
 
         # Create freqprob scorers
+        if self._freqprob_scorer_class is None:
+            raise ValueError("Freqprob scorer class not initialized")
+            
         if self.smoothing_method == "mle":
             joint_scorer = self._freqprob_scorer_class(joint_freqdist)
             x_scorer = self._freqprob_scorer_class(x_freqdist)
@@ -782,9 +796,9 @@ class CatScorer:
             x_scorer = self._freqprob_scorer_class(x_freqdist)
             y_scorer = self._freqprob_scorer_class(y_freqdist)
         else:  # Lidstone
-            joint_scorer = self._freqprob_scorer_class(joint_freqdist, gamma=self.smoothing_alpha)
-            x_scorer = self._freqprob_scorer_class(x_freqdist, gamma=self.smoothing_alpha)
-            y_scorer = self._freqprob_scorer_class(y_freqdist, gamma=self.smoothing_alpha)
+            joint_scorer = self._freqprob_scorer_class(joint_freqdist, self.smoothing_alpha)
+            x_scorer = self._freqprob_scorer_class(x_freqdist, self.smoothing_alpha)
+            y_scorer = self._freqprob_scorer_class(y_freqdist, self.smoothing_alpha)
 
         for pair in product(self.alphabet_x, self.alphabet_y):
             obs = self.obs[pair]
@@ -889,8 +903,10 @@ class CatScorer:
         # Select the scorer to return (this allows easier refactoring later)
         if not normalized:
             ret = self._pmi
+            assert ret is not None, "PMI should have been computed"
         else:
             ret = self._npmi
+            assert ret is not None, "NPMI should have been computed"
 
         return ret
 
@@ -938,6 +954,7 @@ class CatScorer:
 
         # Compute the scorer, if necessary
         if not self._fisher:
+            assert self._square_ct is not None, "Square contingency table should have been computed"
             self._fisher = {}
             for pair in self.obs:
                 fisher = ss.fisher_exact(self._square_ct[pair])[0]

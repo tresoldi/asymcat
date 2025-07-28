@@ -513,7 +513,7 @@ def read_pa_matrix(filename: str, delimiter: str = "\t") -> List[tuple]:
         with open(filename, encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile, delimiter=delimiter)
 
-            if "ID" not in reader.fieldnames:
+            if reader.fieldnames is None or "ID" not in reader.fieldnames:
                 raise ValueError("Missing required 'ID' column in presence-absence matrix")
 
             for row_num, row in enumerate(reader, start=2):  # Start at 2 since header is row 1
