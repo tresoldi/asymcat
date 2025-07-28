@@ -4,9 +4,6 @@ Tests for individual scoring measures.
 Demonstrates usage of each scoring method and validates their mathematical properties.
 """
 
-from typing import Any, Dict, Tuple
-
-import numpy as np
 import pytest
 
 import asymcat
@@ -17,7 +14,6 @@ from ..fixtures.assertions import (
     assert_information_theoretic_scores,
     assert_probabilistic_scores,
     assert_scores_asymmetric,
-    assert_scores_in_range,
     assert_scores_symmetric,
     assert_valid_scores,
 )

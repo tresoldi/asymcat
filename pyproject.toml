@@ -225,6 +225,10 @@ skip-string-normalization = true
 [tool.isort]
 profile = "black"
 
+[tool.flake8]
+max-line-length = 120
+extend-ignore = ["E203", "W503"]
+
 [tool.bandit]
 exclude_dirs = ["tests", "test"]
 skips = ["B101"]  # Skip assert_used test since assertions are acceptable in tests
