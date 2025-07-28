@@ -45,10 +45,10 @@ class TestScorerInitialization:
         scorer = CatScorer(cooccs)
 
         # Validate basic properties
-        assert hasattr(scorer, 'cooccs'), "Scorer should have cooccs attribute"
-        assert hasattr(scorer, 'obs'), "Scorer should have observations attribute"
-        assert hasattr(scorer, 'alphabet_x'), "Scorer should have X alphabet"
-        assert hasattr(scorer, 'alphabet_y'), "Scorer should have Y alphabet"
+        assert hasattr(scorer, "cooccs"), "Scorer should have cooccs attribute"
+        assert hasattr(scorer, "obs"), "Scorer should have observations attribute"
+        assert hasattr(scorer, "alphabet_x"), "Scorer should have X alphabet"
+        assert hasattr(scorer, "alphabet_y"), "Scorer should have Y alphabet"
 
         # Check alphabets
         assert len(scorer.alphabet_x) > 0, "X alphabet should not be empty"
@@ -347,7 +347,7 @@ class TestMeasureProperties:
         # Test MLE - should show perfect prediction for correlated pairs
         mle = scorer.mle()
         # Only check pairs that are actually perfectly correlated
-        perfect_pairs = [('A', 'B'), ('C', 'D')]
+        perfect_pairs = [("A", "B"), ("C", "D")]
         for pair in perfect_pairs:
             if pair in mle:
                 xy, yx = mle[pair]

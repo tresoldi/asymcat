@@ -288,9 +288,9 @@ class TestTransformationEdgeCases:
         """Test scaling with uniform (constant) scores."""
         # Create uniform scores (all the same value)
         uniform_scores = {
-            ('a', 'x'): (0.5, 0.5),
-            ('b', 'y'): (0.5, 0.5),
-            ('c', 'z'): (0.5, 0.5),
+            ("a", "x"): (0.5, 0.5),
+            ("b", "y"): (0.5, 0.5),
+            ("c", "z"): (0.5, 0.5),
         }
 
         # Min-max scaling of uniform data should handle gracefully
@@ -305,9 +305,9 @@ class TestTransformationEdgeCases:
     def test_extreme_values_handling(self):
         """Test handling of extreme score values."""
         extreme_scores = {
-            ('a', 'x'): (0.0, 1.0),  # Extreme values
-            ('b', 'y'): (float('inf'), 0.0),  # Infinite value
-            ('c', 'z'): (0.5, 0.5),  # Normal values
+            ("a", "x"): (0.0, 1.0),  # Extreme values
+            ("b", "y"): (float("inf"), 0.0),  # Infinite value
+            ("c", "z"): (0.5, 0.5),  # Normal values
         }
 
         # Should handle infinite values gracefully

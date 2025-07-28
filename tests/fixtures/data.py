@@ -6,7 +6,6 @@ demonstrating different types of categorical data and expected behaviors.
 """
 
 from pathlib import Path
-from typing import List, Tuple
 
 # Test data directory
 RESOURCE_DIR = Path(__file__).parent.parent.parent / "resources"
@@ -40,7 +39,7 @@ SAMPLE_CMU_DATA = [
 ]
 
 
-def get_sample_cmu_processed() -> List[List[List[str]]]:
+def get_sample_cmu_processed() -> list[list[list[str]]]:
     """
     Get CMU data processed into the format expected by asymcat.
 
@@ -117,7 +116,7 @@ EXPECTED_SCORING_RESULTS = {
 }
 
 
-def get_available_datasets() -> List[Tuple[str, str]]:
+def get_available_datasets() -> list[tuple[str, str]]:
     """
     Get list of available test datasets in the resources directory.
 

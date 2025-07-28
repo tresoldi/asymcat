@@ -4,12 +4,12 @@ Custom assertions and validation utilities for ASymCat tests.
 Provides domain-specific assertions that make tests more readable and maintainable.
 """
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 
 
-def assert_valid_cooccurrences(cooccs: List[Tuple[Any, Any]]) -> None:
+def assert_valid_cooccurrences(cooccs: list[tuple[Any, Any]]) -> None:
     """
     Assert that co-occurrences are in the expected format.
 
@@ -28,7 +28,7 @@ def assert_valid_cooccurrences(cooccs: List[Tuple[Any, Any]]) -> None:
         assert len(coocc) == 2, f"Co-occurrence {i} must have exactly 2 elements"
 
 
-def assert_valid_scores(scores: Dict[Tuple[Any, Any], Tuple[float, float]], allow_infinite: bool = False) -> None:
+def assert_valid_scores(scores: dict[tuple[Any, Any], tuple[float, float]], allow_infinite: bool = False) -> None:
     """
     Assert that scoring results are in the expected format.
 
@@ -61,7 +61,7 @@ def assert_valid_scores(scores: Dict[Tuple[Any, Any], Tuple[float, float]], allo
 
 
 def assert_scores_in_range(
-    scores: Dict[Tuple[Any, Any], Tuple[float, float]], min_val: Optional[float] = None, max_val: Optional[float] = None
+    scores: dict[tuple[Any, Any], tuple[float, float]], min_val: float | None = None, max_val: float | None = None
 ) -> None:
     """
     Assert that scores fall within expected ranges.
@@ -85,7 +85,7 @@ def assert_scores_in_range(
             assert yx <= max_val, f"Y→X score {yx} for {pair} above maximum {max_val}"
 
 
-def assert_scores_symmetric(scores: Dict[Tuple[Any, Any], Tuple[float, float]], tolerance: float = 1e-10) -> None:
+def assert_scores_symmetric(scores: dict[tuple[Any, Any], tuple[float, float]], tolerance: float = 1e-10) -> None:
     """
     Assert that scores are symmetric (xy == yx).
 
@@ -106,7 +106,7 @@ def assert_scores_symmetric(scores: Dict[Tuple[Any, Any], Tuple[float, float]], 
             assert abs(xy - yx) < tolerance, f"Scores for {pair} not symmetric: {xy} vs {yx}"
 
 
-def assert_scores_asymmetric(scores: Dict[Tuple[Any, Any], Tuple[float, float]], min_difference: float = 1e-6) -> None:
+def assert_scores_asymmetric(scores: dict[tuple[Any, Any], tuple[float, float]], min_difference: float = 1e-6) -> None:
     """
     Assert that at least some scores show asymmetry.
 
@@ -127,8 +127,8 @@ def assert_scores_asymmetric(scores: Dict[Tuple[Any, Any], Tuple[float, float]],
 
 
 def assert_expected_score_values(
-    scores: Dict[Tuple[Any, Any], Tuple[float, float]],
-    expected: Dict[Tuple[Any, Any], Tuple[float, float]],
+    scores: dict[tuple[Any, Any], tuple[float, float]],
+    expected: dict[tuple[Any, Any], tuple[float, float]],
     tolerance: float = 1e-5,
 ) -> None:
     """
@@ -153,7 +153,7 @@ def assert_expected_score_values(
         assert abs(act_yx - exp_yx) < tolerance, f"Y→X score for {pair}: expected {exp_yx}, got {act_yx}"
 
 
-def assert_probabilistic_scores(scores: Dict[Tuple[Any, Any], Tuple[float, float]]) -> None:
+def assert_probabilistic_scores(scores: dict[tuple[Any, Any], tuple[float, float]]) -> None:
     """
     Assert that scores represent valid probabilities [0, 1].
 
@@ -167,7 +167,7 @@ def assert_probabilistic_scores(scores: Dict[Tuple[Any, Any], Tuple[float, float
     assert_scores_in_range(scores, min_val=0.0, max_val=1.0)
 
 
-def assert_information_theoretic_scores(scores: Dict[Tuple[Any, Any], Tuple[float, float]]) -> None:
+def assert_information_theoretic_scores(scores: dict[tuple[Any, Any], tuple[float, float]]) -> None:
     """
     Assert that scores represent valid information-theoretic measures.
 
@@ -183,7 +183,7 @@ def assert_information_theoretic_scores(scores: Dict[Tuple[Any, Any], Tuple[floa
 
 
 def assert_matrices_consistent(
-    xy_matrix: np.ndarray, yx_matrix: np.ndarray, x_labels: List[str], y_labels: List[str]
+    xy_matrix: np.ndarray, yx_matrix: np.ndarray, x_labels: list[str], y_labels: list[str]
 ) -> None:
     """
     Assert that score matrices have consistent dimensions and labels.

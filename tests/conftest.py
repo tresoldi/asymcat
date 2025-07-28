@@ -7,7 +7,7 @@ Provides shared fixtures, markers, and configuration for the modernized test str
 import time
 import warnings
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
@@ -169,7 +169,7 @@ class ASymCatAssertions:
 
     @staticmethod
     def assert_score_properties(
-        scores: Dict[Any, Any], min_pairs: int = 1, allow_negative: bool = True, require_finite: bool = True
+        scores: dict[Any, Any], min_pairs: int = 1, allow_negative: bool = True, require_finite: bool = True
     ):
         """Assert general properties of scoring results."""
         assert isinstance(scores, dict), "Scores must be a dictionary"
@@ -177,9 +177,9 @@ class ASymCatAssertions:
 
         for pair, (xy, yx) in scores.items():
             if require_finite:
-                assert all(
-                    float('-inf') < val < float('inf') for val in [xy, yx] if val != float('inf')
-                ), f"Non-finite values in scores for {pair}: {xy}, {yx}"
+                assert all(float("-inf") < val < float("inf") for val in [xy, yx] if val != float("inf")), (
+                    f"Non-finite values in scores for {pair}: {xy}, {yx}"
+                )
 
             if not allow_negative:
                 assert xy >= 0 and yx >= 0, f"Negative values not allowed for {pair}: {xy}, {yx}"

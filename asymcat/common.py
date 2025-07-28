@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 """
 Utility functions for the `asymcat` library.
 
@@ -15,14 +13,15 @@ import os
 
 # Import Python standard libraries
 from collections import Counter
+from collections.abc import Generator
 from itertools import chain, combinations, product
-from typing import Any, Generator, List, Optional, Union
+from typing import Any
 
 # Import 3rd party libraries
 import numpy as np
 
 
-def collect_alphabets(cooccs: List[tuple]) -> tuple:
+def collect_alphabets(cooccs: list[tuple]) -> tuple:
     """
     Return the `x` and `y` alphabets from a list of co-occurrences.
 
@@ -56,7 +55,7 @@ def collect_alphabets(cooccs: List[tuple]) -> tuple:
             raise ValueError(f"Invalid co-occurrence at index {i}: expected tuple/list of length 2, got {coocc}")
 
     try:
-        alphabet_x, alphabet_y = zip(*cooccs)
+        alphabet_x, alphabet_y = zip(*cooccs, strict=False)
     except ValueError as e:
         raise ValueError(f"Failed to unzip co-occurrences: {e}")
 
@@ -64,7 +63,7 @@ def collect_alphabets(cooccs: List[tuple]) -> tuple:
 
 
 # TODO: Use lpngrams?
-def collect_ngrams(seq: Union[List[Any], str], order: int, pad: str) -> Generator[tuple, None, None]:
+def collect_ngrams(seq: list[Any] | str, order: int, pad: str) -> Generator[tuple, None, None]:
     """
     Function for yielding the ngrams of a sequence.
 
@@ -107,14 +106,12 @@ def collect_ngrams(seq: Union[List[Any], str], order: int, pad: str) -> Generato
 
     tuple_seq = tuple(chain((pad,) * (order - 1), seq, (pad,) * (order - 1)))
 
-    for ngram in zip(*[tuple_seq[i:] for i in range(order)]):
+    for ngram in zip(*[tuple_seq[i:] for i in range(order)], strict=False):
         yield ngram
 
 
 # TODO: should yield?
-def collect_cooccs(
-    seqs: List[Union[List[Union[List[Any], str]], tuple]], order: Optional[int] = None, pad: str = "#"
-) -> List[tuple]:
+def collect_cooccs(seqs: list[list[list[Any] | str] | tuple], order: int | None = None, pad: str = "#") -> list[tuple]:
     """
     Collects tuples of co-occurring elements in pairs of sequences.
 
@@ -200,7 +197,7 @@ def collect_cooccs(
         # collected. This is done with a non-expansive itertools operation,
         # with no need to cast a list (as the iterable will be consumed
         # into a list below).
-        _seqs = list(chain(*[zip(*ngram_seq) for ngram_seq in ngram_seqs]))
+        _seqs = list(chain(*[zip(*ngram_seq, strict=False) for ngram_seq in ngram_seqs]))
 
     # From the list of sequence pairs, chain a list with all the co-occurring
     # pairs from the product of each pair.
@@ -215,7 +212,7 @@ def collect_cooccs(
     return coocc
 
 
-def collect_observations(cooccs: List[tuple]) -> dict:
+def collect_observations(cooccs: list[tuple]) -> dict:
     """
     Build a dictionary of observations for all possible correspondences.
 
@@ -298,7 +295,7 @@ def collect_observations(cooccs: List[tuple]) -> dict:
     # use collect_alphabet() as we need the symbols as well, in order to
     # build `x_counter` and `y_counter`
     try:
-        symbols_x, symbols_y = zip(*cooccs)
+        symbols_x, symbols_y = zip(*cooccs, strict=False)
     except ValueError as e:
         raise ValueError(f"Failed to unzip co-occurrences: {e}")
     x_counter: Counter = Counter(symbols_x)
@@ -365,8 +362,8 @@ def build_ct(observ, square: bool = True) -> list:
 
 
 def read_sequences(
-    filename: str, cols: Optional[List[str]] = None, col_delim: str = "\t", elem_delim: str = " "
-) -> List[List[List[str]]]:
+    filename: str, cols: list[str] | None = None, col_delim: str = "\t", elem_delim: str = " "
+) -> list[list[list[str]]]:
     """
     Reads parallel sequences, returning them as a list of lists.
 
@@ -455,7 +452,7 @@ def read_sequences(
     except UnicodeDecodeError as e:
         raise ValueError(f"File encoding error: {e}")
     except Exception as e:
-        raise IOError(f"Error reading file {filename}: {e}")
+        raise OSError(f"Error reading file {filename}: {e}")
 
     if not data:
         raise ValueError(f"No valid data found in file: {filename}")
@@ -472,7 +469,7 @@ def read_sequences(
 
 
 # TODO: assuming one taxon per col and locations per row, allow to switch
-def read_pa_matrix(filename: str, delimiter: str = "\t") -> List[tuple]:
+def read_pa_matrix(filename: str, delimiter: str = "\t") -> list[tuple]:
     """
     Reads a presence-absence matrix, returning as equivalent sequences.
 
@@ -538,7 +535,7 @@ def read_pa_matrix(filename: str, delimiter: str = "\t") -> List[tuple]:
     except UnicodeDecodeError as e:
         raise ValueError(f"File encoding error: {e}")
     except Exception as e:
-        raise IOError(f"Error reading file {filename}: {e}")
+        raise OSError(f"Error reading file {filename}: {e}")
 
     if not matrix:
         raise ValueError(f"No valid data found in presence-absence matrix: {filename}")

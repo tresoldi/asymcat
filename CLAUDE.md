@@ -70,24 +70,23 @@ make format-check
 
 # Using Hatch (recommended)
 hatch run format-check
-hatch run all-checks  # format, lint, typecheck, security, tests
+hatch run all-checks  # ruff format, ruff check, typecheck, security, tests
 
 # Individual tools (legacy)
-make black-check    # Code formatting check
-make isort-check    # Import sorting check
-make lint          # Flake8 linting
+make ruff-check     # Ruff linting and formatting check
+make lint          # Ruff linting
+make format        # Ruff auto-formatting
 make mypy          # Type checking
 
 # Using Hatch
-hatch run format
-hatch run lint
-hatch run typecheck
-hatch run security
+hatch run format    # Ruff formatting
+hatch run lint      # Ruff linting
+hatch run typecheck # MyPy type checking
+hatch run security  # Bandit and safety scans
 
-# Auto-fix formatting issues (legacy)
-make format        # Runs black, isort, lint, mypy
-make black         # Auto-format code
-make isort         # Auto-sort imports
+# Auto-fix formatting and linting issues (legacy)
+make ruff-fix      # Auto-fix with ruff and format
+make format        # Auto-format code with ruff
 
 # Security checks (legacy)
 make security      # Run bandit and safety scans

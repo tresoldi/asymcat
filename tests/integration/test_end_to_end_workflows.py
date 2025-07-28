@@ -60,15 +60,15 @@ class TestCompleteWorkflows:
 
         # Step 3: Create scorer
         scorer = asymcat.scorer.CatScorer(cooccs)
-        assert hasattr(scorer, 'obs'), "Scorer creation failed"
+        assert hasattr(scorer, "obs"), "Scorer creation failed"
 
         # Step 4: Compute multiple measures
         measures = {
-            'mle': scorer.mle(),
-            'tresoldi': scorer.tresoldi(),
-            'mutual_info': scorer.mutual_information(),
-            'jaccard': scorer.jaccard_index(),
-            'chi2': scorer.chi2(),
+            "mle": scorer.mle(),
+            "tresoldi": scorer.tresoldi(),
+            "mutual_info": scorer.mutual_information(),
+            "jaccard": scorer.jaccard_index(),
+            "chi2": scorer.chi2(),
         }
 
         for measure_name, scores in measures.items():
@@ -76,14 +76,14 @@ class TestCompleteWorkflows:
             assert len(scores) >= expected_properties["min_pairs"], f"Too few pairs in {measure_name}: {len(scores)}"
 
         # Step 5: Apply transformations
-        scaled_scores = asymcat.scorer.scale_scorer(measures['tresoldi'], method="minmax")
+        scaled_scores = asymcat.scorer.scale_scorer(measures["tresoldi"], method="minmax")
         inverted_scores = asymcat.scorer.invert_scorer(scaled_scores)
 
         assert_valid_scores(scaled_scores)
         assert_valid_scores(inverted_scores)
 
         # Step 6: Generate matrices
-        xy_matrix, yx_matrix, x_labels, y_labels = asymcat.scorer.scorer2matrices(measures['mle'])
+        xy_matrix, yx_matrix, x_labels, y_labels = asymcat.scorer.scorer2matrices(measures["mle"])
 
         assert isinstance(xy_matrix, np.ndarray), "Matrix generation failed"
         assert len(x_labels) > 0 and len(y_labels) > 0, "Labels missing"
@@ -118,15 +118,15 @@ class TestCompleteWorkflows:
 
         # Step 3: Compute different association measures
         measures = {
-            'chi2': scorer.chi2(),
-            'cramers_v': scorer.cramers_v(),
-            'fisher': scorer.fisher(),
-            'jaccard': scorer.jaccard_index(),
+            "chi2": scorer.chi2(),
+            "cramers_v": scorer.cramers_v(),
+            "fisher": scorer.fisher(),
+            "jaccard": scorer.jaccard_index(),
         }
 
         for measure_name, scores in measures.items():
             # Fisher exact test can produce infinite values for perfect associations
-            allow_inf = measure_name == 'fisher'
+            allow_inf = measure_name == "fisher"
             assert_valid_scores(scores, allow_infinite=allow_inf)
             assert len(scores) > 0, f"No scores for {measure_name}"
 
@@ -164,17 +164,17 @@ class TestCompleteWorkflows:
 
         # Step 2: Compute all measures
         all_measures = {
-            'mle': scorer.mle(),
-            'pmi': scorer.pmi(),
-            'npmi': scorer.pmi(True),
-            'chi2': scorer.chi2(),
-            'cramers_v': scorer.cramers_v(),
-            'fisher': scorer.fisher(),
-            'theil_u': scorer.theil_u(),
-            'tresoldi': scorer.tresoldi(),
-            'mutual_info': scorer.mutual_information(),
-            'jaccard': scorer.jaccard_index(),
-            'gk_lambda': scorer.goodman_kruskal_lambda(),
+            "mle": scorer.mle(),
+            "pmi": scorer.pmi(),
+            "npmi": scorer.pmi(True),
+            "chi2": scorer.chi2(),
+            "cramers_v": scorer.cramers_v(),
+            "fisher": scorer.fisher(),
+            "theil_u": scorer.theil_u(),
+            "tresoldi": scorer.tresoldi(),
+            "mutual_info": scorer.mutual_information(),
+            "jaccard": scorer.jaccard_index(),
+            "gk_lambda": scorer.goodman_kruskal_lambda(),
         }
 
         # Step 3: Standardize measures
@@ -191,9 +191,9 @@ class TestCompleteWorkflows:
 
         # Step 4: Analyze correlations (test a few pairs)
         measure_pairs = [
-            ('chi2', 'cramers_v'),  # Should be highly correlated
-            ('pmi', 'npmi'),  # Should be correlated
-            ('mle', 'theil_u'),  # Should show some correlation
+            ("chi2", "cramers_v"),  # Should be highly correlated
+            ("pmi", "npmi"),  # Should be correlated
+            ("mle", "theil_u"),  # Should show some correlation
         ]
 
         for measure1, measure2 in measure_pairs:
@@ -268,9 +268,9 @@ class TestLargeDatasetWorkflows:
 
         # Test a few key measures for performance
         measures_to_test = [
-            ('MLE', scorer.mle),
-            ('Tresoldi', scorer.tresoldi),
-            ('Mutual Info', scorer.mutual_information),
+            ("MLE", scorer.mle),
+            ("Tresoldi", scorer.tresoldi),
+            ("Mutual Info", scorer.mutual_information),
         ]
 
         for measure_name, method in measures_to_test:
@@ -362,7 +362,7 @@ class TestVisualizationWorkflows:
         scorer = asymcat.scorer.CatScorer(cooccs)
 
         # Test matrix generation for different measures
-        measures = ['mle', 'tresoldi', 'chi2', 'jaccard_index']
+        measures = ["mle", "tresoldi", "chi2", "jaccard_index"]
 
         for measure_name in measures:
             if hasattr(scorer, measure_name):
@@ -422,9 +422,9 @@ class TestVisualizationWorkflows:
                 assert_valid_scores(transformed)
 
                 # Test that transformation preserves structure
-                assert set(transformed.keys()) == set(
-                    raw_scores.keys()
-                ), f"Transformation {transform_name} changed pairs"
+                assert set(transformed.keys()) == set(raw_scores.keys()), (
+                    f"Transformation {transform_name} changed pairs"
+                )
 
                 # Test inversion after transformation
                 if transform_name == "minmax":  # Only invert bounded scores
