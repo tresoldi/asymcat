@@ -111,8 +111,12 @@ Examples:
     # Filtering options
     parser.add_argument("--min-count", type=int, help="Minimum co-occurrence count threshold")
     parser.add_argument("--top", type=int, help="Show only top N results by score")
-    parser.add_argument("--sort-by", choices=["xy", "yx", "pair"], default="xy", 
-                       help="Sort results by X→Y score, Y→X score, or pair name (default: xy)")
+    parser.add_argument(
+        "--sort-by",
+        choices=["xy", "yx", "pair"],
+        default="xy",
+        help="Sort results by X→Y score, Y→X score, or pair name (default: xy)",
+    )
 
     # Verbosity
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
@@ -287,7 +291,7 @@ def format_output(
                 sorted_pairs = sorted(all_pairs, key=lambda p: results[first_scorer].get(p, (0, 0))[1], reverse=True)
             else:
                 sorted_pairs = sorted(all_pairs)
-        
+
         # Apply top N filter if requested
         if top:
             sorted_pairs = sorted_pairs[:top]
@@ -319,16 +323,16 @@ def main():
     """Main CLI entry point."""
     parser = create_parser()
     args = parser.parse_args()
-    
+
     # Validate arguments
     if args.top is not None and args.top <= 0:
         print("Error: --top must be a positive integer", file=sys.stderr)
         sys.exit(1)
-    
+
     if args.min_count is not None and args.min_count < 0:
         print("Error: --min-count must be non-negative", file=sys.stderr)
         sys.exit(1)
-        
+
     if args.precision < 0:
         print("Error: --precision must be non-negative", file=sys.stderr)
         sys.exit(1)

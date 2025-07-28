@@ -4,7 +4,6 @@ Tests for data loading and preprocessing functionality.
 Demonstrates how to load different types of categorical data into ASymCat.
 """
 
-from pathlib import Path
 from typing import List
 
 import pytest
