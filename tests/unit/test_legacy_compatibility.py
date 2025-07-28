@@ -5,15 +5,12 @@ This ensures that the modernized test suite maintains compatibility
 with the original test results and expected behaviors.
 """
 
-from typing import Dict, Tuple
-
 import numpy as np
 import pytest
 
 import asymcat
 
 from ..fixtures.assertions import (
-    assert_expected_score_values,
     assert_valid_cooccurrences,
     assert_valid_scores,
 )
@@ -118,7 +115,7 @@ class TestLegacyDataCompatibility:
 
         for measure_name, scores in measures.items():
             # Fisher exact test can produce infinite values for perfect associations
-            allow_inf = (measure_name == 'fisher')
+            allow_inf = measure_name == 'fisher'
             assert_valid_scores(scores, allow_infinite=allow_inf)
 
         # Test exact values against original test expectations

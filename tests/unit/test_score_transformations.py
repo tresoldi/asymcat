@@ -4,8 +4,6 @@ Tests for score transformation and manipulation functions.
 Demonstrates how to scale, normalize, and manipulate scoring results.
 """
 
-from typing import Any, Dict, Tuple
-
 import numpy as np
 import pytest
 

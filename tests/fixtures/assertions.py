@@ -50,7 +50,7 @@ def assert_valid_scores(scores: Dict[Tuple[Any, Any], Tuple[float, float]], allo
         assert len(pair) == 2, f"Key {pair} must have exactly 2 elements"
         assert isinstance(xy, (int, float)), f"X→Y score for {pair} must be numeric"
         assert isinstance(yx, (int, float)), f"Y→X score for {pair} must be numeric"
-        
+
         if not allow_infinite:
             assert np.isfinite(xy), f"X→Y score for {pair} must be finite"
             assert np.isfinite(yx), f"Y→X score for {pair} must be finite"
