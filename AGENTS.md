@@ -25,21 +25,31 @@ For a coding agent, always use the "env\_lingfil" environment from pyenv.
 
 ### Environment Setup
 ```bash
-# Create virtual environment and install dev dependencies
+# Create virtual environment and install dev dependencies (legacy)
 make install
+
+# Using Hatch (recommended)
+pip install hatch
+hatch env create
 
 # Install with all optional features
 pip install -e ".[all]"
+# or with Hatch:
+hatch env create all
 ```
 
 ### Testing
 ```bash
-# Run full test suite
+# Run full test suite (legacy)
 make test
 # or
 pytest
 
-# Run with coverage report
+# Using Hatch (recommended)
+hatch run test
+hatch run test-cov  # with coverage
+
+# Run with coverage report (legacy)
 make coverage
 # or (if pytest-cov is installed)
 pytest --cov=asymcat --cov-branch --cov-report=html
@@ -49,40 +59,93 @@ pytest -m unit          # Unit tests only
 pytest -m integration   # Integration tests only
 pytest -m slow          # Slow tests only
 
-# Quick testing
+# Quick testing (legacy)
 make quick-test         # Run essential tests quickly
 ```
 
 ### Code Quality
 ```bash
-# Run all formatting and linting
+# Run all formatting and linting (legacy)
 make format-check
 
-# Individual tools
+# Using Hatch (recommended)
+hatch run format-check
+hatch run all-checks  # format, lint, typecheck, security, tests
+
+# Individual tools (legacy)
 make black-check    # Code formatting check
 make isort-check    # Import sorting check
 make lint          # Flake8 linting
 make mypy          # Type checking
 
-# Auto-fix formatting issues
+# Using Hatch
+hatch run format
+hatch run lint
+hatch run typecheck
+hatch run security
+
+# Auto-fix formatting issues (legacy)
 make format        # Runs black, isort, lint, mypy
 make black         # Auto-format code
 make isort         # Auto-sort imports
 
-# Security checks
+# Security checks (legacy)
 make security      # Run bandit and safety scans
 ```
 
 ### Build and Release
 ```bash
-# Build package
+# Build package (legacy)
 make build
 
-# Build documentation
+# Using Hatch (recommended)
+hatch build
+
+# Build documentation (legacy)
 make docs
 # Clean docs
 make docs-clean
+
+# Using Hatch for docs
+hatch run docs:build
+hatch run docs:clean
+hatch run docs:serve  # Serve locally on port 8000
 ```
+
+### Local GitHub Actions Testing
+
+**IMPORTANT**: Always test GitHub Actions workflows locally before pushing to ensure they work correctly.
+
+```bash
+# Install act (GitHub Actions local runner)
+curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | bash -s -- -b ~/.local/bin
+export PATH="$PATH:$HOME/.local/bin"
+
+# Run complete build workflow locally (recommended)
+./scripts/test-local.sh build
+
+# Run individual jobs
+./scripts/test-local.sh lint      # Linting only
+./scripts/test-local.sh test      # Tests only  
+./scripts/test-local.sh security  # Security scans only
+./scripts/test-local.sh notebooks # Notebook execution only
+
+# List all available commands
+./scripts/test-local.sh list
+
+# Run specific workflow manually
+act -W .github/workflows/build.yml --env-file .env
+
+# Test release workflow (use with caution)
+./scripts/test-local.sh release
+```
+
+**Configuration Files:**
+- `.actrc`: Act configuration matching GitHub Actions environment
+- `.env`: Environment variables for local testing
+- `scripts/test-local.sh`: Comprehensive local testing script
+
+This setup ensures **exact version and configuration matching** between local testing and GitHub Actions CI/CD.
 
 ### CLI Testing
 ```bash
