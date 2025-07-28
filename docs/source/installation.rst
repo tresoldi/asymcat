@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-ASymCat requires Python 3.8 or later and the following packages:
+ASymCat requires Python 3.10 or later and the following packages:
 
 - numpy
 - pandas  
