@@ -74,6 +74,45 @@ pip install -e ".[all]"  # Install with all optional dependencies
 - **Documentation**: sphinx, sphinx-rtd-theme, myst-parser
 - **Optional**: jupyter, plotly, bokeh, altair (for enhanced visualization)
 
+## 📚 Documentation & Interactive Examples
+
+ASymCat provides comprehensive documentation through fully executed Jupyter notebooks that demonstrate all features with real examples and visualizations:
+
+### 🎯 **[Simple Examples](docs/Simple_Examples.ipynb)** (278KB) ✅
+**Perfect starting point** - Core functionality demonstrations with synthetic data:
+- Basic asymmetric analysis workflow
+- All 17+ association measures with examples  
+- Smoothing methods comparison
+- Real-world interpretation guidelines
+
+### 🎨 **[Interactive Demo](docs/Demo.ipynb)** (221KB) ✅  
+**Visualization showcase** - Interactive plotting and data exploration:
+- Heatmap visualizations of asymmetric relationships
+- Score distribution analysis
+- Comparative measure evaluation
+- Matrix transformation examples
+
+### 🔬 **[Academic Analysis Tutorial](docs/Academic_Analysis_Tutorial.ipynb)** (44KB) ✅
+**Research-grade examples** - Comprehensive statistical validation:
+- **Historical Linguistics**: Grapheme-phoneme correspondence analysis
+- **Island Biogeography**: Darwin's finch species co-occurrence patterns  
+- **Machine Learning**: Feature selection for categorical classification
+- Bootstrap confidence intervals and permutation testing
+
+### 📊 **[Advanced Examples with Plots](docs/EXAMPLES_WITH_PLOTS.ipynb)** (903KB) ✅
+**Publication-ready analysis** - Advanced smoothing and visualization:
+- Smoothing effects comparison (MLE, Laplace, Lidstone)
+- Statistical significance testing and validation
+- Publication-quality plots and figures
+- Real dataset analysis workflows
+
+> **💡 All notebooks are fully executed with committed outputs** - you can view results immediately without running code locally. Perfect for exploring the library's capabilities before installation.
+
+### 📖 Additional Documentation
+- **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Theory and formulas
+- **[API Documentation](https://asymcat.readthedocs.io/)**: Complete API reference  
+- **[Developer Guide](DEVELOPER.md)**: Comprehensive contributor guide
+
 ## 🎮 Usage
 
 ### Python API
@@ -341,14 +380,14 @@ If you use ASymCat in your research, please cite:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🚀 What's New in v0.3.0
+## 🚀 What's New in v0.3.1
 
-- ✅ **Modern Test Suite**: 75+ comprehensive tests with full parametrization
-- ✅ **Enhanced CLI**: New sorting, filtering, and output format options  
-- ✅ **FreqProb Integration**: Improved numerical stability and smoothing
-- ✅ **Performance Optimizations**: Faster computation for large datasets
-- ✅ **Better Documentation**: Comprehensive guides and examples
-- ✅ **Type Safety**: Full type annotations throughout codebase
+- ✅ **Interactive Documentation**: 4 fully executed Jupyter notebooks (1.4MB+ of examples)
+- ✅ **Publication-Ready Examples**: Academic-grade analysis workflows with statistical validation
+- ✅ **Real-World Applications**: Linguistics, ecology, and machine learning case studies
+- ✅ **Advanced Visualizations**: Heatmaps, distributions, and publication-quality plots
+- ✅ **Comprehensive Coverage**: Every feature demonstrated with working code
+- ✅ **Immediate Access**: All notebooks pre-executed with committed outputs
 
 ## 🔮 Roadmap
 
