@@ -75,37 +75,37 @@ pip install -e ".[dev]"  # Install with all optional dependencies
 
 ## 📚 Documentation & Interactive Examples
 
-ASymCat provides comprehensive documentation through fully executed Jupyter notebooks that demonstrate all features with real examples and visualizations:
+ASymCat provides comprehensive documentation through executable tutorials that demonstrate all features with real examples and visualizations:
 
-### 🎯 **[Simple Examples](docs/Simple_Examples.ipynb)** (278KB) ✅
+### 🎯 **[Simple Examples](docs/Simple_Examples.html)** ([source](docs/Simple_Examples.py))
 **Perfect starting point** - Core functionality demonstrations with synthetic data:
 - Basic asymmetric analysis workflow
-- All 17+ association measures with examples  
+- All 17+ association measures with examples
 - Smoothing methods comparison
 - Real-world interpretation guidelines
 
-### 🎨 **[Interactive Demo](docs/Demo.ipynb)** (221KB) ✅  
+### 🎨 **[Interactive Demo](docs/Demo.html)** ([source](docs/Demo.py))
 **Visualization showcase** - Interactive plotting and data exploration:
 - Heatmap visualizations of asymmetric relationships
 - Score distribution analysis
 - Comparative measure evaluation
 - Matrix transformation examples
 
-### 🔬 **[Academic Analysis Tutorial](docs/Academic_Analysis_Tutorial.ipynb)** (44KB) ✅
+### 🔬 **[Academic Analysis Tutorial](docs/Academic_Analysis_Tutorial.html)** ([source](docs/Academic_Analysis_Tutorial.py))
 **Research-grade examples** - Comprehensive statistical validation:
 - **Historical Linguistics**: Grapheme-phoneme correspondence analysis
-- **Island Biogeography**: Darwin's finch species co-occurrence patterns  
+- **Island Biogeography**: Darwin's finch species co-occurrence patterns
 - **Machine Learning**: Feature selection for categorical classification
 - Bootstrap confidence intervals and permutation testing
 
-### 📊 **[Advanced Examples with Plots](docs/EXAMPLES_WITH_PLOTS.ipynb)** (903KB) ✅
+### 📊 **[Advanced Examples with Plots](docs/EXAMPLES_WITH_PLOTS.html)** ([source](docs/EXAMPLES_WITH_PLOTS.py))
 **Publication-ready analysis** - Advanced smoothing and visualization:
 - Smoothing effects comparison (MLE, Laplace, Lidstone)
 - Statistical significance testing and validation
 - Publication-quality plots and figures
 - Real dataset analysis workflows
 
-> **💡 All notebooks are fully executed with committed outputs** - you can view results immediately without running code locally. Perfect for exploring the library's capabilities before installation.
+> **💡 All tutorials are fully executed with committed outputs** - view the HTML files for immediate results, or run the Python source files locally to explore and modify. Generate fresh documentation with `make docs`.
 
 ### 📖 Additional Documentation
 - **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Theory and formulas
@@ -276,11 +276,11 @@ make test-cov
 # Run tests in parallel (faster)
 make test-fast
 
-# Re-execute Jupyter notebooks
-make docs-execute
+# Generate HTML documentation from tutorials
+make docs
 
-# Validate notebooks have outputs
-make docs-validate
+# Clean generated documentation
+make docs-clean
 ```
 
 ### Testing
@@ -340,7 +340,7 @@ make quality && make test-cov
 
 ## 📚 Documentation
 
-- **[Jupyter Examples](docs/)**: Interactive notebooks with academic-grade analysis
+- **[Tutorial Examples](docs/)**: Executable Python tutorials with HTML reports (see section above)
 - **[CHANGELOG](CHANGELOG.md)**: Version history and migration guides
 - **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Theory and formulas (if available)
 

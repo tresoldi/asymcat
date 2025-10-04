@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>Nhandu Report</title>
+<style>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            color: #333;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .code-block {
+            margin: 1.5rem 0;
+        }
+        .code-input {
+            padding: 1rem;
+            border-radius: 4px 4px 0 0;
+            margin: 0;
+        }
+        .code-input pre {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        .code-output {
+            background: #f8f8f8;
+            border: 1px solid #e1e4e8;
+            border-top: none;
+            padding: 1rem;
+            border-radius: 0 0 4px 4px;
+            margin: 0;
+        }
+        .error {
+            color: #d73a49;
+            background: #ffeef0;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ffdce0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Pygments syntax highlighting */
+        pre { line-height: 125%; }
+td.linenos .normal { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #6e7681 }
+.highlight { background: #0d1117; color: #E6EDF3 }
+.highlight .c { color: #8B949E; font-style: italic } /* Comment */
+.highlight .err { color: #F85149 } /* Error */
+.highlight .esc { color: #E6EDF3 } /* Escape */
+.highlight .g { color: #E6EDF3 } /* Generic */
+.highlight .k { color: #FF7B72 } /* Keyword */
+.highlight .l { color: #A5D6FF } /* Literal */
+.highlight .n { color: #E6EDF3 } /* Name */
+.highlight .o { color: #FF7B72; font-weight: bold } /* Operator */
+.highlight .x { color: #E6EDF3 } /* Other */
+.highlight .p { color: #E6EDF3 } /* Punctuation */
+.highlight .ch { color: #8B949E; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #8B949E; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: #8B949E; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #8B949E; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #FFA198; background-color: #490202 } /* Generic.Deleted */
+.highlight .ge { color: #E6EDF3; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #E6EDF3; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #FFA198 } /* Generic.Error */
+.highlight .gh { color: #79C0FF; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #56D364; background-color: #0F5323 } /* Generic.Inserted */
+.highlight .go { color: #8B949E } /* Generic.Output */
+.highlight .gp { color: #8B949E } /* Generic.Prompt */
+.highlight .gs { color: #E6EDF3; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #79C0FF } /* Generic.Subheading */
+.highlight .gt { color: #FF7B72 } /* Generic.Traceback */
+.highlight .g-Underline { color: #E6EDF3; text-decoration: underline } /* Generic.Underline */
+.highlight .kc { color: #79C0FF } /* Keyword.Constant */
+.highlight .kd { color: #FF7B72 } /* Keyword.Declaration */
+.highlight .kn { color: #FF7B72 } /* Keyword.Namespace */
+.highlight .kp { color: #79C0FF } /* Keyword.Pseudo */
+.highlight .kr { color: #FF7B72 } /* Keyword.Reserved */
+.highlight .kt { color: #FF7B72 } /* Keyword.Type */
+.highlight .ld { color: #79C0FF } /* Literal.Date */
+.highlight .m { color: #A5D6FF } /* Literal.Number */
+.highlight .s { color: #A5D6FF } /* Literal.String */
+.highlight .na { color: #E6EDF3 } /* Name.Attribute */
+.highlight .nb { color: #E6EDF3 } /* Name.Builtin */
+.highlight .nc { color: #F0883E; font-weight: bold } /* Name.Class */
+.highlight .no { color: #79C0FF; font-weight: bold } /* Name.Constant */
+.highlight .nd { color: #D2A8FF; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #FFA657 } /* Name.Entity */
+.highlight .ne { color: #F0883E; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #D2A8FF; font-weight: bold } /* Name.Function */
+.highlight .nl { color: #79C0FF; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #FF7B72 } /* Name.Namespace */
+.highlight .nx { color: #E6EDF3 } /* Name.Other */
+.highlight .py { color: #79C0FF } /* Name.Property */
+.highlight .nt { color: #7EE787 } /* Name.Tag */
+.highlight .nv { color: #79C0FF } /* Name.Variable */
+.highlight .ow { color: #FF7B72; font-weight: bold } /* Operator.Word */
+.highlight .pm { color: #E6EDF3 } /* Punctuation.Marker */
+.highlight .w { color: #6E7681 } /* Text.Whitespace */
+.highlight .mb { color: #A5D6FF } /* Literal.Number.Bin */
+.highlight .mf { color: #A5D6FF } /* Literal.Number.Float */
+.highlight .mh { color: #A5D6FF } /* Literal.Number.Hex */
+.highlight .mi { color: #A5D6FF } /* Literal.Number.Integer */
+.highlight .mo { color: #A5D6FF } /* Literal.Number.Oct */
+.highlight .sa { color: #79C0FF } /* Literal.String.Affix */
+.highlight .sb { color: #A5D6FF } /* Literal.String.Backtick */
+.highlight .sc { color: #A5D6FF } /* Literal.String.Char */
+.highlight .dl { color: #79C0FF } /* Literal.String.Delimiter */
+.highlight .sd { color: #A5D6FF } /* Literal.String.Doc */
+.highlight .s2 { color: #A5D6FF } /* Literal.String.Double */
+.highlight .se { color: #79C0FF } /* Literal.String.Escape */
+.highlight .sh { color: #79C0FF } /* Literal.String.Heredoc */
+.highlight .si { color: #A5D6FF } /* Literal.String.Interpol */
+.highlight .sx { color: #A5D6FF } /* Literal.String.Other */
+.highlight .sr { color: #79C0FF } /* Literal.String.Regex */
+.highlight .s1 { color: #A5D6FF } /* Literal.String.Single */
+.highlight .ss { color: #A5D6FF } /* Literal.String.Symbol */
+.highlight .bp { color: #E6EDF3 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #D2A8FF; font-weight: bold } /* Name.Function.Magic */
+.highlight .vc { color: #79C0FF } /* Name.Variable.Class */
+.highlight .vg { color: #79C0FF } /* Name.Variable.Global */
+.highlight .vi { color: #79C0FF } /* Name.Variable.Instance */
+.highlight .vm { color: #79C0FF } /* Name.Variable.Magic */
+.highlight .il { color: #A5D6FF } /* Literal.Number.Integer.Long */
+        
+</style>
+</head>
+<body>
+<h1>Categorical Co-occurrences</h1>
+<p><code>catcoocc</code> is a library for facilitating the analysis of categorical co-occurrence by means of symmetric matrices, asymmetric matrices, and association rules. It is intended for usage on three main types of data: collections of pairwise sequences (both aligned and not), categorical fields in databases, and matrices of presence/absence (such as for investigation of species co-occurrence in biology). More than statistical significance, interested in effect size and strength of association.</p>
+<p>For the purposes of the library, the following definitions are used:</p>
+<ul>
+<li>a co-occurrence is an observation of two categorical elements from two different series</li>
+<li>a population is a collection of co-occurrences which can come from the product of elements observed in two sequences (or, if the sequences are aligned, by n-gram windows), by the properties of an individual in a population, or by the product of presences</li>
+<li>a scorer is a collection of association measures between all the possible products of values in alphabet_x and alphabet_y (including those not observed in the data)</li>
+<li>scorers can be computed according to different methods (such as MLE...), either on raw counts of observed data or on smoothed methods; likewise, the output of scorers can be scaled in different ways</li>
+<li>scorers can be symmetric (such as those coming from chi2 methods) or assymetric (such a Theil U), and can be either restricted to positive values or include negative values, and can be bound or not to a range</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Install the current asymcat package locally</span>
+<span class="c1"># Note: In most environments, you would install via: pip install asymcat</span>
+<span class="c1"># This cell is for development/demonstration purposes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="c1"># For Google Colab or similar environments, you might need:</span>
+<span class="c1"># !pip install asymcat</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using local asymcat installation&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;If running elsewhere, install with: pip install asymcat&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="c1"># Import 3rd party libraries</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tabulate</span>
+
+<span class="c1"># Import asymcat library (updated from catcoocc)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asymcat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">asymcat.scorer</span><span class="w"> </span><span class="kn">import</span> <span class="n">CatScorer</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_scorer</span><span class="p">(</span><span class="n">scorer</span><span class="p">,</span> <span class="n">alpha_x</span><span class="p">,</span> <span class="n">alpha_y</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">font_scale</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span> <span class="n">subset</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">title</span><span class="p">:</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Fixed: scorer matrix rows should match index, columns should match columns</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">scorer</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">alpha_x</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">alpha_y</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">subset</span><span class="p">:</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span>
+        <span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,:</span><span class="n">subset</span><span class="p">]</span>
+
+    <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">font_scale</span><span class="o">=</span><span class="n">font_scale</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.2f&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">font_scale</span><span class="o">*</span><span class="n">figsize</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<pre class="code-output">Using local asymcat installation
+If running elsewhere, install with: pip install asymcat</pre>
+</div>
+<p>Let's start exploring using a subset of the mushroom dataset.</p>
+<p>| class     | cap-shape |
+|-----------|-----------|
+| poisonous | convex    |
+| edible    | convex    |
+| edible    | bell      |
+| poisonous | convex    |
+| edible    | convex    |
+| edible    | convex    |
+| edible    | bell      |
+| edible    | bell      |
+| poisonous | convex    |
+| edible    | bell      |
+| edible    | convex    |
+| edible    | convex    |
+| edible    | bell      |
+| poisonous | convex    |
+| edible    | convex    |
+| edible    | sunken    |
+| edible    | flat      |
+| poisonous | convex    |
+| poisonous | convex    |
+| poisonous | convex    |</p>
+<p>Mushrooms can be either edible or poisonous, and the cap shapre can be of four types, convex, bell, flat, or sunken. In this subset, flat and sunken are underrepresented, with a single case, both being edibles, but of course it is not safe to eat it?</p>
+<p>And now with a sample of CMU</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;../resources/cmudict.sample100.tsv&quot;</span><span class="p">)</span>
+<span class="n">my_cooccs</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">collect_cooccs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># README example - simple synthetic data</span>
+<span class="n">my_cooccs</span> <span class="o">=</span> <span class="p">[</span>
+             <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;g&quot;</span><span class="p">),</span>
+             <span class="p">(</span><span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;f&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">my_cooccs</span><span class="p">)</span>
+
+<span class="n">mle</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+<span class="n">pmi</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">pmi</span><span class="p">()</span>
+<span class="n">chi2</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">chi2</span><span class="p">()</span>
+<span class="n">cramersv</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">cramers_v</span><span class="p">()</span>
+<span class="n">fisher</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">fisher</span><span class="p">()</span>
+<span class="n">theil_u</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">theil_u</span><span class="p">()</span>
+<span class="n">cond_entropy</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">cond_entropy</span><span class="p">()</span>
+<span class="n">tresoldi</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">tresoldi</span><span class="p">()</span>
+
+<span class="n">headers</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;pair&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mle_xy&#39;</span><span class="p">,</span>           <span class="s1">&#39;mle_yx&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pmi_xy&#39;</span><span class="p">,</span>           <span class="s1">&#39;pmi_yx&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;chi2_xy&#39;</span><span class="p">,</span>          <span class="s1">&#39;chi2_yx&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cremersv_xy&#39;</span><span class="p">,</span>      <span class="s1">&#39;cremersv_yx&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fisher_xy&#39;</span><span class="p">,</span>        <span class="s1">&#39;fisher_yx&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;theilu_xy&#39;</span><span class="p">,</span>        <span class="s1">&#39;theilu_yx&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;cond_entropy_xy&#39;</span><span class="p">,</span>  <span class="s1">&#39;cond_entropy_yx&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;tresoldi_xy&#39;</span><span class="p">,</span>      <span class="s1">&#39;tresoldi_yx&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">table</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># Get unique pairs from the scorer results</span>
+<span class="n">unique_pairs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">mle</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">unique_pairs</span><span class="p">:</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">pair</span><span class="p">,</span>
+        <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mle</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>           <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">mle</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">pmi</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>           <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">pmi</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">chi2</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>          <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">chi2</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">cramersv</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>      <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">cramersv</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fisher</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>        <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fisher</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">theil_u</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>       <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">theil_u</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">cond_entropy</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>  <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">cond_entropy</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">tresoldi</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>      <span class="s2">&quot;</span><span class="si">%0.4f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">tresoldi</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+    <span class="p">]</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+
+
+<span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">tabulate</span><span class="o">.</span><span class="n">tabulate</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s1">&#39;html&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<pre class="error">FileNotFoundError: File not found: ../resources/cmudict.sample100.tsv
+  at line 83 in code block</pre>
+</div>
+<p>and now more</p>
+<h2>With Theil U</h2>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">,</span> <span class="n">alpha_x</span><span class="p">,</span> <span class="n">alpha_y</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">scorer2matrices</span><span class="p">(</span><span class="n">theil_u</span><span class="p">)</span>
+
+<span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">subset</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c1"># xy matrix: shape (len(alpha_x), len(alpha_y)), so index=alpha_x, columns=alpha_y</span>
+<span class="n">plot_scorer</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">alpha_x</span><span class="p">,</span> <span class="n">alpha_y</span><span class="p">,</span> <span class="s2">&quot;x-&gt;y&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;theil_u&#39; is not defined
+  at line 143 in code block</pre>
+</div>
+<p>and even more</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">subset</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c1"># yx matrix: shape (len(alpha_y), len(alpha_x)), so index=alpha_y, columns=alpha_x</span>
+<span class="n">plot_scorer</span><span class="p">(</span><span class="n">yx</span><span class="p">,</span> <span class="n">alpha_y</span><span class="p">,</span> <span class="n">alpha_x</span><span class="p">,</span> <span class="s2">&quot;y-&gt;x&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;yx&#39; is not defined
+  at line 152 in code block</pre>
+</div>
+<h2>With tresoldi</h2>
+<p>my implementation</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">,</span> <span class="n">alpha_x</span><span class="p">,</span> <span class="n">alpha_y</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">scorer2matrices</span><span class="p">(</span><span class="n">tresoldi</span><span class="p">)</span>
+
+<span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">subset</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c1"># xy matrix: shape (len(alpha_x), len(alpha_y)), so index=alpha_x, columns=alpha_y</span>
+<span class="n">plot_scorer</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">alpha_x</span><span class="p">,</span> <span class="n">alpha_y</span><span class="p">,</span> <span class="s2">&quot;x-&gt;y&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">)</span>
+
+<span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">subset</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c1"># yx matrix: shape (len(alpha_y), len(alpha_x)), so index=alpha_y, columns=alpha_x</span>
+<span class="n">plot_scorer</span><span class="p">(</span><span class="n">yx</span><span class="p">,</span> <span class="n">alpha_y</span><span class="p">,</span> <span class="n">alpha_x</span><span class="p">,</span> <span class="s2">&quot;y-&gt;x&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;tresoldi&#39; is not defined
+  at line 161 in code block</pre>
+</div>
+</body>
+</html>

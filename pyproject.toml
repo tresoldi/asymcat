@@ -73,6 +73,7 @@ dev = [
     "sphinx-autodoc-typehints >= 1.24.0",
     "sphinx-copybutton >= 0.5.0",
     "sphinx-design >= 0.5.0",
+    "nhandu >= 0.1.0",
 
     # Jupyter notebooks
     "jupyter >= 1.0.0",

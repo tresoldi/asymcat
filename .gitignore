@@ -60,7 +60,6 @@ venv.bak/
 
 # Documentation
 docs/_build/
-docs/*.html
 docs/*.out.*
 
 # Benchmark results

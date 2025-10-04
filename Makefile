@@ -1,6 +1,6 @@
 # Makefile for asymcat development
 .DEFAULT_GOAL := help
-.PHONY: help quality format format-check lint mypy test test-cov test-fast bump-version build build-release clean install install-dev docs-execute docs-validate
+.PHONY: help quality format format-check lint mypy test test-cov test-fast bump-version build build-release clean install install-dev docs docs-clean security
 
 # Variables
 PYTHON_BINARY := python3
@@ -121,32 +121,19 @@ clean: ## Remove build artifacts, caches, and coverage reports
 	find . -name '*.pyc' -delete
 
 # Documentation
-docs: ## Build Sphinx documentation
-	cd docs && make html
+docs: ## Generate HTML documentation from Nhandu tutorial sources
+	@echo "🔄 Generating tutorial documentation..."
+	@for f in docs/Simple_Examples.py docs/Demo.py docs/Academic_Analysis_Tutorial.py docs/EXAMPLES_WITH_PLOTS.py; do \
+		echo "  Generating $$(basename $$f .py).html..."; \
+		$(PYTHON) -m nhandu "$$f" --format html -o "docs/$$(basename $$f .py).html"; \
+	done
+	@echo "✅ Documentation generated in docs/"
 
-docs-clean: ## Clean documentation build
+docs-clean: ## Remove generated HTML documentation
+	@echo "🧹 Cleaning generated documentation..."
+	rm -f docs/Simple_Examples.html docs/Demo.html docs/Academic_Analysis_Tutorial.html docs/EXAMPLES_WITH_PLOTS.html
 	rm -rf docs/_build/ docs/build/
-
-docs-execute: ## Re-execute all Jupyter notebooks
-	@echo "🔄 Re-executing Jupyter notebooks..."
-	@for notebook in docs/*.ipynb; do \
-		echo "  Executing: $$(basename $$notebook)"; \
-		$(PYTHON) -m jupyter nbconvert --to notebook --execute --inplace "$$notebook"; \
-	done
-	@echo "✅ All notebooks re-executed"
-
-docs-validate: ## Validate notebooks have execution outputs
-	@echo "📊 Validating notebook outputs..."
-	@for notebook in docs/*.ipynb; do \
-		size=$$(stat --format="%s" "$$notebook" 2>/dev/null || stat -f%z "$$notebook"); \
-		if [ "$$size" -lt 30000 ]; then \
-			echo "❌ $$(basename $$notebook): $$size bytes (missing outputs)"; \
-			exit 1; \
-		else \
-			echo "✅ $$(basename $$notebook): $$size bytes"; \
-		fi; \
-	done
-	@echo "🎉 All notebooks validated"
+	@echo "✅ Documentation cleaned!"
 
 # Security
 security: ## Run security checks (bandit + safety)

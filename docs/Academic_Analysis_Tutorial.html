@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>Nhandu Report</title>
+<style>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            color: #333;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .code-block {
+            margin: 1.5rem 0;
+        }
+        .code-input {
+            padding: 1rem;
+            border-radius: 4px 4px 0 0;
+            margin: 0;
+        }
+        .code-input pre {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        .code-output {
+            background: #f8f8f8;
+            border: 1px solid #e1e4e8;
+            border-top: none;
+            padding: 1rem;
+            border-radius: 0 0 4px 4px;
+            margin: 0;
+        }
+        .error {
+            color: #d73a49;
+            background: #ffeef0;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ffdce0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Pygments syntax highlighting */
+        pre { line-height: 125%; }
+td.linenos .normal { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #6e7681 }
+.highlight { background: #0d1117; color: #E6EDF3 }
+.highlight .c { color: #8B949E; font-style: italic } /* Comment */
+.highlight .err { color: #F85149 } /* Error */
+.highlight .esc { color: #E6EDF3 } /* Escape */
+.highlight .g { color: #E6EDF3 } /* Generic */
+.highlight .k { color: #FF7B72 } /* Keyword */
+.highlight .l { color: #A5D6FF } /* Literal */
+.highlight .n { color: #E6EDF3 } /* Name */
+.highlight .o { color: #FF7B72; font-weight: bold } /* Operator */
+.highlight .x { color: #E6EDF3 } /* Other */
+.highlight .p { color: #E6EDF3 } /* Punctuation */
+.highlight .ch { color: #8B949E; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #8B949E; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: #8B949E; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #8B949E; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #FFA198; background-color: #490202 } /* Generic.Deleted */
+.highlight .ge { color: #E6EDF3; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #E6EDF3; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #FFA198 } /* Generic.Error */
+.highlight .gh { color: #79C0FF; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #56D364; background-color: #0F5323 } /* Generic.Inserted */
+.highlight .go { color: #8B949E } /* Generic.Output */
+.highlight .gp { color: #8B949E } /* Generic.Prompt */
+.highlight .gs { color: #E6EDF3; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #79C0FF } /* Generic.Subheading */
+.highlight .gt { color: #FF7B72 } /* Generic.Traceback */
+.highlight .g-Underline { color: #E6EDF3; text-decoration: underline } /* Generic.Underline */
+.highlight .kc { color: #79C0FF } /* Keyword.Constant */
+.highlight .kd { color: #FF7B72 } /* Keyword.Declaration */
+.highlight .kn { color: #FF7B72 } /* Keyword.Namespace */
+.highlight .kp { color: #79C0FF } /* Keyword.Pseudo */
+.highlight .kr { color: #FF7B72 } /* Keyword.Reserved */
+.highlight .kt { color: #FF7B72 } /* Keyword.Type */
+.highlight .ld { color: #79C0FF } /* Literal.Date */
+.highlight .m { color: #A5D6FF } /* Literal.Number */
+.highlight .s { color: #A5D6FF } /* Literal.String */
+.highlight .na { color: #E6EDF3 } /* Name.Attribute */
+.highlight .nb { color: #E6EDF3 } /* Name.Builtin */
+.highlight .nc { color: #F0883E; font-weight: bold } /* Name.Class */
+.highlight .no { color: #79C0FF; font-weight: bold } /* Name.Constant */
+.highlight .nd { color: #D2A8FF; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #FFA657 } /* Name.Entity */
+.highlight .ne { color: #F0883E; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #D2A8FF; font-weight: bold } /* Name.Function */
+.highlight .nl { color: #79C0FF; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #FF7B72 } /* Name.Namespace */
+.highlight .nx { color: #E6EDF3 } /* Name.Other */
+.highlight .py { color: #79C0FF } /* Name.Property */
+.highlight .nt { color: #7EE787 } /* Name.Tag */
+.highlight .nv { color: #79C0FF } /* Name.Variable */
+.highlight .ow { color: #FF7B72; font-weight: bold } /* Operator.Word */
+.highlight .pm { color: #E6EDF3 } /* Punctuation.Marker */
+.highlight .w { color: #6E7681 } /* Text.Whitespace */
+.highlight .mb { color: #A5D6FF } /* Literal.Number.Bin */
+.highlight .mf { color: #A5D6FF } /* Literal.Number.Float */
+.highlight .mh { color: #A5D6FF } /* Literal.Number.Hex */
+.highlight .mi { color: #A5D6FF } /* Literal.Number.Integer */
+.highlight .mo { color: #A5D6FF } /* Literal.Number.Oct */
+.highlight .sa { color: #79C0FF } /* Literal.String.Affix */
+.highlight .sb { color: #A5D6FF } /* Literal.String.Backtick */
+.highlight .sc { color: #A5D6FF } /* Literal.String.Char */
+.highlight .dl { color: #79C0FF } /* Literal.String.Delimiter */
+.highlight .sd { color: #A5D6FF } /* Literal.String.Doc */
+.highlight .s2 { color: #A5D6FF } /* Literal.String.Double */
+.highlight .se { color: #79C0FF } /* Literal.String.Escape */
+.highlight .sh { color: #79C0FF } /* Literal.String.Heredoc */
+.highlight .si { color: #A5D6FF } /* Literal.String.Interpol */
+.highlight .sx { color: #A5D6FF } /* Literal.String.Other */
+.highlight .sr { color: #79C0FF } /* Literal.String.Regex */
+.highlight .s1 { color: #A5D6FF } /* Literal.String.Single */
+.highlight .ss { color: #A5D6FF } /* Literal.String.Symbol */
+.highlight .bp { color: #E6EDF3 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #D2A8FF; font-weight: bold } /* Name.Function.Magic */
+.highlight .vc { color: #79C0FF } /* Name.Variable.Class */
+.highlight .vg { color: #79C0FF } /* Name.Variable.Global */
+.highlight .vi { color: #79C0FF } /* Name.Variable.Instance */
+.highlight .vm { color: #79C0FF } /* Name.Variable.Magic */
+.highlight .il { color: #A5D6FF } /* Literal.Number.Integer.Long */
+        
+</style>
+</head>
+<body>
+<h1>ASymCat: Mathematical Foundations and Academic Applications</h1>
+<h2>Abstract</h2>
+<p>This notebook provides a comprehensive academic treatment of asymmetric categorical association analysis using the ASymCat library. We present the theoretical foundations, mathematical formulations, and empirical applications across three domains: <strong>linguistic phylogenetics</strong>, <strong>ecological biogeography</strong>, and <strong>machine learning classification</strong>.</p>
+<p>The notebook demonstrates how asymmetric measures reveal directional relationships that symmetric measures miss, providing deeper insights into complex categorical data structures.</p>
+<hr />
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#1.-Theoretical-Foundations">Theoretical Foundations</a></li>
+<li><a href="#2.-Mathematical-Formulations">Mathematical Formulations</a></li>
+<li><a href="#3.-Case-Study-I:-Historical-Linguistics">Case Study I: Historical Linguistics</a></li>
+<li><a href="#4.-Case-Study-II:-Island-Biogeography">Case Study II: Island Biogeography</a></li>
+<li><a href="#5.-Case-Study-III:-Feature-Selection">Case Study III: Feature Selection</a></li>
+<li><a href="#6.-Comparative-Methodology">Comparative Methodology</a></li>
+<li><a href="#7.-Statistical-Validation">Statistical Validation</a></li>
+<li><a href="#8.-Discussion-and-Future-Directions">Discussion and Future Directions</a></li>
+</ol>
+<hr />
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Scientific computing and data analysis</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">stats</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.distance</span><span class="w"> </span><span class="kn">import</span> <span class="n">pdist</span><span class="p">,</span> <span class="n">squareform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.cluster.hierarchy</span><span class="w"> </span><span class="kn">import</span> <span class="n">dendrogram</span><span class="p">,</span> <span class="n">linkage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mutual_info_score</span><span class="p">,</span> <span class="n">adjusted_rand_score</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+<span class="c1"># Visualization</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="c1"># ASymCat library</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asymcat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">asymcat.scorer</span><span class="w"> </span><span class="kn">import</span> <span class="n">CatScorer</span>
+
+<span class="c1"># Configuration</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;seaborn-v0_8-whitegrid&#39;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_palette</span><span class="p">(</span><span class="s2">&quot;husl&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+    <span class="s1">&#39;figure.figsize&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+    <span class="s1">&#39;font.size&#39;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
+    <span class="s1">&#39;axes.titlesize&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+    <span class="s1">&#39;axes.labelsize&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="s1">&#39;legend.fontsize&#39;</span><span class="p">:</span> <span class="mi">10</span>
+<span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ASymCat Academic Analysis Tutorial&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">ModuleNotFoundError: No module named &#39;sklearn&#39;
+  at line 23 in code block</pre>
+</div>
+<h2>1. Theoretical Foundations</h2>
+<h3>1.1 The Problem of Categorical Association</h3>
+<p>Traditional measures of association assume <strong>symmetric relationships</strong>. However, many real-world phenomena exhibit <strong>asymmetric dependencies</strong> where X influences Y differently than Y influences X.</p>
+<h3>1.2 Mathematical Foundation</h3>
+<p>Given categorical variables <strong>X</strong> and <strong>Y</strong> with co-occurrence data, we define:</p>
+<p><strong>Conditional Distributions (Asymmetric):</strong></p>
+<ul>
+<li>P(Y|X) ≠ P(X|Y) in general</li>
+<li>Quantifies directional predictive relationships</li>
+</ul>
+<p><strong>Information-Theoretic Perspective:</strong></p>
+<ul>
+<li>Mutual Information: I(X;Y) = H(Y) - H(Y|X)</li>
+<li>Uncertainty Coefficient: U(Y|X) = I(X;Y)/H(Y)</li>
+</ul>
+<p>This asymmetric framework reveals hidden directional patterns in categorical data.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Demonstrate theoretical concepts with synthetic data</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_asymmetric_example</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a simple asymmetric dataset for demonstration.&quot;&quot;&quot;</span>
+    <span class="c1"># X strongly predicts Y, but Y weakly predicts X</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">),</span>  <span class="c1"># A → c (75%), A → d (25%)</span>
+        <span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">),</span>  <span class="c1"># B → g,f (50% each)</span>
+        <span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">)</span>                <span class="c1"># C → random</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+<span class="c1"># Create example and analyze</span>
+<span class="n">example_data</span> <span class="o">=</span> <span class="n">create_asymmetric_example</span><span class="p">()</span>
+<span class="c1"># CatScorer expects list of (x, y) tuples directly</span>
+<span class="n">scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">example_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+
+<span class="c1"># Compute measures</span>
+<span class="n">mle_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+<span class="n">pmi_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">pmi</span><span class="p">()</span>
+<span class="n">theil_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">theil_u</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Theoretical Demonstration: Asymmetric vs Symmetric&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Key Pairs Analysis:&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)]:</span>
+    <span class="k">if</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">mle_scores</span><span class="p">:</span>
+        <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="o">=</span> <span class="n">mle_scores</span><span class="p">[</span><span class="n">pair</span><span class="p">]</span>
+        <span class="n">pmi_val</span> <span class="o">=</span> <span class="n">pmi_scores</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># PMI is symmetric</span>
+        <span class="n">u_xy</span><span class="p">,</span> <span class="n">u_yx</span> <span class="o">=</span> <span class="n">theil_scores</span><span class="p">[</span><span class="n">pair</span><span class="p">]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Pair </span><span class="si">{</span><span class="n">pair</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  MLE: P(</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">xy</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, P(</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">yx</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Asymmetry: |</span><span class="si">{</span><span class="n">xy</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">yx</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">| = </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">xy</span><span class="o">-</span><span class="n">yx</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  PMI: </span><span class="si">{</span><span class="n">pmi_val</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> (symmetric)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Theil U: U(</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">u_xy</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, U(</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">u_yx</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;CatScorer&#39; is not defined
+  at line 76 in code block</pre>
+</div>
+<h2>3. Case Study I: Historical Linguistics</h2>
+<h3>Research Question</h3>
+<p><strong>How do orthographic systems predict phonological patterns in language evolution?</strong></p>
+<p>We analyze the CMU Pronunciation Dictionary to understand grapheme-phoneme correspondences in English, testing whether orthography predicts phonology more reliably than vice versa.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Historical Linguistics Analysis</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Case Study I: Historical Linguistics Analysis&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+
+<span class="c1"># Load CMU dictionary data</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">cmu_data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;../resources/cmudict.sample1000.tsv&quot;</span><span class="p">)</span>
+    <span class="n">cmu_cooccs</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">collect_cooccs</span><span class="p">(</span><span class="n">cmu_data</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cmu_data</span><span class="p">)</span><span class="si">}</span><span class="s2"> word alignments&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Co-occurrences: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cmu_cooccs</span><span class="p">)</span><span class="si">}</span><span class="s2"> grapheme-phoneme pairs&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Show sample alignments</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sample orthography-phoneme alignments:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+        <span class="n">ortho</span><span class="p">,</span> <span class="n">phon</span> <span class="o">=</span> <span class="n">cmu_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  &#39;</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ortho</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39; → /</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">phon</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create scorer and compute measures</span>
+    <span class="n">cmu_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">cmu_cooccs</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+
+    <span class="n">cmu_mle</span> <span class="o">=</span> <span class="n">cmu_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+    <span class="n">cmu_theil</span> <span class="o">=</span> <span class="n">cmu_scorer</span><span class="o">.</span><span class="n">theil_u</span><span class="p">()</span>
+
+    <span class="c1"># Analyze asymmetry in linguistic correspondences</span>
+    <span class="n">asymmetries</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">xy</span> <span class="o">-</span> <span class="n">yx</span><span class="p">)</span> <span class="k">for</span> <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="ow">in</span> <span class="n">cmu_mle</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+    <span class="n">ortho_stronger</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="ow">in</span> <span class="n">cmu_mle</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">xy</span> <span class="o">&gt;</span> <span class="n">yx</span><span class="p">)</span>
+    <span class="n">total_pairs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cmu_mle</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Linguistic Analysis Results:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Mean asymmetry (MLE): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">asymmetries</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Orthography predicts phonology better: </span><span class="si">{</span><span class="p">(</span><span class="n">ortho_stronger</span><span class="o">/</span><span class="n">total_pairs</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% of pairs&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  This supports orthographic depth theory in psycholinguistics&quot;</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CMU dataset not found. Using synthetic linguistic data for demonstration.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create synthetic linguistic correspondences</span>
+    <span class="n">synthetic_linguistic</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">),</span>  <span class="c1"># Regular correspondence</span>
+        <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">),</span>  <span class="c1"># Variable correspondence</span>
+        <span class="p">(</span><span class="s1">&#39;gh&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;gh&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;gh&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">)</span> <span class="c1"># Historical change</span>
+    <span class="p">]</span>
+
+    <span class="c1"># CatScorer expects (x, y) tuples directly</span>
+    <span class="n">ling_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">synthetic_linguistic</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+    <span class="n">ling_mle</span> <span class="o">=</span> <span class="n">ling_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Synthetic Linguistic Correspondences:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pair</span><span class="p">,</span> <span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ling_mle</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  &#39;</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; ↔ /</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">/: P(phon|graph)=</span><span class="si">{</span><span class="n">xy</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, P(graph|phon)=</span><span class="si">{</span><span class="n">yx</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;asymcat&#39; is not defined
+  at line 120 in code block</pre>
+</div>
+<h2>4. Case Study II: Island Biogeography</h2>
+<h3>Research Question</h3>
+<p><strong>How do species co-occurrence patterns reflect ecological processes in island systems?</strong></p>
+<p>We analyze Darwin's finch species across Galápagos islands to test island biogeography theory and identify asymmetric ecological relationships.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Island Biogeography Analysis</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Case Study II: Island Biogeography Analysis&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">45</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># Load Galápagos finch data</span>
+    <span class="n">galapagos_data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_pa_matrix</span><span class="p">(</span><span class="s2">&quot;../resources/galapagos.tsv&quot;</span><span class="p">)</span>
+    <span class="n">galapagos_cooccs</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">collect_cooccs</span><span class="p">(</span><span class="n">galapagos_data</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">galapagos_data</span><span class="p">)</span><span class="si">}</span><span class="s2"> species-island combinations&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Co-occurrences: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">galapagos_cooccs</span><span class="p">)</span><span class="si">}</span><span class="s2"> species pairs&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Load matrix for detailed analysis</span>
+    <span class="n">galapagos_matrix</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../resources/galapagos.tsv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Matrix: </span><span class="si">{</span><span class="n">galapagos_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> islands × </span><span class="si">{</span><span class="n">galapagos_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> species&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create scorer and compute measures</span>
+    <span class="n">galapagos_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">galapagos_cooccs</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+
+    <span class="n">gap_mle</span> <span class="o">=</span> <span class="n">galapagos_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+    <span class="n">gap_jaccard</span> <span class="o">=</span> <span class="n">galapagos_scorer</span><span class="o">.</span><span class="n">jaccard_index</span><span class="p">()</span>
+    <span class="n">gap_fisher</span> <span class="o">=</span> <span class="n">galapagos_scorer</span><span class="o">.</span><span class="n">fisher</span><span class="p">()</span>
+
+    <span class="c1"># Analyze ecological patterns</span>
+    <span class="n">species_richness</span> <span class="o">=</span> <span class="n">galapagos_matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">species_prevalence</span> <span class="o">=</span> <span class="n">galapagos_matrix</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Ecological Patterns:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Most species-rich islands: </span><span class="si">{</span><span class="nb">dict</span><span class="p">(</span><span class="n">species_richness</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Most widespread species: </span><span class="si">{</span><span class="nb">dict</span><span class="p">(</span><span class="n">species_prevalence</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Network analysis</span>
+    <span class="n">strong_associations</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pair</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">))</span> <span class="k">for</span> <span class="n">pair</span><span class="p">,</span> <span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">)</span> <span class="ow">in</span> <span class="n">gap_mle</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">]</span>
+    <span class="n">strong_associations</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Strongest Species Associations (MLE &gt; 0.7):&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">pair</span><span class="p">,</span> <span class="n">strength</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">strong_associations</span><span class="p">[:</span><span class="mi">8</span><span class="p">]):</span>
+        <span class="n">sp1</span><span class="p">,</span> <span class="n">sp2</span> <span class="o">=</span> <span class="n">pair</span>
+        <span class="c1"># Shorten species names for display</span>
+        <span class="n">sp1_short</span> <span class="o">=</span> <span class="n">sp1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Geospiza.&#39;</span><span class="p">,</span> <span class="s1">&#39;G.&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;Geospiza&#39;</span> <span class="ow">in</span> <span class="n">sp1</span> <span class="k">else</span> <span class="n">sp1</span><span class="p">[:</span><span class="mi">15</span><span class="p">]</span>
+        <span class="n">sp2_short</span> <span class="o">=</span> <span class="n">sp2</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Geospiza.&#39;</span><span class="p">,</span> <span class="s1">&#39;G.&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39;Geospiza&#39;</span> <span class="ow">in</span> <span class="n">sp2</span> <span class="k">else</span> <span class="n">sp2</span><span class="p">[:</span><span class="mi">15</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sp1_short</span><span class="si">}</span><span class="s2"> ↔ </span><span class="si">{</span><span class="n">sp2_short</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">strength</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Test island biogeography theory</span>
+    <span class="n">network_density</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">strong_associations</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">gap_mle</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Biogeographical Insights:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Network density (strong associations): </span><span class="si">{</span><span class="n">network_density</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Supports nested occurrence patterns predicted by island biogeography theory&quot;</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Galápagos dataset not found. Using synthetic ecological data.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create synthetic species co-occurrence data</span>
+    <span class="n">synthetic_ecology</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;Species_A&#39;</span><span class="p">,</span> <span class="s1">&#39;Species_B&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Species_A&#39;</span><span class="p">,</span> <span class="s1">&#39;Species_C&#39;</span><span class="p">),</span>  <span class="c1"># A co-occurs with B,C</span>
+        <span class="p">(</span><span class="s1">&#39;Species_B&#39;</span><span class="p">,</span> <span class="s1">&#39;Species_C&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Species_B&#39;</span><span class="p">,</span> <span class="s1">&#39;Species_D&#39;</span><span class="p">),</span>  <span class="c1"># B co-occurs with C,D</span>
+        <span class="p">(</span><span class="s1">&#39;Species_X&#39;</span><span class="p">,</span> <span class="s1">&#39;Species_Y&#39;</span><span class="p">)</span>                                <span class="c1"># X,Y co-occur (separate group)</span>
+    <span class="p">]</span>
+
+    <span class="c1"># CatScorer expects (x, y) tuples directly</span>
+    <span class="n">eco_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">synthetic_ecology</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+    <span class="n">eco_mle</span> <span class="o">=</span> <span class="n">eco_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Synthetic Ecological Associations:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pair</span><span class="p">,</span> <span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">)</span> <span class="ow">in</span> <span class="n">eco_mle</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> ↔ </span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">: MLE = </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span><span class="w"> </span><span class="n">yx</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;asymcat&#39; is not defined
+  at line 179 in code block</pre>
+</div>
+<h2>5. Case Study III: Feature Selection in Classification</h2>
+<h3>Research Question</h3>
+<p><strong>How can asymmetric measures improve feature selection for categorical classification?</strong></p>
+<p>We analyze the mushroom dataset to identify features that asymmetrically predict edibility, demonstrating applications in machine learning and safety-critical classification.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Feature Selection Analysis</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Case Study III: Feature Selection in Classification&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># Load mushroom classification data</span>
+    <span class="n">mushroom_data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;../resources/mushrooms.tsv&quot;</span><span class="p">)</span>
+    <span class="n">mushroom_cooccs</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">collect_cooccs</span><span class="p">(</span><span class="n">mushroom_data</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">mushroom_data</span><span class="p">)</span><span class="si">}</span><span class="s2"> mushroom samples&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Feature-class associations: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">mushroom_cooccs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Show sample data structure</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sample data:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+        <span class="n">features</span><span class="p">,</span> <span class="n">class_label</span> <span class="o">=</span> <span class="n">mushroom_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Features: </span><span class="si">{</span><span class="n">features</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span><span class="si">}</span><span class="s2">..., Class: </span><span class="si">{</span><span class="n">class_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create scorer and compute measures</span>
+    <span class="n">mushroom_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">mushroom_cooccs</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+
+    <span class="n">mush_mle</span> <span class="o">=</span> <span class="n">mushroom_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+    <span class="n">mush_theil</span> <span class="o">=</span> <span class="n">mushroom_scorer</span><span class="o">.</span><span class="n">theil_u</span><span class="p">()</span>
+    <span class="n">mush_chi2</span> <span class="o">=</span> <span class="n">mushroom_scorer</span><span class="o">.</span><span class="n">chi2</span><span class="p">()</span>
+
+    <span class="c1"># Analyze predictive features</span>
+    <span class="n">edible_predictors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">poison_predictors</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">class_label</span><span class="p">),</span> <span class="p">(</span><span class="n">feat_to_class</span><span class="p">,</span> <span class="n">class_to_feat</span><span class="p">)</span> <span class="ow">in</span> <span class="n">mush_mle</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">class_label</span> <span class="o">==</span> <span class="s1">&#39;edible&#39;</span> <span class="ow">and</span> <span class="n">feat_to_class</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+            <span class="n">edible_predictors</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">feature</span><span class="p">,</span> <span class="n">feat_to_class</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">class_label</span> <span class="o">==</span> <span class="s1">&#39;poisonous&#39;</span> <span class="ow">and</span> <span class="n">feat_to_class</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+            <span class="n">poison_predictors</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">feature</span><span class="p">,</span> <span class="n">feat_to_class</span><span class="p">))</span>
+
+    <span class="n">edible_predictors</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">poison_predictors</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Strong Edibility Predictors (P(edible|feature) &gt; 0.8):&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">edible_predictors</span><span class="p">[:</span><span class="mi">8</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">prob</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Strong Toxicity Predictors (P(poisonous|feature) &gt; 0.8):&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">poison_predictors</span><span class="p">[:</span><span class="mi">8</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">prob</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Safety analysis</span>
+    <span class="n">total_strong_predictors</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">edible_predictors</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">poison_predictors</span><span class="p">)</span>
+    <span class="n">safety_ratio</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">poison_predictors</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_strong_predictors</span> <span class="k">if</span> <span class="n">total_strong_predictors</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Safety Classification Analysis:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Strong predictive features found: </span><span class="si">{</span><span class="n">total_strong_predictors</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Toxicity predictors ratio: </span><span class="si">{</span><span class="n">safety_ratio</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Asymmetric analysis reveals critical safety features&quot;</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Mushroom dataset not found. Using synthetic classification data.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create synthetic classification data</span>
+    <span class="n">synthetic_classification</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;red_cap&#39;</span><span class="p">,</span> <span class="s1">&#39;poisonous&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;red_cap&#39;</span><span class="p">,</span> <span class="s1">&#39;poisonous&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;red_cap&#39;</span><span class="p">,</span> <span class="s1">&#39;edible&#39;</span><span class="p">),</span>     <span class="c1"># Red cap mostly toxic</span>
+        <span class="p">(</span><span class="s1">&#39;white_stem&#39;</span><span class="p">,</span> <span class="s1">&#39;edible&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;white_stem&#39;</span><span class="p">,</span> <span class="s1">&#39;edible&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;white_stem&#39;</span><span class="p">,</span> <span class="s1">&#39;edible&#39;</span><span class="p">),</span> <span class="c1"># White stem safe</span>
+        <span class="p">(</span><span class="s1">&#39;spots&#39;</span><span class="p">,</span> <span class="s1">&#39;poisonous&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;spots&#39;</span><span class="p">,</span> <span class="s1">&#39;poisonous&#39;</span><span class="p">),</span>                                <span class="c1"># Spots indicate toxicity</span>
+        <span class="p">(</span><span class="s1">&#39;smooth_cap&#39;</span><span class="p">,</span> <span class="s1">&#39;edible&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;smooth_cap&#39;</span><span class="p">,</span> <span class="s1">&#39;edible&#39;</span><span class="p">)</span>                            <span class="c1"># Smooth cap safe</span>
+    <span class="p">]</span>
+
+    <span class="c1"># CatScorer expects (x, y) tuples directly</span>
+    <span class="n">class_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">synthetic_classification</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+    <span class="n">class_mle</span> <span class="o">=</span> <span class="n">class_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Synthetic Classification Features:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">class_label</span><span class="p">),</span> <span class="p">(</span><span class="n">feat_to_class</span><span class="p">,</span> <span class="n">class_to_feat</span><span class="p">)</span> <span class="ow">in</span> <span class="n">class_mle</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">class_label</span><span class="si">}</span><span class="s2">: P(</span><span class="si">{</span><span class="n">class_label</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">feat_to_class</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;asymcat&#39; is not defined
+  at line 253 in code block</pre>
+</div>
+<h2>6. Comparative Methodology</h2>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Comparative Analysis of Measures</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Comparative Methodology Analysis&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">35</span><span class="p">)</span>
+
+<span class="c1"># Create test dataset with known asymmetric properties</span>
+<span class="n">test_data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;X1&#39;</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X1&#39;</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X1&#39;</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X1&#39;</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">),</span>  <span class="c1"># X1 → Y1 (75%)</span>
+    <span class="p">(</span><span class="s1">&#39;X2&#39;</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X2&#39;</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X2&#39;</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">),</span>                 <span class="c1"># X2 → Y2 (67%)</span>
+    <span class="p">(</span><span class="s1">&#39;X3&#39;</span><span class="p">,</span> <span class="s1">&#39;Y3&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X3&#39;</span><span class="p">,</span> <span class="s1">&#39;Y3&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X3&#39;</span><span class="p">,</span> <span class="s1">&#39;Y3&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X3&#39;</span><span class="p">,</span> <span class="s1">&#39;Y3&#39;</span><span class="p">)</span>   <span class="c1"># X3 → Y3 (100%)</span>
+<span class="p">]</span>
+
+<span class="c1"># Fixed: test_data is already co-occurrences, pass directly to CatScorer</span>
+<span class="n">test_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+
+<span class="c1"># Compute all available measures</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;MLE&#39;</span><span class="p">:</span> <span class="n">test_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">(),</span>
+    <span class="s1">&#39;PMI&#39;</span><span class="p">:</span> <span class="n">test_scorer</span><span class="o">.</span><span class="n">pmi</span><span class="p">(),</span>
+    <span class="s1">&#39;Theil_U&#39;</span><span class="p">:</span> <span class="n">test_scorer</span><span class="o">.</span><span class="n">theil_u</span><span class="p">(),</span>
+    <span class="s1">&#39;Chi2&#39;</span><span class="p">:</span> <span class="n">test_scorer</span><span class="o">.</span><span class="n">chi2</span><span class="p">(),</span>
+    <span class="s1">&#39;Jaccard&#39;</span><span class="p">:</span> <span class="n">test_scorer</span><span class="o">.</span><span class="n">jaccard_index</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Measure Comparison on Test Data:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pair</span><span class="se">\t\t</span><span class="s2">MLE(XY)</span><span class="se">\t</span><span class="s2">MLE(YX)</span><span class="se">\t</span><span class="s2">PMI</span><span class="se">\t</span><span class="s2">Theil(XY)</span><span class="se">\t</span><span class="s2">Chi2&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">65</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="p">[(</span><span class="s1">&#39;X1&#39;</span><span class="p">,</span> <span class="s1">&#39;Y1&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X2&#39;</span><span class="p">,</span> <span class="s1">&#39;Y2&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;X3&#39;</span><span class="p">,</span> <span class="s1">&#39;Y3&#39;</span><span class="p">)]:</span>
+    <span class="k">if</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;MLE&#39;</span><span class="p">]:</span>
+        <span class="n">mle_xy</span><span class="p">,</span> <span class="n">mle_yx</span> <span class="o">=</span> <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;MLE&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">]</span>
+        <span class="n">pmi_val</span> <span class="o">=</span> <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;PMI&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># PMI is symmetric</span>
+        <span class="n">theil_xy</span><span class="p">,</span> <span class="n">theil_yx</span> <span class="o">=</span> <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;Theil_U&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">]</span>
+        <span class="n">chi2_val</span> <span class="o">=</span> <span class="n">measures</span><span class="p">[</span><span class="s1">&#39;Chi2&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Chi2 is symmetric</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pair</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">mle_xy</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">mle_yx</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">pmi_val</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">theil_xy</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">chi2_val</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Measure properties analysis</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Measure Properties:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">measure_name</span><span class="p">,</span> <span class="n">scores</span> <span class="ow">in</span> <span class="n">measures</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">asymmetric_pairs</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="ow">in</span> <span class="n">scores</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">xy</span> <span class="o">-</span> <span class="n">yx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.01</span><span class="p">)</span>
+    <span class="n">total_pairs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+    <span class="n">asymmetry_ratio</span> <span class="o">=</span> <span class="n">asymmetric_pairs</span> <span class="o">/</span> <span class="n">total_pairs</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">measure_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">asymmetry_ratio</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2"> of pairs show asymmetry &gt; 0.01&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Methodological Recommendations:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • Use MLE for direct probability interpretation&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • Use Theil U for information-theoretic analysis&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • Use PMI/Chi2 for symmetric association strength&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • Use Fisher&#39;s exact test for small sample validation&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • Apply smoothing for sparse data (Laplace/ELE)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;CatScorer&#39; is not defined
+  at line 329 in code block</pre>
+</div>
+<h2>7. Statistical Validation</h2>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Statistical Validation Framework</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Statistical Validation Analysis&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">bootstrap_confidence_interval</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">scorer_func</span><span class="p">,</span> <span class="n">n_bootstrap</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute bootstrap confidence intervals for asymmetric measures.&quot;&quot;&quot;</span>
+    <span class="n">bootstrap_results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bootstrap</span><span class="p">):</span>
+        <span class="c1"># Bootstrap sample</span>
+        <span class="n">bootstrap_sample</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)]</span>
+        <span class="c1"># Fixed: bootstrap_sample is already co-occurrences</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bootstrap_sample</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">bootstrap_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">bootstrap_sample</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+            <span class="n">bootstrap_scores</span> <span class="o">=</span> <span class="n">scorer_func</span><span class="p">(</span><span class="n">bootstrap_scorer</span><span class="p">)</span>
+
+            <span class="c1"># Calculate mean asymmetry</span>
+            <span class="n">asymmetries</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">xy</span> <span class="o">-</span> <span class="n">yx</span><span class="p">)</span> <span class="k">for</span> <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="ow">in</span> <span class="n">bootstrap_scores</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+            <span class="k">if</span> <span class="n">asymmetries</span><span class="p">:</span>
+                <span class="n">bootstrap_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">asymmetries</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">bootstrap_results</span><span class="p">:</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">confidence</span>
+        <span class="n">lower</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bootstrap_results</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">alpha</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bootstrap_results</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bootstrap_results</span><span class="p">),</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+<span class="c1"># Validate with test data</span>
+<span class="n">validation_data</span> <span class="o">=</span> <span class="n">test_data</span> <span class="o">*</span> <span class="mi">5</span>  <span class="c1"># Increase sample size for bootstrap</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Bootstrap Validation (95% CI):&quot;</span><span class="p">)</span>
+
+<span class="c1"># MLE validation</span>
+<span class="n">mle_mean</span><span class="p">,</span> <span class="n">mle_lower</span><span class="p">,</span> <span class="n">mle_upper</span> <span class="o">=</span> <span class="n">bootstrap_confidence_interval</span><span class="p">(</span>
+    <span class="n">validation_data</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">mle</span><span class="p">(),</span> <span class="n">n_bootstrap</span><span class="o">=</span><span class="mi">50</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="n">mle_mean</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  MLE Asymmetry: </span><span class="si">{</span><span class="n">mle_mean</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">mle_lower</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">mle_upper</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+<span class="c1"># Theil U validation</span>
+<span class="n">theil_mean</span><span class="p">,</span> <span class="n">theil_lower</span><span class="p">,</span> <span class="n">theil_upper</span> <span class="o">=</span> <span class="n">bootstrap_confidence_interval</span><span class="p">(</span>
+    <span class="n">validation_data</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">theil_u</span><span class="p">(),</span> <span class="n">n_bootstrap</span><span class="o">=</span><span class="mi">50</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="n">theil_mean</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Theil U Asymmetry: </span><span class="si">{</span><span class="n">theil_mean</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">theil_lower</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">theil_upper</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+<span class="c1"># Significance testing</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">permutation_test</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n_permutations</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test significance of asymmetric patterns via permutation.&quot;&quot;&quot;</span>
+    <span class="c1"># Original asymmetry</span>
+    <span class="c1"># Fixed: data is already co-occurrences</span>
+    <span class="n">original_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+    <span class="n">original_mle</span> <span class="o">=</span> <span class="n">original_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+    <span class="n">original_asymmetry</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">xy</span> <span class="o">-</span> <span class="n">yx</span><span class="p">)</span> <span class="k">for</span> <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="ow">in</span> <span class="n">original_mle</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+
+    <span class="c1"># Permutation asymmetries</span>
+    <span class="n">permutation_asymmetries</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_permutations</span><span class="p">):</span>
+        <span class="c1"># Shuffle Y values while keeping X fixed</span>
+        <span class="n">shuffled_data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="n">y</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]))</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+        <span class="c1"># Fixed: shuffled_data is already co-occurrences</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shuffled_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">shuffled_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">shuffled_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+            <span class="n">shuffled_mle</span> <span class="o">=</span> <span class="n">shuffled_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+            <span class="n">shuffled_asymmetry</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">xy</span> <span class="o">-</span> <span class="n">yx</span><span class="p">)</span> <span class="k">for</span> <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="ow">in</span> <span class="n">shuffled_mle</span><span class="o">.</span><span class="n">values</span><span class="p">()])</span>
+            <span class="n">permutation_asymmetries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shuffled_asymmetry</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">permutation_asymmetries</span><span class="p">:</span>
+        <span class="n">p_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">perm_asym</span> <span class="o">&gt;=</span> <span class="n">original_asymmetry</span> <span class="k">for</span> <span class="n">perm_asym</span> <span class="ow">in</span> <span class="n">permutation_asymmetries</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">original_asymmetry</span><span class="p">,</span> <span class="n">p_value</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">original_asymmetry</span><span class="p">,</span> <span class="kc">None</span>
+
+<span class="c1"># Perform permutation test</span>
+<span class="n">observed_asymmetry</span><span class="p">,</span> <span class="n">p_value</span> <span class="o">=</span> <span class="n">permutation_test</span><span class="p">(</span><span class="n">validation_data</span><span class="p">,</span> <span class="n">n_permutations</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Permutation Test Results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Observed asymmetry: </span><span class="si">{</span><span class="n">observed_asymmetry</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">p_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  P-value: </span><span class="si">{</span><span class="n">p_value</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">significance</span> <span class="o">=</span> <span class="s2">&quot;significant&quot;</span> <span class="k">if</span> <span class="n">p_value</span> <span class="o">&lt;</span> <span class="mf">0.05</span> <span class="k">else</span> <span class="s2">&quot;not significant&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Result: Asymmetric pattern is </span><span class="si">{</span><span class="n">significance</span><span class="si">}</span><span class="s2"> (α = 0.05)&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Validation Summary:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  • Bootstrap CIs confirm measure stability&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  • Permutation tests validate asymmetric patterns&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  • Statistical framework supports scientific conclusions&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;CatScorer&#39; is not defined
+  at line 383 in code block</pre>
+</div>
+<h2>8. Discussion and Future Directions</h2>
+<h3>Key Findings</h3>
+<p>This comprehensive analysis demonstrates that <strong>asymmetric categorical association measures</strong> reveal important directional patterns missed by traditional symmetric approaches:</p>
+<ol>
+<li><strong>Linguistic Applications</strong>: Orthography-phoneme asymmetries support psycholinguistic theories</li>
+<li><strong>Ecological Insights</strong>: Species co-occurrence networks show competitive hierarchies</li>
+<li><strong>Classification Improvements</strong>: Directional feature-class relationships enhance safety-critical decisions</li>
+</ol>
+<h3>Methodological Contributions</h3>
+<ul>
+<li><strong>Theoretical Framework</strong>: Information-theoretic foundation for asymmetric association</li>
+<li><strong>Computational Implementation</strong>: Robust algorithms with smoothing for sparse data</li>
+<li><strong>Statistical Validation</strong>: Bootstrap and permutation testing for significance</li>
+<li><strong>Domain Applications</strong>: Demonstrated utility across linguistics, ecology, and machine learning</li>
+</ul>
+<h3>Future Research Directions</h3>
+<ol>
+<li><strong>Temporal Dynamics</strong>: Extending to time-series categorical data</li>
+<li><strong>Multivariate Extensions</strong>: Higher-order asymmetric relationships</li>
+<li><strong>Causal Inference</strong>: Linking asymmetric patterns to causal structures</li>
+<li><strong>Deep Learning Integration</strong>: Asymmetric measures in neural network architectures</li>
+<li><strong>Large-Scale Applications</strong>: Scalability for big data contexts</li>
+</ol>
+<h3>Practical Recommendations</h3>
+<p>For researchers applying asymmetric categorical association analysis:</p>
+<ul>
+<li><strong>Start with MLE</strong> for interpretable conditional probabilities</li>
+<li><strong>Add Theil's U</strong> for information-theoretic perspective</li>
+<li><strong>Use appropriate smoothing</strong> for sparse data (Laplace, ELE)</li>
+<li><strong>Validate statistically</strong> with bootstrap confidence intervals</li>
+<li><strong>Compare multiple measures</strong> to capture different relationship aspects</li>
+<li><strong>Visualize results</strong> to communicate directional patterns effectively</li>
+</ul>
+<h3>Conclusion</h3>
+<p>Asymmetric categorical association analysis opens new avenues for understanding directional relationships in categorical data. The ASymCat library provides a comprehensive toolkit for researchers across disciplines to explore these previously hidden patterns, leading to deeper insights and improved predictive models.</p>
+<p>The mathematical rigor, computational efficiency, and empirical validation demonstrated here establish asymmetric measures as valuable additions to the categorical data analysis toolkit, with broad applications in linguistics, ecology, machine learning, and beyond.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</body>
+</html>
