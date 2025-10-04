@@ -1,84 +1,156 @@
+# Makefile for asymcat development
+.DEFAULT_GOAL := help
+.PHONY: help quality format format-check lint mypy test test-cov test-fast bump-version build build-release clean install install-dev docs-execute docs-validate
+
+# Variables
 PYTHON_BINARY := python3
 VIRTUAL_ENV := venv
 VIRTUAL_BIN := $(VIRTUAL_ENV)/bin
-# Fallback to system python if venv doesn't exist
 PYTHON := $(if $(wildcard $(VIRTUAL_BIN)/python),$(VIRTUAL_BIN)/python,$(PYTHON_BINARY))
 PIP := $(if $(wildcard $(VIRTUAL_BIN)/pip),$(VIRTUAL_BIN)/pip,pip)
 PROJECT_NAME := asymcat
 TEST_DIR := tests
+TYPE ?= patch  # For version bumping: patch, minor, or major
 
-## help - Display help about make targets for this Makefile
-help:
-	@cat Makefile | grep '^## ' --color=never | cut -c4- | sed -e "`printf 's/ - /\t- /;'`" | column -s "`printf '\t'`" -t
+# Self-documenting help
+help: ## Show this help message
+	@echo "ASymCat Development Commands"
+	@echo "============================"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+	    awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "Common workflows:"
+	@echo "  make install-dev    # First-time setup"
+	@echo "  make quality        # Run all checks before commit"
+	@echo "  make test-cov       # Test with coverage report"
+	@echo "  make bump-version TYPE=minor  # Bump version and tag"
 
-## build - Builds the project in preparation for release
-build:
-	$(PYTHON) -m build
+# Quality checks
+quality: ## Run all code quality checks (format-check + lint + typecheck)
+	@echo "🔍 Running code quality checks..."
+	@echo "1. Checking formatting..."
+	$(PYTHON) -m ruff format --check $(PROJECT_NAME)/ $(TEST_DIR)/
+	@echo "2. Linting..."
+	$(PYTHON) -m ruff check $(PROJECT_NAME)/ $(TEST_DIR)/
+	@echo "3. Type checking..."
+	$(PYTHON) -m mypy $(PROJECT_NAME)/ $(TEST_DIR)/
+	@echo "✅ All quality checks passed!"
 
-## coverage - Test the project and generate an HTML coverage report
-coverage:
-	$(PYTHON) -m pytest --cov=$(PROJECT_NAME) --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing
-
-## clean - Remove the virtual environment and clear out .pyc files
-clean:
-	rm -rf $(VIRTUAL_ENV) dist *.egg-info .coverage htmlcov .pytest_cache
-	find . -name '*.pyc' -delete
-	find . -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null || true
-
-## format - Auto-format code with ruff
-format:
+format: ## Auto-format code with ruff
 	$(PYTHON) -m ruff format $(PROJECT_NAME)/ $(TEST_DIR)/
 
-## format-check - Check code formatting and linting with ruff
-format-check:
-	$(PYTHON) -m ruff check $(PROJECT_NAME)/ $(TEST_DIR)/
+format-check: ## Check code formatting without modifying
 	$(PYTHON) -m ruff format --check $(PROJECT_NAME)/ $(TEST_DIR)/
 
-## ruff-check - Check code quality with ruff (alias for format-check)
-ruff-check: format-check
-
-## install - Install package in development mode (creates venv if needed)
-install:
-	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
-	$(VIRTUAL_BIN)/pip install -e .
-
-## install-dev - Install package with all development dependencies
-install-dev:
-	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
-	$(VIRTUAL_BIN)/pip install -e ".[dev]"
-
-## lint - Lint the project (ruff check)
-lint:
+lint: ## Lint code with ruff
 	$(PYTHON) -m ruff check $(PROJECT_NAME)/ $(TEST_DIR)/
 
-## ruff-fix - Auto-fix issues with ruff
-ruff-fix:
+ruff-fix: ## Auto-fix ruff issues and format
 	$(PYTHON) -m ruff check --fix $(PROJECT_NAME)/ $(TEST_DIR)/
 	$(PYTHON) -m ruff format $(PROJECT_NAME)/ $(TEST_DIR)/
 
-## mypy - Run mypy type checking on the project
-mypy:
+mypy: ## Run mypy type checking
 	$(PYTHON) -m mypy $(PROJECT_NAME)/ $(TEST_DIR)/
 
-## test - Test the project
-test:
+# Testing
+test: ## Run test suite
 	$(PYTHON) -m pytest
 
-## docs - Build the documentation
-docs:
+test-cov: ## Run tests with coverage report (HTML + terminal)
+	$(PYTHON) -m pytest \
+		--cov=$(PROJECT_NAME) \
+		--cov-branch \
+		--cov-report=html \
+		--cov-report=term-missing \
+		--cov-fail-under=78
+
+test-fast: ## Run tests in parallel (requires pytest-xdist)
+	$(PYTHON) -m pytest -n auto
+
+coverage: test-cov ## Alias for test-cov
+
+# Version management
+bump-version: ## Bump version (TYPE=patch|minor|major), commit, and tag
+	@CURRENT=$$(grep -o "__version__ = \"[^\"]*\"" $(PROJECT_NAME)/__init__.py | cut -d'"' -f2); \
+	echo "==> Current version: $$CURRENT"; \
+	IFS='.' read -r major minor patch <<< "$$CURRENT"; \
+	if [ "$(TYPE)" = "major" ]; then NEW="$$((major + 1)).0.0"; \
+	elif [ "$(TYPE)" = "minor" ]; then NEW="$$major.$$((minor + 1)).0"; \
+	elif [ "$(TYPE)" = "patch" ]; then NEW="$$major.$$minor.$$((patch + 1))"; \
+	else echo "❌ Error: TYPE must be patch, minor, or major"; exit 1; fi; \
+	echo "==> Bumping $(TYPE) version: $$CURRENT → $$NEW"; \
+	sed -i "s/__version__ = \"$$CURRENT\"/__version__ = \"$$NEW\"/" $(PROJECT_NAME)/__init__.py; \
+	sed -i "s/version = \"$$CURRENT\"/version = \"$$NEW\"/" pyproject.toml; \
+	echo ""; \
+	echo "⚠️  IMPORTANT: Please update CHANGELOG.md manually:"; \
+	echo "   1. Move items from [Unreleased] to [$$NEW]"; \
+	echo "   2. Add release date"; \
+	echo "   3. Review migration guide if needed"; \
+	echo ""; \
+	read -p "Press Enter when CHANGELOG is ready, or Ctrl+C to cancel..."; \
+	git add $(PROJECT_NAME)/__init__.py pyproject.toml CHANGELOG.md; \
+	git commit -m "chore: bump version to $$NEW"; \
+	git tag -a "v$$NEW" -m "Release v$$NEW"; \
+	echo "✅ Version bumped to $$NEW and tagged!"; \
+	echo "📋 Next steps:"; \
+	echo "   git push && git push --tags"
+
+# Build
+build: ## Build package (creates dist/)
+	$(PYTHON) -m build
+
+build-release: clean quality test build ## Full release build (clean → quality → test → build)
+	@echo "✅ Release build complete!"
+	@ls -lh dist/
+
+# Installation
+install: ## Install package in development mode
+	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
+	$(VIRTUAL_BIN)/pip install -e .
+
+install-dev: ## Install package with all development dependencies
+	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
+	$(VIRTUAL_BIN)/pip install -e ".[dev]"
+
+# Cleanup
+clean: ## Remove build artifacts, caches, and coverage reports
+	rm -rf dist/ build/ *.egg-info
+	rm -rf .coverage htmlcov/ coverage.xml coverage.lcov
+	rm -rf .pytest_cache .ruff_cache .mypy_cache .hypothesis/
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	find . -name '*.pyc' -delete
+
+# Documentation
+docs: ## Build Sphinx documentation
 	cd docs && make html
 
-## docs-clean - Clean the documentation build
-docs-clean:
-	rm -rf docs/build/
+docs-clean: ## Clean documentation build
+	rm -rf docs/_build/ docs/build/
 
-## quick-test - Run a quick subset of tests
-quick-test:
-	$(PYTHON) -m pytest tests/unit/test_data_loading.py tests/unit/test_scoring_measures.py::TestScorerInitialization -v
+docs-execute: ## Re-execute all Jupyter notebooks
+	@echo "🔄 Re-executing Jupyter notebooks..."
+	@for notebook in docs/*.ipynb; do \
+		echo "  Executing: $$(basename $$notebook)"; \
+		$(PYTHON) -m jupyter nbconvert --to notebook --execute --inplace "$$notebook"; \
+	done
+	@echo "✅ All notebooks re-executed"
 
-## security - Run security checks
-security:
-	$(PYTHON) -m bandit -r $(PROJECT_NAME)/ || echo "Install bandit for security scanning: pip install bandit"
-	$(PYTHON) -m safety check || echo "Install safety for vulnerability scanning: pip install safety"
+docs-validate: ## Validate notebooks have execution outputs
+	@echo "📊 Validating notebook outputs..."
+	@for notebook in docs/*.ipynb; do \
+		size=$$(stat --format="%s" "$$notebook" 2>/dev/null || stat -f%z "$$notebook"); \
+		if [ "$$size" -lt 30000 ]; then \
+			echo "❌ $$(basename $$notebook): $$size bytes (missing outputs)"; \
+			exit 1; \
+		else \
+			echo "✅ $$(basename $$notebook): $$size bytes"; \
+		fi; \
+	done
+	@echo "🎉 All notebooks validated"
 
-.PHONY: help build coverage clean format format-check ruff-check install lint ruff-fix mypy test docs docs-clean quick-test security
+# Security
+security: ## Run security checks (bandit + safety)
+	@echo "🔒 Running security scans..."
+	$(PYTHON) -m bandit -r $(PROJECT_NAME)/ || echo "⚠️  Install bandit: pip install bandit"
+	$(PYTHON) -m safety check || echo "⚠️  Install safety: pip install safety"
