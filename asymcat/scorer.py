@@ -158,16 +158,13 @@ def compute_theil_u(x_symbols: list[Any], y_symbols: list[Any]) -> float:
     population = len(x_symbols)
 
     # Compute the probability for each symbol and, from there, the entropy
-    p_x = list(map(lambda n: n / population, x_counter.values()))
+    p_x = [n / population for n in x_counter.values()]
     h_x = ss.entropy(p_x)
 
     # If the entropy is zero (all items alike), the uncertainty coeffiecient
     # is by definition 1.0; otherwise, compute it in relation to the
     # conditional entropy
-    if h_x == 0.0:
-        theil_u = 1.0
-    else:
-        theil_u = (h_x - h_xy) / h_x
+    theil_u = 1.0 if h_x == 0.0 else (h_x - h_xy) / h_x
 
     return theil_u
 
@@ -1031,15 +1028,13 @@ class CatScorer:
             # Build the new scorer
             self._tresoldi = {}
             for pair in self.obs:
-                if pmi[pair][0] < 0:
-                    xy = -((-pmi[pair][0]) ** (1 - mle[pair][0]))
-                else:
-                    xy = pmi[pair][0] ** (1 - mle[pair][0])
+                xy = (
+                    -((-pmi[pair][0]) ** (1 - mle[pair][0])) if pmi[pair][0] < 0 else pmi[pair][0] ** (1 - mle[pair][0])
+                )
 
-                if pmi[pair][1] < 0:
-                    yx = -((-pmi[pair][1]) ** (1 - mle[pair][1]))
-                else:
-                    yx = pmi[pair][1] ** (1 - mle[pair][1])
+                yx = (
+                    -((-pmi[pair][1]) ** (1 - mle[pair][1])) if pmi[pair][1] < 0 else pmi[pair][1] ** (1 - mle[pair][1])
+                )
 
                 self._tresoldi[pair] = (xy, yx)
 

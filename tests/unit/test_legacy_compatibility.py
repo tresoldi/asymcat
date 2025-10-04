@@ -391,8 +391,8 @@ class TestLegacyNewMethods:
         chi2 = scorer.chi2()
 
         # Test correlation between G² and Chi² (as in original)
-        g2_values = [g2[p][0] for p in g2.keys()]
-        chi2_values = [chi2[p][0] for p in chi2.keys() if p in g2]
+        g2_values = [g2[p][0] for p in g2]
+        chi2_values = [chi2[p][0] for p in chi2 if p in g2]
 
         if len(g2_values) > 2 and len(chi2_values) > 2:
             correlation = np.corrcoef(g2_values, chi2_values)[0, 1]

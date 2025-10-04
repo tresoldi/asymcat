@@ -119,7 +119,7 @@ def assert_scores_asymmetric(scores: dict[tuple[Any, Any], tuple[float, float]],
         >>> assert_scores_asymmetric(scores)  # Passes (first pair is asymmetric)
     """
     asymmetric_count = 0
-    for pair, (xy, yx) in scores.items():
+    for _pair, (xy, yx) in scores.items():
         if abs(xy - yx) >= min_difference:
             asymmetric_count += 1
 

@@ -210,6 +210,8 @@ select = [
 ]
 ignore = [
     "E203", # whitespace before ':'
+    "B904", # Exception chaining (stylistic - raise from err)
+    "SIM102", # Nested if statements (stylistic preference)
 ]
 
 [tool.ruff.format]

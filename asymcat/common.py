@@ -106,8 +106,7 @@ def collect_ngrams(seq: list[Any] | str, order: int, pad: str) -> Generator[tupl
 
     tuple_seq = tuple(chain((pad,) * (order - 1), seq, (pad,) * (order - 1)))
 
-    for ngram in zip(*[tuple_seq[i:] for i in range(order)], strict=False):
-        yield ngram
+    yield from zip(*[tuple_seq[i:] for i in range(order)], strict=False)
 
 
 # TODO: should yield?

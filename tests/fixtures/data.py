@@ -151,8 +151,4 @@ def validate_test_environment() -> bool:
     """
     required_files = ["toy.tsv", "mushroom-small.tsv"]
 
-    for filename in required_files:
-        if not (RESOURCE_DIR / filename).exists():
-            return False
-
-    return True
+    return all((RESOURCE_DIR / filename).exists() for filename in required_files)
