@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "asymcat"
-version = "0.3.1"
+version = "0.4.0"
 description = "A Python library for obtaining asymmetric measures of association between categorical variables in data exploration and description"
 readme = "README.md"
 license = {text = "MIT"}
@@ -117,9 +117,6 @@ all = [
 [project.urls]
 Homepage = "http://github.com/tresoldi/asymcat"
 Repository = "http://github.com/tresoldi/asymcat"
-
-[project.scripts]
-asymcat = "asymcat.__main__:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["asymcat"]
@@ -255,9 +252,15 @@ skips = ["B101"]  # Skip assert_used test since assertions are acceptable in tes
 [tool.coverage.report]
 exclude_lines = [
     "if __name__ == '__main__':",
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
 ]
 
 [tool.pytest.ini_options]
+minversion = "7.0"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
@@ -265,4 +268,21 @@ addopts = [
     "--strict-markers",
     "--strict-config",
     "--verbose",
+    "--cov=asymcat",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=78",  # TODO: Increase to 80 after testing correlation.py or removing it
+]
+markers = [
+    "slow: marks tests as slow (may take several seconds)",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "performance: marks tests that measure performance",
+    "large_data: marks tests that require large datasets",
+]
+filterwarnings = [
+    "ignore::RuntimeWarning:numpy.*",
+    "ignore::FutureWarning:pandas.*",
+    "ignore::DeprecationWarning",
 ]

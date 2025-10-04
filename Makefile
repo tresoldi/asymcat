@@ -67,19 +67,6 @@ docs:
 docs-clean:
 	rm -rf docs/build/
 
-## cli-test - Test CLI functionality with sample data
-cli-test:
-	@echo "Testing CLI with toy dataset..."
-	$(PYTHON) -m $(PROJECT_NAME) resources/toy.tsv --scorers mle pmi --verbose
-	@echo "\nTesting CLI with JSON output..."
-	$(PYTHON) -m $(PROJECT_NAME) resources/toy.tsv --scorers mle --output-format json --top 3
-	@echo "\nTesting CLI with smoothing..."
-	$(PYTHON) -m $(PROJECT_NAME) resources/toy.tsv --scorers pmi_smoothed --smoothing laplace
-
-## cli-help - Show CLI help
-cli-help:
-	$(PYTHON) -m $(PROJECT_NAME) --help
-
 ## quick-test - Run a quick subset of tests
 quick-test:
 	$(PYTHON) -m pytest tests/unit/test_data_loading.py tests/unit/test_scoring_measures.py::TestScorerInitialization -v
@@ -89,4 +76,4 @@ security:
 	$(PYTHON) -m bandit -r $(PROJECT_NAME)/ || echo "Install bandit for security scanning: pip install bandit"
 	$(PYTHON) -m safety check || echo "Install safety for vulnerability scanning: pip install safety"
 
-.PHONY: help build coverage clean format format-check ruff-check install lint ruff-fix mypy test docs docs-clean cli-test cli-help quick-test security
+.PHONY: help build coverage clean format format-check ruff-check install lint ruff-fix mypy test docs docs-clean quick-test security
