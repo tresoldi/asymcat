@@ -715,9 +715,9 @@ class CatScorer:
                             raise ValueError("Freqprob scorer class not initialized")
 
                         if self.smoothing_method == "mle" or self.smoothing_method == "laplace":
-                            scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y)
+                            scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y)  # type: ignore[call-arg]
                         else:  # Lidstone
-                            scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y, self.smoothing_alpha)
+                            scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y, gamma=self.smoothing_alpha)  # type: ignore[call-arg]
 
                         xy_score = math.exp(scorer_xy(pair[0]))
                 else:
@@ -736,9 +736,9 @@ class CatScorer:
                             raise ValueError("Freqprob scorer class not initialized")
 
                         if self.smoothing_method == "mle" or self.smoothing_method == "laplace":
-                            scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x)
+                            scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x)  # type: ignore[call-arg]
                         else:  # Lidstone
-                            scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x, self.smoothing_alpha)
+                            scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x, gamma=self.smoothing_alpha)  # type: ignore[call-arg]
 
                         yx_score = math.exp(scorer_yx(pair[1]))
                 else:
@@ -788,13 +788,13 @@ class CatScorer:
             raise ValueError("Freqprob scorer class not initialized")
 
         if self.smoothing_method == "mle" or self.smoothing_method == "laplace":
-            joint_scorer = self._freqprob_scorer_class(joint_freqdist)
-            x_scorer = self._freqprob_scorer_class(x_freqdist)
-            y_scorer = self._freqprob_scorer_class(y_freqdist)
+            joint_scorer = self._freqprob_scorer_class(joint_freqdist)  # type: ignore[call-arg]
+            x_scorer = self._freqprob_scorer_class(x_freqdist)  # type: ignore[call-arg]
+            y_scorer = self._freqprob_scorer_class(y_freqdist)  # type: ignore[call-arg]
         else:  # Lidstone
-            joint_scorer = self._freqprob_scorer_class(joint_freqdist, self.smoothing_alpha)
-            x_scorer = self._freqprob_scorer_class(x_freqdist, self.smoothing_alpha)
-            y_scorer = self._freqprob_scorer_class(y_freqdist, self.smoothing_alpha)
+            joint_scorer = self._freqprob_scorer_class(joint_freqdist, gamma=self.smoothing_alpha)  # type: ignore[call-arg]
+            x_scorer = self._freqprob_scorer_class(x_freqdist, gamma=self.smoothing_alpha)  # type: ignore[call-arg]
+            y_scorer = self._freqprob_scorer_class(y_freqdist, gamma=self.smoothing_alpha)  # type: ignore[call-arg]
 
         for pair in product(self.alphabet_x, self.alphabet_y):
             obs = self.obs[pair]
