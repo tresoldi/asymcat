@@ -2,8 +2,9 @@
 
 [![PyPI version](https://badge.fury.io/py/asymcat.svg)](https://badge.fury.io/py/asymcat)
 [![Python versions](https://img.shields.io/pypi/pyversions/asymcat.svg)](https://pypi.org/project/asymcat/)
-[![Build Status](https://github.com/tresoldi/asymcat/workflows/build/badge.svg)](https://github.com/tresoldi/asymcat/actions)
+[![Code Quality](https://github.com/tresoldi/asymcat/workflows/Code%20Quality/badge.svg)](https://github.com/tresoldi/asymcat/actions)
 [![codecov](https://codecov.io/gh/tresoldi/asymcat/branch/master/graph/badge.svg)](https://codecov.io/gh/tresoldi/asymcat)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ASymCat is a comprehensive Python library for analyzing **asymmetric associations** between categorical variables. Unlike traditional symmetric measures that treat relationships as bidirectional, ASymCat provides directional measures that reveal which variable predicts which, making it invaluable for understanding causal relationships, dependencies, and information flow in categorical data.
@@ -11,12 +12,11 @@ ASymCat is a comprehensive Python library for analyzing **asymmetric association
 ## 🚀 Key Features
 
 - **17+ Association Measures**: From basic MLE to advanced information-theoretic measures
-- **Directional Analysis**: X→Y vs Y→X asymmetric relationship quantification  
+- **Directional Analysis**: X→Y vs Y→X asymmetric relationship quantification
 - **Robust Smoothing**: FreqProb integration for numerical stability
 - **Multiple Data Formats**: Sequences, presence-absence matrices, n-grams
-- **CLI Interface**: Production-ready command-line tool with rich output formats
 - **Scalable Architecture**: Optimized for large datasets with efficient algorithms
-- **Comprehensive Testing**: 75+ tests ensuring reliability and accuracy
+- **Comprehensive Testing**: 75+ tests with 78%+ coverage ensuring reliability and accuracy
 
 ## 🎯 Why Asymmetric Measures Matter
 
@@ -65,14 +65,13 @@ pip install asymcat
 ```bash
 git clone https://github.com/tresoldi/asymcat.git
 cd asymcat
-pip install -e ".[all]"  # Install with all optional dependencies
+pip install -e ".[dev]"  # Install with all optional dependencies
 ```
 
 ### Dependencies
 - **Core**: numpy, pandas, scipy, matplotlib, seaborn, tabulate, freqprob
-- **Development**: pytest, black, isort, flake8, mypy
-- **Documentation**: sphinx, sphinx-rtd-theme, myst-parser
-- **Optional**: jupyter, plotly, bokeh, altair (for enhanced visualization)
+- **Development**: pytest, ruff, mypy, jupyter
+- **Optional**: plotly, bokeh, altair (for enhanced visualization)
 
 ## 📚 Documentation & Interactive Examples
 
@@ -160,49 +159,6 @@ scaled_scores = asymcat.scorer.scale_scorer(scores, method="minmax")
 inverted_scores = asymcat.scorer.invert_scorer(scaled_scores)
 ```
 
-### Command Line Interface
-
-The CLI provides production-ready access to all functionality:
-
-#### Basic Usage
-```bash
-# Analyze with multiple measures
-asymcat data.tsv --scorers mle pmi chi2 --output results.json
-
-# Presence-absence matrix analysis  
-asymcat species_data.tsv --format pa-matrix --scorers fisher theil_u
-
-# Advanced options
-asymcat sequences.tsv \
-  --scorers all \
-  --smoothing laplace \
-  --smoothing-alpha 0.5 \
-  --sort-by yx \
-  --top 10 \
-  --output-format csv \
-  --output top_associations.csv
-```
-
-#### Output Formats
-```bash
-# JSON output
-asymcat data.tsv --scorers mle pmi --output-format json
-
-# CSV for further analysis
-asymcat data.tsv --scorers chi2 --output-format csv --precision 6
-
-# Formatted tables
-asymcat data.tsv --scorers fisher --table-format markdown
-```
-
-#### N-gram Analysis
-```bash
-# Bigram analysis
-asymcat text_data.tsv --ngrams 2 --pad "#" --scorers tresoldi
-
-# Filter by minimum co-occurrence count
-asymcat large_dataset.tsv --min-count 5 --scorers mle pmi
-```
 
 ## 📈 Association Measures
 
@@ -297,16 +253,34 @@ git clone https://github.com/tresoldi/asymcat.git
 cd asymcat
 
 # Install development dependencies
-make install  # Creates venv and installs with [dev] extras
+make install-dev  # Creates venv and installs with [dev] extras
+```
 
-# Run tests
-make test
-make coverage
+### Common Development Commands
+```bash
+# Code quality checks (runs all: format-check + lint + typecheck)
+make quality
 
-# Code quality
-make format     # Auto-format with black, isort
-make lint       # Check with flake8
-make mypy       # Type checking
+# Auto-format code
+make format
+
+# Auto-fix linting issues and format
+make ruff-fix
+
+# Type checking
+make mypy
+
+# Run tests with coverage report
+make test-cov
+
+# Run tests in parallel (faster)
+make test-fast
+
+# Re-execute Jupyter notebooks
+make docs-execute
+
+# Validate notebooks have outputs
+make docs-validate
 ```
 
 ### Testing
@@ -315,34 +289,64 @@ make mypy       # Type checking
 pytest
 
 # Specific categories
-pytest tests/unit/           # Unit tests only  
+pytest tests/unit/           # Unit tests only
 pytest tests/integration/    # Integration tests only
 pytest -m slow              # Performance tests
+pytest -m "not slow"        # Skip slow tests
 
-# Quick development testing
-make quick-test
+# Coverage with threshold enforcement (78%)
+make test-cov
 ```
 
-### CLI Development
-```bash
-# Test CLI functionality
-make cli-test
-make cli-help
+### Release Process
 
-# Security scanning
-make security
+**Version Bumping:**
+```bash
+# Bump patch version (0.4.0 → 0.4.1)
+make bump-version TYPE=patch
+
+# Bump minor version (0.4.0 → 0.5.0)
+make bump-version TYPE=minor
+
+# Bump major version (0.4.0 → 1.0.0)
+make bump-version TYPE=major
+```
+
+The `bump-version` target will:
+1. Update version in `asymcat/__init__.py` and `pyproject.toml`
+2. Prompt you to update CHANGELOG.md
+3. Create a git commit with the version bump
+4. Create a git tag (e.g., `v0.4.1`)
+5. Display next steps for pushing changes
+
+**Full Release Build:**
+```bash
+# Clean → Quality checks → Tests → Build distribution
+make build-release
+```
+
+### Code Quality Standards
+
+All code must pass:
+- **Ruff formatting**: `ruff format --check asymcat/ tests/`
+- **Ruff linting**: `ruff check asymcat/ tests/`
+- **MyPy type checking**: `mypy asymcat/ tests/`
+- **Test coverage**: Minimum 78% coverage (goal: 80%)
+
+Run all checks before committing:
+```bash
+make quality && make test-cov
 ```
 
 ## 📚 Documentation
 
-- **[Developer Guide](DEVELOPER.md)**: Comprehensive guide for contributors
-- **[Jupyter Examples](docs/examples/)**: Academic notebooks with detailed analysis
-- **[API Documentation](https://asymcat.readthedocs.io/)**: Complete API reference
-- **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Theory and formulas
+- **[Jupyter Examples](docs/)**: Interactive notebooks with academic-grade analysis
+- **[CHANGELOG](CHANGELOG.md)**: Version history and migration guides
+- **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Theory and formulas (if available)
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Developer Guide](DEVELOPER.md) for:
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 - Setting up the development environment
 - Code style guidelines and testing requirements
@@ -353,7 +357,7 @@ We welcome contributions! Please see our [Developer Guide](DEVELOPER.md) for:
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature-name`
 3. Make changes and add tests
-4. Run the test suite: `make test`
+4. Run quality checks: `make quality && make test-cov`
 5. Submit a pull request
 
 ## 📖 Citation
@@ -380,14 +384,20 @@ If you use ASymCat in your research, please cite:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🚀 What's New in v0.3.1
+## 🚀 What's New in v0.4.0
 
-- ✅ **Interactive Documentation**: 4 fully executed Jupyter notebooks (1.4MB+ of examples)
-- ✅ **Publication-Ready Examples**: Academic-grade analysis workflows with statistical validation
-- ✅ **Real-World Applications**: Linguistics, ecology, and machine learning case studies
-- ✅ **Advanced Visualizations**: Heatmaps, distributions, and publication-quality plots
-- ✅ **Comprehensive Coverage**: Every feature demonstrated with working code
-- ✅ **Immediate Access**: All notebooks pre-executed with committed outputs
+- ✅ **Simplified Dependencies**: Consolidated to `[viz]` and `[dev]` groups - easier installation
+- ✅ **Modern Tooling**: Unified linting/formatting with Ruff, replacing black/isort/flake8
+- ✅ **Enhanced CI/CD**: Simplified quality workflow with faster feedback
+- ✅ **Coverage Enforcement**: 78% minimum threshold (goal: 80%)
+- ✅ **Keep a Changelog**: Semantic versioning with full version history
+- ✅ **Developer-Friendly Makefile**: Self-documenting help, automated version bumping
+- ✅ **Library-Only Focus**: Removed CLI tool for better coverage and maintainability
+
+**Migration from v0.3.1:**
+- Use `pip install asymcat[dev]` instead of multiple dependency groups
+- Use library API directly instead of CLI tool (see examples above)
+- See [CHANGELOG.md](CHANGELOG.md) for detailed migration guide
 
 ## 🔮 Roadmap
 
@@ -396,6 +406,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **GPU Acceleration**: CUDA support for massive datasets
 - **Interactive Dashboards**: Web-based exploration tools
 - **Extended Measures**: Additional domain-specific association metrics
+- **Nhandu Documentation**: Migration to modern documentation system
 
 ---
 

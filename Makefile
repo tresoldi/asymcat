@@ -60,7 +60,6 @@ test: ## Run test suite
 test-cov: ## Run tests with coverage report (HTML + terminal)
 	$(PYTHON) -m pytest \
 		--cov=$(PROJECT_NAME) \
-		--cov-branch \
 		--cov-report=html \
 		--cov-report=term-missing \
 		--cov-fail-under=78
