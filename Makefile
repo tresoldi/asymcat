@@ -37,10 +37,15 @@ format-check:
 ## ruff-check - Check code quality with ruff (alias for format-check)
 ruff-check: format-check
 
-## install - Install the project locally
+## install - Install package in development mode (creates venv if needed)
 install:
 	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
-	$(VIRTUAL_BIN)/pip install -e ."[dev]"
+	$(VIRTUAL_BIN)/pip install -e .
+
+## install-dev - Install package with all development dependencies
+install-dev:
+	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
+	$(VIRTUAL_BIN)/pip install -e ".[dev]"
 
 ## lint - Lint the project (ruff check)
 lint:
