@@ -1,147 +1,195 @@
 # ASymCat Documentation
 
-This directory contains comprehensive documentation for ASymCat, including mathematical foundations, examples, and visualizations.
+Welcome to the ASymCat documentation! This directory contains comprehensive guides, tutorials, and references for the ASymCat library.
 
-## 📚 Documentation Files
+## 📚 Documentation Structure
 
 ### Core Documentation
-- **[MATHEMATICAL_FOUNDATIONS.md](MATHEMATICAL_FOUNDATIONS.md)** - Complete mathematical basis of asymmetric association measures
-- **[EXAMPLES_WITH_PLOTS.ipynb](EXAMPLES_WITH_PLOTS.ipynb)** - Interactive notebook with comprehensive examples and visualizations
-- **[AGENTS.md](../AGENTS.md)** - Development guide for 
 
-### Visualizations
-- **[generate_readme_plots.py](generate_readme_plots.py)** - Script to generate documentation plots
-- **images/** - Generated visualization files
+| Document | Purpose | Best For |
+|----------|---------|----------|
+| **[User Guide](USER_GUIDE.md)** | Conceptual guide with theory and best practices | Understanding asymmetric association analysis, mathematical foundations, and methodology |
+| **[API Reference](API_REFERENCE.md)** | Complete technical API documentation | Looking up specific functions, classes, and parameters |
+| **[LLM Documentation](LLM_DOCUMENTATION.md)** | Practical guide for LLM coding agents | Quick integration, code examples, and common patterns |
 
-### Legacy Documentation
-- **Demo.ipynb** - Original demonstration notebook
-- **source/** - Sphinx documentation source files
+### Interactive Tutorials (Nhandu)
 
-## 🧮 Mathematical Overview
+Progressive, hands-on tutorials with executable code and visualizations:
 
-ASymCat implements **15+ association measures** for categorical co-occurrence analysis:
+1. **[Tutorial 1: Basics](tutorial_1_basics.py)** ([HTML](tutorial_1_basics.html))
+   - Getting started with ASymCat
+   - Basic workflow and data loading
+   - Simple association measures
+   - Understanding asymmetric relationships
 
-### Asymmetric Measures (Directional)
-| Measure | Range | Interpretation |
-|---------|-------|---------------|
-| **MLE** | [0,1] | P(Y\|X) - conditional probability |
-| **Theil's U** | [0,1] | Uncertainty reduction U(Y\|X) |
-| **Lambda** | [0,1] | Prediction error reduction λ(Y\|X) |
-| **Tresoldi** | [0,∞) | Combined MLE×PMI measure |
+2. **[Tutorial 2: Advanced Measures](tutorial_2_advanced_measures.py)** ([HTML](tutorial_2_advanced_measures.html))
+   - Information-theoretic measures (PMI, MI, Theil U)
+   - Statistical measures (Chi-square, Fisher)
+   - Smoothing methods and their effects
+   - Measure comparison and selection
 
-### Symmetric Measures (Bidirectional)
-| Measure | Range | Interpretation |
-|---------|-------|---------------|
-| **PMI** | (-∞,+∞) | Information overlap, 0=independence |
-| **Chi-square** | [0,+∞) | Deviation from independence |
-| **Jaccard** | [0,1] | Context overlap similarity |
-| **Cramér's V** | [0,1] | Normalized chi-square |
+3. **[Tutorial 3: Visualization](tutorial_3_visualization.py)** ([HTML](tutorial_3_visualization.html))
+   - Heatmap visualizations
+   - Score distributions and comparisons
+   - Matrix transformations
+   - Publication-quality plots
 
-## 🔬 Key Features
+4. **[Tutorial 4: Real-World Applications](tutorial_4_real_world.py)** ([HTML](tutorial_4_real_world.html))
+   - Linguistics: Grapheme-phoneme correspondence
+   - Ecology: Species co-occurrence analysis
+   - Market research: Product associations
+   - Machine learning: Feature selection
 
-### Robust Probability Estimation
-- **MLE (Maximum Likelihood)**: Direct estimation P(Y|X) = count(X,Y)/count(X)
-- **Laplace Smoothing**: Adds pseudo-count of 1 to handle sparse data
-- **Lidstone Smoothing**: Parameterized smoothing with adjustable γ parameter
+> **Note:** Tutorials are written in Nhandu format (`.py` files with `#'` markdown comments) and can be executed to generate HTML reports with `make docs`.
 
-### Comprehensive Data Support
-- **Sequential Data**: Aligned sequences (orthography↔phonetics)
-- **Presence-Absence**: Binary matrices (species×locations)
-- **Categorical Features**: Any categorical co-occurrence data
+## 🎯 Quick Navigation
 
-### Advanced Analytics
-- **N-gram Analysis**: Extract patterns from sequential data
-- **Matrix Operations**: Convert scores to visualization matrices
-- **Score Transformations**: Scaling, normalization, inversion
-- **Statistical Tests**: Fisher exact test, log-likelihood ratios
+### I want to...
 
-## 📊 Usage Examples
+**...understand what asymmetric association is**
+→ Start with [User Guide - Introduction](USER_GUIDE.md#introduction)
 
-### Basic Analysis
-```python
-import asymcat
+**...get started quickly with code**
+→ Check [LLM Documentation - Quick Start](LLM_DOCUMENTATION.md#quick-start) or [Tutorial 1](tutorial_1_basics.py)
 
-# Load data and compute co-occurrences
-data = asymcat.read_sequences("data.tsv")
-cooccs = asymcat.collect_cooccs(data)
+**...look up a specific function**
+→ Use [API Reference](API_REFERENCE.md)
 
-# Create scorer with smoothing
-scorer = asymcat.scorer.CatScorer(cooccs,
-                                  smoothing_method='laplace')
+**...understand the mathematical foundations**
+→ Read [User Guide - Mathematical Background](USER_GUIDE.md#mathematical-background)
 
-# Compute multiple measures
-results = {
-    'MLE': scorer.mle(),
-    'PMI': scorer.pmi(),
-    'Theil_U': scorer.theil_u(),
-    'PMI_Smoothed': scorer.pmi_smoothed()
-}
-```
+**...see visualizations and examples**
+→ Run the [interactive tutorials](#interactive-tutorials-nhandu) or view their HTML outputs
 
-### CLI Analysis
+**...integrate ASymCat into my project**
+→ Follow [LLM Documentation - Common Patterns](LLM_DOCUMENTATION.md#common-patterns)
+
+**...choose the right association measure**
+→ See [User Guide - Association Measures Guide](USER_GUIDE.md#association-measures-guide) or [LLM Documentation - Measure Selection](LLM_DOCUMENTATION.md#measure-selection-decision-tree)
+
+**...understand smoothing methods**
+→ Read [User Guide - Smoothing Methods](USER_GUIDE.md#smoothing-methods) or [Tutorial 2](tutorial_2_advanced_measures.py)
+
+**...see real-world applications**
+→ Explore [Tutorial 4](tutorial_4_real_world.py) or [User Guide - Common Use Cases](USER_GUIDE.md#common-use-cases)
+
+## 📖 Documentation Philosophy
+
+### Three-Tier Approach
+
+1. **User Guide** (Conceptual)
+   - *"Why"* and *"when"* questions
+   - Mathematical theory and intuition
+   - Best practices and methodology
+   - Domain-specific guidance
+
+2. **API Reference** (Technical)
+   - *"What"* and *"how"* questions
+   - Complete function signatures
+   - Parameter descriptions
+   - Return types and examples
+
+3. **LLM Documentation** (Practical)
+   - *"Show me"* questions
+   - Copy-paste code snippets
+   - Common patterns and recipes
+   - Quick integration examples
+
+### Progressive Tutorials
+
+Tutorials build skills incrementally:
+- **Tutorial 1**: Foundation - basic workflow and concepts
+- **Tutorial 2**: Depth - advanced measures and methods
+- **Tutorial 3**: Communication - visualization techniques
+- **Tutorial 4**: Application - real-world case studies
+
+Each tutorial is self-contained but references previous concepts.
+
+## 🔧 Working with Tutorials
+
+### Viewing Tutorials
+
+**HTML (Pre-generated):**
 ```bash
-# Basic analysis
-asymcat data.tsv --scorers mle pmi theil_u
-
-# With smoothing for sparse data
-asymcat data.tsv --scorers mle pmi_smoothed --smoothing laplace
-
-# Advanced parameterized smoothing
-asymcat data.tsv --smoothing lidstone --smoothing-alpha 0.5
+# Open in browser
+firefox docs/tutorial_1_basics.html
 ```
 
-## 🌍 Real-World Applications
+**Python Source:**
+```bash
+# View source code
+less docs/tutorial_1_basics.py
+```
 
-### Computational Linguistics
-- **Phoneme-grapheme correspondence**: English orthography → IPA mappings
-- **Historical linguistics**: Sound change directionality
-- **Morphological analysis**: Affix dependency patterns
-- **Syntactic relationships**: Word order asymmetries
+### Running Tutorials
 
-### Ecological Analysis
-- **Species co-occurrence**: Galápagos finch distribution patterns
-- **Habitat associations**: Environmental factor dependencies
-- **Predator-prey relationships**: Directional ecological dependencies
-- **Biogeographical patterns**: Range overlap asymmetries
+**Execute and generate fresh HTML:**
+```bash
+# Regenerate all tutorial HTML files
+make docs
 
-### Data Science Applications
-- **Feature engineering**: Variable dependency discovery
-- **Classification analysis**: Feature → class predictive strength
-- **Market research**: Product purchase dependencies
-- **Causal inference**: Directional relationship identification
+# Or run individual tutorials
+python docs/tutorial_1_basics.py
+```
 
-## 🎯 Choosing the Right Measure
+### Modifying Tutorials
 
-### For Prediction Tasks
-- **MLE**: When you need interpretable conditional probabilities
-- **Theil's U**: When measuring information-theoretic uncertainty reduction
-- **Lambda**: When measuring prediction error reduction
+1. Edit the `.py` file (Nhandu format with `#'` comments)
+2. Run `make docs` to regenerate HTML
+3. View updated HTML in browser
 
-### For Association Discovery
-- **PMI**: When you want information-theoretic association strength
-- **Chi-square**: When testing statistical independence
-- **Jaccard**: When measuring context overlap similarity
+**Nhandu Syntax Reminder:**
+```python
+#' # This is a markdown header
+#' Regular markdown text goes here.
+#'
+#' - Bullet point 1
+#' - Bullet point 2
 
-### For Sparse Data
-- **Use smoothing**: Laplace or Lidstone methods
-- **pmi_smoothed()**: PMI with numerical stability
-- **Higher α/γ values**: For more aggressive smoothing
+# This is a regular Python comment (not rendered)
 
-## 📖 Further Reading
+import asymcat  # Code is executed and output captured
 
-1. **[MATHEMATICAL_FOUNDATIONS.md](MATHEMATICAL_FOUNDATIONS.md)** - Complete mathematical derivations
-2. **[EXAMPLES_WITH_PLOTS.ipynb](EXAMPLES_WITH_PLOTS.ipynb)** - Interactive examples with visualizations
-3. **Main README** - Quick start and installation guide
-4. **API Documentation** - Auto-generated from docstrings
+#' More markdown after code execution.
+```
 
-## 🤝 Contributing
+## 📊 Data Files
 
-See the main repository for contribution guidelines. Documentation improvements are especially welcome!
+Tutorials use data files from `resources/`:
+- `resources/linguistic_data.tsv` - Phoneme alignment sequences
+- `resources/galapagos_finches.tsv` - Species presence-absence matrix
+- `resources/market_data.tsv` - Customer purchase sequences
+- Additional datasets for specific examples
+
+## 🤝 Contributing to Documentation
+
+When contributing:
+
+1. **User Guide**: Add conceptual explanations, theory, best practices
+2. **API Reference**: Keep synchronized with code (auto-generate if possible)
+3. **LLM Documentation**: Add practical examples and common patterns
+4. **Tutorials**: Ensure reproducibility, add visualizations, explain outputs
+
+All documentation should:
+- Be clear and concise
+- Include working code examples
+- Use consistent terminology
+- Reference other documents for context
+
+## 📄 Additional Resources
+
+- **[Main README](../README.md)**: Project overview and quick start
+- **[CHANGELOG](../CHANGELOG.md)**: Version history and migration guides
+- **[CONTRIBUTING](../CONTRIBUTING.md)**: Contribution guidelines
+- **[GitHub Repository](https://github.com/tresoldi/asymcat)**: Source code and issues
+
+## 🔍 Search Tips
+
+- **Function lookup**: Search API Reference for function names
+- **Concept lookup**: Search User Guide for theoretical concepts
+- **Example lookup**: Search LLM Documentation or tutorials
+- **Error messages**: Check LLM Documentation troubleshooting section
 
 ---
 
-**Mathematical Foundation**: ASymCat implements rigorous statistical and information-theoretic measures with comprehensive numerical stability through freqprob integration.
-
-**Visualization**: All measures can be visualized as heatmaps, networks, and comparative plots for intuitive interpretation.
-
-**Scalability**: Efficient algorithms handle datasets from small examples to large-scale corpus analysis.
+**Need help?** Check the [User Guide](USER_GUIDE.md) for concepts, [API Reference](API_REFERENCE.md) for technical details, or [Tutorial 1](tutorial_1_basics.py) to get started!
