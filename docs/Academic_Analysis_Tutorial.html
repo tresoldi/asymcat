@@ -203,8 +203,8 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">ModuleNotFoundError: No module named &#39;sklearn&#39;
-  at line 23 in code block</pre>
+<pre class="code-output">ASymCat Academic Analysis Tutorial
+========================================</pre>
 </div>
 <h2>1. Theoretical Foundations</h2>
 <h3>1.1 The Problem of Categorical Association</h3>
@@ -262,8 +262,22 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Theil U: U(</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">u_xy</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, U(</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">u_yx</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;CatScorer&#39; is not defined
-  at line 76 in code block</pre>
+<pre class="code-output">Theoretical Demonstration: Asymmetric vs Symmetric
+==================================================
+
+Key Pairs Analysis:
+
+Pair (&#39;A&#39;, &#39;c&#39;):
+  MLE: P(c|A) = 0.800, P(A|c) = 0.667
+  Asymmetry: |0.800 - 0.667| = 0.133
+  PMI: 1.012 (symmetric)
+  Theil U: U(c|A) = 0.000, U(A|c) = 1.000
+
+Pair (&#39;B&#39;, &#39;g&#39;):
+  MLE: P(g|B) = 0.750, P(B|g) = 0.500
+  Asymmetry: |0.750 - 0.500| = 0.250
+  PMI: 1.012 (symmetric)
+  Theil U: U(g|B) = 0.000, U(B|g) = 1.000</pre>
 </div>
 <h2>3. Case Study I: Historical Linguistics</h2>
 <h3>Research Question</h3>
@@ -324,8 +338,29 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  &#39;</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; ↔ /</span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">/: P(phon|graph)=</span><span class="si">{</span><span class="n">xy</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, P(graph|phon)=</span><span class="si">{</span><span class="n">yx</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;asymcat&#39; is not defined
-  at line 120 in code block</pre>
+<pre class="code-output">Case Study I: Historical Linguistics Analysis
+=============================================
+CMU dataset not found. Using synthetic linguistic data for demonstration.
+
+Synthetic Linguistic Correspondences:
+  &#39;b&#39; ↔ //: P(phon|graph)=0.333, P(graph|phon)=0.200
+  &#39;b&#39; ↔ /b/: P(phon|graph)=0.800, P(graph|phon)=0.800
+  &#39;b&#39; ↔ /f/: P(phon|graph)=0.333, P(graph|phon)=0.200
+  &#39;b&#39; ↔ /g/: P(phon|graph)=0.333, P(graph|phon)=0.200
+  &#39;b&#39; ↔ /k/: P(phon|graph)=0.250, P(graph|phon)=0.200
+  &#39;b&#39; ↔ /s/: P(phon|graph)=0.333, P(graph|phon)=0.200
+  &#39;c&#39; ↔ //: P(phon|graph)=0.333, P(graph|phon)=0.200
+  &#39;c&#39; ↔ /b/: P(phon|graph)=0.200, P(graph|phon)=0.200
+  &#39;c&#39; ↔ /f/: P(phon|graph)=0.333, P(graph|phon)=0.200
+  &#39;c&#39; ↔ /g/: P(phon|graph)=0.333, P(graph|phon)=0.200
+  &#39;c&#39; ↔ /k/: P(phon|graph)=0.750, P(graph|phon)=0.600
+  &#39;c&#39; ↔ /s/: P(phon|graph)=0.667, P(graph|phon)=0.400
+  &#39;gh&#39; ↔ //: P(phon|graph)=0.667, P(graph|phon)=0.400
+  &#39;gh&#39; ↔ /b/: P(phon|graph)=0.200, P(graph|phon)=0.200
+  &#39;gh&#39; ↔ /f/: P(phon|graph)=0.667, P(graph|phon)=0.400
+  &#39;gh&#39; ↔ /g/: P(phon|graph)=0.667, P(graph|phon)=0.400
+  &#39;gh&#39; ↔ /k/: P(phon|graph)=0.250, P(graph|phon)=0.200
+  &#39;gh&#39; ↔ /s/: P(phon|graph)=0.333, P(graph|phon)=0.200</pre>
 </div>
 <h2>4. Case Study II: Island Biogeography</h2>
 <h3>Research Question</h3>
@@ -401,8 +436,23 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> ↔ </span><span class="si">{</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">: MLE = </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span><span class="w"> </span><span class="n">yx</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;asymcat&#39; is not defined
-  at line 179 in code block</pre>
+<pre class="code-output">Case Study II: Island Biogeography Analysis
+=============================================
+Galápagos dataset not found. Using synthetic ecological data.
+
+Synthetic Ecological Associations:
+  Species_A ↔ Species_B: MLE = 0.667
+  Species_A ↔ Species_C: MLE = 0.500
+  Species_A ↔ Species_D: MLE = 0.333
+  Species_A ↔ Species_Y: MLE = 0.333
+  Species_B ↔ Species_B: MLE = 0.333
+  Species_B ↔ Species_C: MLE = 0.500
+  Species_B ↔ Species_D: MLE = 0.667
+  Species_B ↔ Species_Y: MLE = 0.333
+  Species_X ↔ Species_B: MLE = 0.333
+  Species_X ↔ Species_C: MLE = 0.333
+  Species_X ↔ Species_D: MLE = 0.333
+  Species_X ↔ Species_Y: MLE = 0.667</pre>
 </div>
 <h2>5. Case Study III: Feature Selection in Classification</h2>
 <h3>Research Question</h3>
@@ -485,8 +535,19 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">class_label</span><span class="si">}</span><span class="s2">: P(</span><span class="si">{</span><span class="n">class_label</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">feature</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">feat_to_class</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;asymcat&#39; is not defined
-  at line 253 in code block</pre>
+<pre class="code-output">Case Study III: Feature Selection in Classification
+==================================================
+Mushroom dataset not found. Using synthetic classification data.
+
+Synthetic Classification Features:
+  red_cap → edible: P(edible|red_cap) = 0.250
+  red_cap → poisonous: P(poisonous|red_cap) = 0.500
+  smooth_cap → edible: P(edible|smooth_cap) = 0.375
+  smooth_cap → poisonous: P(poisonous|smooth_cap) = 0.167
+  spots → edible: P(edible|spots) = 0.125
+  spots → poisonous: P(poisonous|spots) = 0.500
+  white_stem → edible: P(edible|white_stem) = 0.500
+  white_stem → poisonous: P(poisonous|white_stem) = 0.167</pre>
 </div>
 <h2>6. Comparative Methodology</h2>
 
@@ -544,8 +605,29 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • Apply smoothing for sparse data (Laplace/ELE)&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;CatScorer&#39; is not defined
-  at line 329 in code block</pre>
+<pre class="code-output">Comparative Methodology Analysis
+===================================
+
+Measure Comparison on Test Data:
+Pair		MLE(XY)	MLE(YX)	PMI	Theil(XY)	Chi2
+-----------------------------------------------------------------
+(&#39;X1&#39;, &#39;Y1&#39;)	0.667	0.667	0.724	0.101	1.856
+(&#39;X2&#39;, &#39;Y2&#39;)	0.600	0.600	0.894	0.151	1.074
+(&#39;X3&#39;, &#39;Y3&#39;)	0.833	0.833	1.012	1.000	7.103
+
+Measure Properties:
+  MLE: 44.4% of pairs show asymmetry &gt; 0.01
+  PMI: 0.0% of pairs show asymmetry &gt; 0.01
+  Theil_U: 66.7% of pairs show asymmetry &gt; 0.01
+  Chi2: 0.0% of pairs show asymmetry &gt; 0.01
+  Jaccard: 0.0% of pairs show asymmetry &gt; 0.01
+
+Methodological Recommendations:
+  • Use MLE for direct probability interpretation
+  • Use Theil U for information-theoretic analysis
+  • Use PMI/Chi2 for symmetric association strength
+  • Use Fisher&#39;s exact test for small sample validation
+  • Apply smoothing for sparse data (Laplace/ELE)</pre>
 </div>
 <h2>7. Statistical Validation</h2>
 
@@ -647,8 +729,21 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  • Statistical framework supports scientific conclusions&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;CatScorer&#39; is not defined
-  at line 383 in code block</pre>
+<pre class="code-output">Statistical Validation Analysis
+================================
+Bootstrap Validation (95% CI):
+  MLE Asymmetry: 0.0489 [0.0164, 0.1018]
+  Theil U Asymmetry: 0.1406 [0.1038, 0.1865]
+
+Permutation Test Results:
+  Observed asymmetry: 0.0208
+  P-value: 1.000
+  Result: Asymmetric pattern is not significant (α = 0.05)
+
+Validation Summary:
+  • Bootstrap CIs confirm measure stability
+  • Permutation tests validate asymmetric patterns
+  • Statistical framework supports scientific conclusions</pre>
 </div>
 <h2>8. Discussion and Future Directions</h2>
 <h3>Key Findings</h3>

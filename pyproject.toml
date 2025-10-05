@@ -85,6 +85,9 @@ dev = [
     # Performance profiling
     "memory-profiler >= 0.61.0",
     "line-profiler >= 4.0.0",
+
+    # Machine learning (for tutorials)
+    "scikit-learn >= 1.0.0",
 ]
 
 # All features combined
