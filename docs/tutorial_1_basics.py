@@ -203,7 +203,7 @@ print(comparison_df.to_string(index=False))
 #' ASymCat can load aligned sequences from TSV files. Let's use the toy dataset.
 
 # Load sequence data from file
-data = asymcat.read_sequences("../resources/toy.tsv")
+data = asymcat.read_sequences("resources/toy.tsv")
 
 print("\nSequence Data Loaded:")
 print("=" * 50)
@@ -241,7 +241,7 @@ for (x, y), (p_y_x, p_x_y) in sorted_pairs[:5]:
 #' ASymCat can also analyze binary presence-absence matrices, commonly used in ecology.
 
 # Load Galápagos finch data
-pa_data = asymcat.read_pa_matrix("../resources/galapagos.tsv")
+pa_data = asymcat.read_pa_matrix("resources/galapagos.tsv")
 
 print("\nGalápagos Finch Dataset:")
 print("=" * 50)

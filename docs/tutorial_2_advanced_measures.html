@@ -222,7 +222,7 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
 
 <div class="code-block">
 <div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Load data</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;../resources/toy.tsv&quot;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;resources/toy.tsv&quot;</span><span class="p">)</span>
 <span class="n">cooccs</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">collect_cooccs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2"> sequence pairs&quot;</span><span class="p">)</span>
@@ -234,8 +234,9 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scorer ready with Laplace smoothing&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">FileNotFoundError: File not found: ../resources/toy.tsv
-  at line 61 in code block</pre>
+<pre class="code-output">Loaded 2 sequence pairs
+Total co-occurrences: 57
+Scorer ready with Laplace smoothing</pre>
 </div>
 <h2>3. Information-Theoretic Measures</h2>
 <p>These measures quantify the <strong>information content</strong> of associations.</p>
@@ -269,8 +270,20 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): PMI = </span><span class="si">{</span><span class="n">pmi_val</span><span class="si">:</span><span class="s2">6.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;scorer&#39; is not defined
-  at line 87 in code block</pre>
+<pre class="code-output">
+PMI (Pointwise Mutual Information):
+============================================================
+Top 10 strongest associations (highest PMI):
+ 1. (o  , O  ): PMI =  4.043
+ 2. (e  , P  ): PMI =  0.018
+ 3. (e  , B  ): PMI =  0.018
+ 4. (e  , E  ): PMI =  0.018
+ 5. (e  , J  ): PMI =  0.018
+ 6. (p  , P  ): PMI =  0.018
+ 7. (p  , B  ): PMI =  0.018
+ 8. (p  , E  ): PMI =  0.018
+ 9. (p  , J  ): PMI =  0.018
+10. (u  , P  ): PMI =  0.018</pre>
 </div>
 <h3>3.2 NPMI (Normalized PMI)</h3>
 <p>NPMI normalizes PMI to the range [-1, 1] for easier interpretation:</p>
@@ -295,7 +308,7 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): NPMI = </span><span class="si">{</span><span class="n">npmi_val</span><span class="si">:</span><span class="s2">6.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;scorer&#39; is not defined
+<pre class="error">AttributeError: &#39;CatScorer&#39; object has no attribute &#39;npmi&#39;
   at line 110 in code block</pre>
 </div>
 <h3>3.3 Theil's U (Uncertainty Coefficient)</h3>
@@ -324,8 +337,21 @@ uncertainty about Y:</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">→</span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">: U=</span><span class="si">{</span><span class="n">u_y_x</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  |  </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">→</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">: U=</span><span class="si">{</span><span class="n">u_x_y</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  |  Δ=</span><span class="si">{</span><span class="n">asymmetry</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;scorer&#39; is not defined
-  at line 133 in code block</pre>
+<pre class="code-output">
+
+Theil&#39;s U (Uncertainty Coefficient):
+============================================================
+Top 10 predictive relationships (highest U(Y|X)):
+ 1. o  →B  : U=1.000  |  B  →o  : U=0.207  |  Δ=0.793
+ 2. o  →E  : U=1.000  |  E  →o  : U=0.134  |  Δ=0.866
+ 3. o  →J  : U=1.000  |  J  →o  : U=0.300  |  Δ=0.700
+ 4. o  →O  : U=1.000  |  O  →o  : U=1.000  |  Δ=0.000
+ 5. o  →P  : U=1.000  |  P  →o  : U=0.300  |  Δ=0.700
+ 6. u  →B  : U=0.443  |  B  →u  : U=0.354  |  Δ=0.089
+ 7. u  →J  : U=0.408  |  J  →u  : U=0.488  |  Δ=0.080
+ 8. u  →P  : U=0.408  |  P  →u  : U=0.488  |  Δ=0.080
+ 9. u  →E  : U=0.402  |  E  →u  : U=0.188  |  Δ=0.214
+10. u  →O  : U=0.244  |  O  →u  : U=1.000  |  Δ=0.756</pre>
 </div>
 <h2>4. Statistical Measures</h2>
 <p>These measures test statistical significance and independence.</p>
@@ -354,8 +380,21 @@ uncertainty about Y:</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): χ² = </span><span class="si">{</span><span class="n">chi2_val</span><span class="si">:</span><span class="s2">8.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;scorer&#39; is not defined
-  at line 159 in code block</pre>
+<pre class="code-output">
+
+Chi-Square Statistic:
+============================================================
+Top 10 strongest associations (highest χ²):
+ 1. (o  , O  ): χ² =    13.75
+ 2. (u  , P  ): χ² =     0.00
+ 3. (u  , B  ): χ² =     0.00
+ 4. (u  , E  ): χ² =     0.00
+ 5. (u  , O  ): χ² =     0.00
+ 6. (u  , J  ): χ² =     0.00
+ 7. (o  , P  ): χ² =     0.00
+ 8. (o  , B  ): χ² =     0.00
+ 9. (o  , E  ): χ² =     0.00
+10. (o  , J  ): χ² =     0.00</pre>
 </div>
 <h3>4.2 Cramér's V</h3>
 <p>Cramér's V normalizes chi-square to [0, 1] range:</p>
@@ -379,7 +418,7 @@ uncertainty about Y:</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): V = </span><span class="si">{</span><span class="n">v_val</span><span class="si">:</span><span class="s2">6.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;scorer&#39; is not defined
+<pre class="error">AttributeError: &#39;CatScorer&#39; object has no attribute &#39;cramer_v&#39;
   at line 180 in code block</pre>
 </div>
 <h3>4.3 Fisher Exact Test</h3>
@@ -400,8 +439,21 @@ uncertainty about Y:</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): OR(Y|X) = </span><span class="si">{</span><span class="n">or_xy</span><span class="si">:</span><span class="s2">8.2f</span><span class="si">}</span><span class="s2">, OR(X|Y) = </span><span class="si">{</span><span class="n">or_yx</span><span class="si">:</span><span class="s2">8.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;scorer&#39; is not defined
-  at line 198 in code block</pre>
+<pre class="code-output">
+
+Fisher Exact Test (Odds Ratios):
+============================================================
+Top 10 strongest associations:
+ 1. (o  , O  ): OR(Y|X) =      inf, OR(X|Y) =      inf
+ 2. (e  , E  ): OR(Y|X) =     1.06, OR(X|Y) =     1.06
+ 3. (p  , E  ): OR(Y|X) =     1.06, OR(X|Y) =     1.06
+ 4. (u  , E  ): OR(Y|X) =     1.04, OR(X|Y) =     1.04
+ 5. (e  , B  ): OR(Y|X) =     1.04, OR(X|Y) =     1.04
+ 6. (p  , B  ): OR(Y|X) =     1.04, OR(X|Y) =     1.04
+ 7. (e  , P  ): OR(Y|X) =     1.04, OR(X|Y) =     1.04
+ 8. (e  , J  ): OR(Y|X) =     1.04, OR(X|Y) =     1.04
+ 9. (p  , P  ): OR(Y|X) =     1.04, OR(X|Y) =     1.04
+10. (p  , J  ): OR(Y|X) =     1.04, OR(X|Y) =     1.04</pre>
 </div>
 <h2>5. Comparing Measures</h2>
 <p>Different measures reveal different aspects of associations. Let's compare them.</p>
@@ -444,7 +496,7 @@ uncertainty about Y:</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">comparison_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;cooccs&#39; is not defined
+<pre class="error">AttributeError: &#39;CatScorer&#39; object has no attribute &#39;npmi&#39;
   at line 214 in code block</pre>
 </div>
 <h3>Correlation Between Measures</h3>
@@ -681,8 +733,21 @@ MEASURE SELECTION DECISION TREE
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): Combined=</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  [MLE=</span><span class="si">{</span><span class="n">mle_val</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, PMI=</span><span class="si">{</span><span class="n">pmi_val</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;scorer&#39; is not defined
-  at line 388 in code block</pre>
+<pre class="code-output">
+
+Combined Score (MLE × PMI):
+============================================================
+Top 10 pairs balancing predictiveness and informativeness:
+ 1. (o  , O  ): Combined=1.642  [MLE=0.667, PMI=4.043]
+ 2. (e  , J  ): Combined=0.089  [MLE=0.444, PMI=0.018]
+ 3. (e  , P  ): Combined=0.089  [MLE=0.444, PMI=0.018]
+ 4. (p  , J  ): Combined=0.089  [MLE=0.444, PMI=0.018]
+ 5. (p  , P  ): Combined=0.089  [MLE=0.444, PMI=0.018]
+ 6. (e  , B  ): Combined=0.088  [MLE=0.438, PMI=0.018]
+ 7. (p  , B  ): Combined=0.088  [MLE=0.438, PMI=0.018]
+ 8. (e  , E  ): Combined=0.088  [MLE=0.433, PMI=0.018]
+ 9. (p  , E  ): Combined=0.088  [MLE=0.433, PMI=0.018]
+10. (u  , J  ): Combined=0.063  [MLE=0.222, PMI=0.018]</pre>
 </div>
 <h2>9. Key Takeaways</h2>
 <p><strong>You've learned:</strong></p>

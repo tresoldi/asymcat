@@ -60,7 +60,7 @@ print("=" * 50)
 #' We'll use the toy linguistic data for demonstrations.
 
 # Load data
-data = asymcat.read_sequences("../resources/toy.tsv")
+data = asymcat.read_sequences("resources/toy.tsv")
 cooccs = asymcat.collect_cooccs(data)
 
 print(f"Loaded {len(data)} sequence pairs")

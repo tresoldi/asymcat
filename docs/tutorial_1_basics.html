@@ -474,7 +474,7 @@ consistency, but both values are identical.</p>
 
 <div class="code-block">
 <div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Load sequence data from file</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;../resources/toy.tsv&quot;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;resources/toy.tsv&quot;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sequence Data Loaded:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
@@ -487,8 +487,18 @@ consistency, but both values are identical.</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sequence 2: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">FileNotFoundError: File not found: ../resources/toy.tsv
-  at line 204 in code block</pre>
+<pre class="code-output">
+Sequence Data Loaded:
+==================================================
+Number of sequence pairs: 2
+
+Pair 1:
+  Sequence 1: p e p e p e u
+  Sequence 2: B J E B E P E E
+
+Pair 2:
+  Sequence 1: o
+  Sequence 2: O</pre>
 </div>
 <h3>Collecting Co-occurrences</h3>
 <p>From aligned sequences, we extract co-occurrences at each position.</p>
@@ -512,15 +522,34 @@ consistency, but both values are identical.</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">: P(</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">p_y_x</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">NameError: name &#39;data&#39; is not defined
-  at line 221 in code block</pre>
+<pre class="code-output">
+Total co-occurrences collected: 57
+
+Sample co-occurrences:
+  1. (p, B)
+  2. (p, J)
+  3. (p, E)
+  4. (p, B)
+  5. (p, E)
+  6. (p, P)
+  7. (p, E)
+  8. (p, E)
+  9. (e, B)
+  10. (e, J)
+
+Top 5 strongest associations (by P(Y|X)):
+  o → O: P(O|o) = 0.667
+  e → J: P(J|e) = 0.444
+  e → P: P(P|e) = 0.444
+  p → J: P(J|p) = 0.444
+  p → P: P(P|p) = 0.444</pre>
 </div>
 <h2>6. Working with Presence-Absence Data</h2>
 <p>ASymCat can also analyze binary presence-absence matrices, commonly used in ecology.</p>
 
 <div class="code-block">
 <div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Load Galápagos finch data</span>
-<span class="n">pa_data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_pa_matrix</span><span class="p">(</span><span class="s2">&quot;../resources/galapagos.tsv&quot;</span><span class="p">)</span>
+<span class="n">pa_data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_pa_matrix</span><span class="p">(</span><span class="s2">&quot;resources/galapagos.tsv&quot;</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Galápagos Finch Dataset:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
@@ -541,8 +570,22 @@ consistency, but both values are identical.</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sp1_short</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">sp2_short</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2">: P = </span><span class="si">{</span><span class="n">p_sp2_sp1</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<pre class="error">FileNotFoundError: File not found: ../resources/galapagos.tsv
-  at line 242 in code block</pre>
+<pre class="code-output">
+Galápagos Finch Dataset:
+==================================================
+Co-occurrence pairs: 447
+
+Top 10 species associations (by P(Species2|Species1)):
+ 1. heliobates           → pallida             : P = 0.750
+ 2. olivacea             → conirostris         : P = 0.750
+ 3. pallida              → parvulus            : P = 0.700
+ 4. parvulus             → pauper              : P = 0.667
+ 5. parvulus             → psittacula          : P = 0.526
+ 6. parvulus             → olivacea            : P = 0.355
+ 7. psittacula           → olivacea            : P = 0.355
+ 8. heliobates           → pauper              : P = 0.333
+ 9. pallida              → pauper              : P = 0.333
+10. pauper               → pauper              : P = 0.333</pre>
 </div>
 <h2>7. Understanding Smoothing</h2>
 <p><strong>Smoothing</strong> handles sparse data by adding pseudo-counts. Let's see the effect.</p>

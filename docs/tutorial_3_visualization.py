@@ -39,7 +39,7 @@ print("=" * 50)
 #' between all pairs of categorical values.
 
 # Load sample data
-data = asymcat.read_sequences("../resources/cmudict.sample100.tsv")
+data = asymcat.read_sequences("resources/cmudict.sample100.tsv")
 cooccs = asymcat.collect_cooccs(data)
 
 print(f"Loaded {len(data)} sequence pairs")

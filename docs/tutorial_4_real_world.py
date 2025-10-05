@@ -62,7 +62,7 @@ print("="*60)
 #' ### Step 1: Data Preparation
 
 # Load CMU dictionary data
-data = asymcat.read_sequences("../resources/cmudict.sample1000.tsv")
+data = asymcat.read_sequences("resources/cmudict.sample1000.tsv")
 cooccs = asymcat.collect_cooccs(data)
 
 print(f"\nDataset: CMU Pronunciation Dictionary (sample)")
@@ -233,13 +233,13 @@ print("="*60)
 #' ### Data Preparation
 
 # Load Galápagos finch presence-absence data
-pa_data = asymcat.read_pa_matrix("../resources/galapagos.tsv")
+pa_data = asymcat.read_pa_matrix("resources/galapagos.tsv")
 
 print(f"\nDataset: Galápagos Finch Species")
 print(f"  Co-occurrence pairs: {len(pa_data)}")
 
 # Load original matrix for analysis
-galapagos_df = pd.read_csv("../resources/galapagos.tsv", sep='\t', index_col=0)
+galapagos_df = pd.read_csv("resources/galapagos.tsv", sep='\t', index_col=0)
 
 print(f"  Islands: {galapagos_df.shape[0]}")
 print(f"  Species: {galapagos_df.shape[1]}")
@@ -399,7 +399,7 @@ print("="*60)
 #' ### Data Preparation
 
 # Load mushroom dataset (categorical features predicting edibility)
-mushroom_data = asymcat.read_pa_matrix("../resources/mushroom-small.tsv")
+mushroom_data = asymcat.read_pa_matrix("resources/mushroom-small.tsv")
 
 print(f"\nDataset: Mushroom Classification")
 print(f"  Feature-class co-occurrences: {len(mushroom_data)}")
