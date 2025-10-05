@@ -133,7 +133,7 @@ plt.show()
 #' 3. What are the **ecological implications** of these patterns?
 
 # Load Galápagos finch data
-galapagos_data = asymcat.read_pa_matrix("../resources/galapagos.tsv")
+galapagos_data = asymcat.read_pa_matrix("resources/galapagos.tsv")
 galapagos_cooccs = asymcat.collect_cooccs(galapagos_data)
 
 print(f"Galápagos Dataset: {len(galapagos_cooccs)} co-occurrences")
@@ -152,7 +152,7 @@ measures = {
 }
 
 # Display raw data structure
-df = pd.read_csv("../resources/galapagos.tsv", sep='\t', index_col=0)
+df = pd.read_csv("resources/galapagos.tsv", sep='\t', index_col=0)
 print(f"\nData shape: {df.shape} (islands × species)")
 print(f"Species: {list(df.columns)[:5]}...")  # Show first 5 species
 print(f"Islands: {list(df.index)[:5]}...")   # Show first 5 islands
@@ -275,7 +275,7 @@ jaccard_matrix, _ = create_association_heatmap(measures['Jaccard'],
 #' - **Asymmetric Relationships**: Orthography may predict phonetics better than vice versa
 
 # Load CMU dictionary data
-cmu_data = asymcat.read_sequences("../resources/cmudict.sample1000.tsv")
+cmu_data = asymcat.read_sequences("resources/cmudict.sample1000.tsv")
 cmu_cooccs = asymcat.collect_cooccs(cmu_data)
 
 print(f"CMU Dictionary Sample: {len(cmu_data)} words")
@@ -419,7 +419,7 @@ plot_correspondence_strength(ortho_phon_mle, 'Orthography → Phoneme Correspond
 #' The mushroom dataset demonstrates **classification analysis** where we examine how morphological features predict edibility.
 
 # Load mushroom data
-mushroom_data = asymcat.read_sequences("../resources/mushrooms.tsv")
+mushroom_data = asymcat.read_sequences("resources/mushrooms.tsv")
 mushroom_cooccs = asymcat.collect_cooccs(mushroom_data)
 
 print(f"Mushroom Dataset: {len(mushroom_data)} samples")
