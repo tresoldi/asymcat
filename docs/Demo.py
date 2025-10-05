@@ -81,7 +81,7 @@ def plot_scorer(scorer, alpha_x, alpha_y, title=None, font_scale=2, figsize=(25,
 #'
 #' And now with a sample of CMU
 
-data = asymcat.read_sequences("../resources/cmudict.sample100.tsv")
+data = asymcat.read_sequences("resources/cmudict.sample100.tsv")
 my_cooccs = asymcat.collect_cooccs(data)
 
 # README example - simple synthetic data

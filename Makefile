@@ -125,7 +125,7 @@ docs: ## Generate HTML documentation from Nhandu tutorial sources
 	@echo "🔄 Generating tutorial documentation..."
 	@for f in docs/Simple_Examples.py docs/Demo.py docs/Academic_Analysis_Tutorial.py docs/EXAMPLES_WITH_PLOTS.py; do \
 		echo "  Generating $$(basename $$f .py).html..."; \
-		$(PYTHON) -m nhandu "$$f" --format html -o "docs/$$(basename $$f .py).html"; \
+		$(PYTHON) -m nhandu "$$f" --format html --working-dir . -o "docs/$$(basename $$f .py).html"; \
 	done
 	@echo "✅ Documentation generated in docs/"
 
