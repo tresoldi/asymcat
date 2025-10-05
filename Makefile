@@ -123,7 +123,7 @@ clean: ## Remove build artifacts, caches, and coverage reports
 # Documentation
 docs: ## Generate HTML documentation from Nhandu tutorial sources
 	@echo "🔄 Generating tutorial documentation..."
-	@for f in docs/Simple_Examples.py docs/Demo.py docs/Academic_Analysis_Tutorial.py docs/EXAMPLES_WITH_PLOTS.py; do \
+	@for f in docs/tutorial_1_basics.py docs/tutorial_2_advanced_measures.py docs/tutorial_3_visualization.py docs/tutorial_4_real_world.py; do \
 		echo "  Generating $$(basename $$f .py).html..."; \
 		$(PYTHON) -m nhandu "$$f" --format html --working-dir . -o "docs/$$(basename $$f .py).html"; \
 	done
@@ -131,7 +131,7 @@ docs: ## Generate HTML documentation from Nhandu tutorial sources
 
 docs-clean: ## Remove generated HTML documentation
 	@echo "🧹 Cleaning generated documentation..."
-	rm -f docs/Simple_Examples.html docs/Demo.html docs/Academic_Analysis_Tutorial.html docs/EXAMPLES_WITH_PLOTS.html
+	rm -f docs/tutorial_1_basics.html docs/tutorial_2_advanced_measures.html docs/tutorial_3_visualization.html docs/tutorial_4_real_world.html
 	rm -rf docs/_build/ docs/build/
 	@echo "✅ Documentation cleaned!"
 

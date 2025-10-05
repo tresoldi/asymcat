@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>Nhandu Report</title>
+<style>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            color: #333;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .code-block {
+            margin: 1.5rem 0;
+        }
+        .code-input {
+            padding: 1rem;
+            border-radius: 4px 4px 0 0;
+            margin: 0;
+        }
+        .code-input pre {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        .code-output {
+            background: #f8f8f8;
+            border: 1px solid #e1e4e8;
+            border-top: none;
+            padding: 1rem;
+            border-radius: 0 0 4px 4px;
+            margin: 0;
+        }
+        .error {
+            color: #d73a49;
+            background: #ffeef0;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ffdce0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Pygments syntax highlighting */
+        pre { line-height: 125%; }
+td.linenos .normal { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #6e7681 }
+.highlight { background: #0d1117; color: #E6EDF3 }
+.highlight .c { color: #8B949E; font-style: italic } /* Comment */
+.highlight .err { color: #F85149 } /* Error */
+.highlight .esc { color: #E6EDF3 } /* Escape */
+.highlight .g { color: #E6EDF3 } /* Generic */
+.highlight .k { color: #FF7B72 } /* Keyword */
+.highlight .l { color: #A5D6FF } /* Literal */
+.highlight .n { color: #E6EDF3 } /* Name */
+.highlight .o { color: #FF7B72; font-weight: bold } /* Operator */
+.highlight .x { color: #E6EDF3 } /* Other */
+.highlight .p { color: #E6EDF3 } /* Punctuation */
+.highlight .ch { color: #8B949E; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #8B949E; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: #8B949E; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #8B949E; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #FFA198; background-color: #490202 } /* Generic.Deleted */
+.highlight .ge { color: #E6EDF3; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #E6EDF3; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #FFA198 } /* Generic.Error */
+.highlight .gh { color: #79C0FF; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #56D364; background-color: #0F5323 } /* Generic.Inserted */
+.highlight .go { color: #8B949E } /* Generic.Output */
+.highlight .gp { color: #8B949E } /* Generic.Prompt */
+.highlight .gs { color: #E6EDF3; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #79C0FF } /* Generic.Subheading */
+.highlight .gt { color: #FF7B72 } /* Generic.Traceback */
+.highlight .g-Underline { color: #E6EDF3; text-decoration: underline } /* Generic.Underline */
+.highlight .kc { color: #79C0FF } /* Keyword.Constant */
+.highlight .kd { color: #FF7B72 } /* Keyword.Declaration */
+.highlight .kn { color: #FF7B72 } /* Keyword.Namespace */
+.highlight .kp { color: #79C0FF } /* Keyword.Pseudo */
+.highlight .kr { color: #FF7B72 } /* Keyword.Reserved */
+.highlight .kt { color: #FF7B72 } /* Keyword.Type */
+.highlight .ld { color: #79C0FF } /* Literal.Date */
+.highlight .m { color: #A5D6FF } /* Literal.Number */
+.highlight .s { color: #A5D6FF } /* Literal.String */
+.highlight .na { color: #E6EDF3 } /* Name.Attribute */
+.highlight .nb { color: #E6EDF3 } /* Name.Builtin */
+.highlight .nc { color: #F0883E; font-weight: bold } /* Name.Class */
+.highlight .no { color: #79C0FF; font-weight: bold } /* Name.Constant */
+.highlight .nd { color: #D2A8FF; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #FFA657 } /* Name.Entity */
+.highlight .ne { color: #F0883E; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #D2A8FF; font-weight: bold } /* Name.Function */
+.highlight .nl { color: #79C0FF; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #FF7B72 } /* Name.Namespace */
+.highlight .nx { color: #E6EDF3 } /* Name.Other */
+.highlight .py { color: #79C0FF } /* Name.Property */
+.highlight .nt { color: #7EE787 } /* Name.Tag */
+.highlight .nv { color: #79C0FF } /* Name.Variable */
+.highlight .ow { color: #FF7B72; font-weight: bold } /* Operator.Word */
+.highlight .pm { color: #E6EDF3 } /* Punctuation.Marker */
+.highlight .w { color: #6E7681 } /* Text.Whitespace */
+.highlight .mb { color: #A5D6FF } /* Literal.Number.Bin */
+.highlight .mf { color: #A5D6FF } /* Literal.Number.Float */
+.highlight .mh { color: #A5D6FF } /* Literal.Number.Hex */
+.highlight .mi { color: #A5D6FF } /* Literal.Number.Integer */
+.highlight .mo { color: #A5D6FF } /* Literal.Number.Oct */
+.highlight .sa { color: #79C0FF } /* Literal.String.Affix */
+.highlight .sb { color: #A5D6FF } /* Literal.String.Backtick */
+.highlight .sc { color: #A5D6FF } /* Literal.String.Char */
+.highlight .dl { color: #79C0FF } /* Literal.String.Delimiter */
+.highlight .sd { color: #A5D6FF } /* Literal.String.Doc */
+.highlight .s2 { color: #A5D6FF } /* Literal.String.Double */
+.highlight .se { color: #79C0FF } /* Literal.String.Escape */
+.highlight .sh { color: #79C0FF } /* Literal.String.Heredoc */
+.highlight .si { color: #A5D6FF } /* Literal.String.Interpol */
+.highlight .sx { color: #A5D6FF } /* Literal.String.Other */
+.highlight .sr { color: #79C0FF } /* Literal.String.Regex */
+.highlight .s1 { color: #A5D6FF } /* Literal.String.Single */
+.highlight .ss { color: #A5D6FF } /* Literal.String.Symbol */
+.highlight .bp { color: #E6EDF3 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #D2A8FF; font-weight: bold } /* Name.Function.Magic */
+.highlight .vc { color: #79C0FF } /* Name.Variable.Class */
+.highlight .vg { color: #79C0FF } /* Name.Variable.Global */
+.highlight .vi { color: #79C0FF } /* Name.Variable.Instance */
+.highlight .vm { color: #79C0FF } /* Name.Variable.Magic */
+.highlight .il { color: #A5D6FF } /* Literal.Number.Integer.Long */
+        
+</style>
+</head>
+<body>
+<h1>Tutorial 4: Real-World Applications</h1>
+<p><strong>Apply ASymCat to real-world problems</strong> across multiple domains.</p>
+<h2>What You'll Learn</h2>
+<ol>
+<li>Complete analysis workflows from data to insights</li>
+<li>Linguistics: Grapheme-phoneme correspondence analysis</li>
+<li>Ecology: Species co-occurrence patterns</li>
+<li>Machine learning: Feature selection with asymmetric measures</li>
+<li>Interpretation best practices</li>
+<li>Reporting and communication strategies</li>
+</ol>
+<h2>Prerequisites</h2>
+<p>Complete Tutorials 1-3 to understand measures, smoothing, and visualization.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Import required libraries</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asymcat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">asymcat.scorer</span><span class="w"> </span><span class="kn">import</span> <span class="n">CatScorer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">asymcat</span><span class="w"> </span><span class="kn">import</span> <span class="n">scorer</span> <span class="k">as</span> <span class="n">scorer_utils</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="c1"># Set up plotting</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_palette</span><span class="p">(</span><span class="s2">&quot;husl&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ASymCat Real-World Applications Tutorial&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">ASymCat Real-World Applications Tutorial
+==================================================</pre>
+</div>
+<h2>1. Application Framework</h2>
+<p>A complete ASymCat analysis follows these steps:</p>
+<ol>
+<li><strong>Data Preparation</strong>: Load and validate data</li>
+<li><strong>Exploratory Analysis</strong>: Understand basic patterns</li>
+<li><strong>Measure Selection</strong>: Choose appropriate measures</li>
+<li><strong>Computation</strong>: Calculate associations</li>
+<li><strong>Interpretation</strong>: Extract insights</li>
+<li><strong>Visualization</strong>: Communicate results</li>
+<li><strong>Validation</strong>: Check robustness</li>
+</ol>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>2. Case Study 1: Linguistics - Grapheme-Phoneme Correspondence</h2>
+<h3>Research Question</h3>
+<p><strong>How predictable are English phonemes from orthography?</strong></p>
+<p>This question is fundamental to understanding:</p>
+<ul>
+<li>Reading acquisition and literacy</li>
+<li>Historical language change</li>
+<li>Orthographic depth theory</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CASE STUDY 1: LINGUISTIC ANALYSIS&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+============================================================
+CASE STUDY 1: LINGUISTIC ANALYSIS
+============================================================</pre>
+</div>
+<h3>Step 1: Data Preparation</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Load CMU dictionary data</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;../resources/cmudict.sample1000.tsv&quot;</span><span class="p">)</span>
+<span class="n">cooccs</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">collect_cooccs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Dataset: CMU Pronunciation Dictionary (sample)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sequence pairs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Co-occurrence pairs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cooccs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Show sample alignments</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sample grapheme-phoneme alignments:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">ortho</span><span class="p">,</span> <span class="n">phon</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  &#39;</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ortho</span><span class="p">)</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2">&#39; → /</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">phon</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">FileNotFoundError: File not found: ../resources/cmudict.sample1000.tsv
+  at line 63 in code block</pre>
+</div>
+<h3>Step 2: Exploratory Analysis</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Analyze frequency distributions</span>
+<span class="n">graphemes</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+<span class="n">phonemes</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+<span class="n">grapheme_counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">graphemes</span><span class="p">)</span>
+<span class="n">phoneme_counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">phonemes</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Frequency Statistics:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Unique graphemes: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">grapheme_counts</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Unique phonemes: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">phoneme_counts</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Most common graphemes: </span><span class="si">{</span><span class="n">grapheme_counts</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Most common phonemes: </span><span class="si">{</span><span class="n">phoneme_counts</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Check data sparsity</span>
+<span class="n">total_possible</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">grapheme_counts</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">phoneme_counts</span><span class="p">)</span>
+<span class="n">observed_pairs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">cooccs</span><span class="p">))</span>
+<span class="n">sparsity</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">observed_pairs</span> <span class="o">/</span> <span class="n">total_possible</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Data Sparsity:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Possible grapheme-phoneme pairs: </span><span class="si">{</span><span class="n">total_possible</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Observed pairs: </span><span class="si">{</span><span class="n">observed_pairs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sparsity: </span><span class="si">{</span><span class="n">sparsity</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → Smoothing recommended!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;data&#39; is not defined
+  at line 79 in code block</pre>
+</div>
+<h3>Step 3: Measure Selection</h3>
+<p>For linguistic correspondence:</p>
+<ul>
+<li><strong>MLE</strong>: Direct predictability P(phoneme|grapheme)</li>
+<li><strong>Theil's U</strong>: Information-theoretic uncertainty reduction</li>
+<li><strong>Tresoldi</strong>: Custom measure for sequence alignment</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Create scorer with Laplace smoothing</span>
+<span class="n">scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">cooccs</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">,</span> <span class="n">smoothing_alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;cooccs&#39; is not defined
+  at line 110 in code block</pre>
+</div>
+<h3>Step 4: Computation</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Compute measures</span>
+<span class="n">mle_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+<span class="n">theil_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">theil_u</span><span class="p">()</span>
+<span class="n">tresoldi_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">tresoldi</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Computed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">mle_scores</span><span class="p">)</span><span class="si">}</span><span class="s2"> association scores&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;scorer&#39; is not defined
+  at line 115 in code block</pre>
+</div>
+<h3>Step 5: Interpretation</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Analyze orthography → phonology prediction strength</span>
+<span class="n">ortho_to_phon</span> <span class="o">=</span> <span class="p">[</span><span class="n">xy</span> <span class="k">for</span> <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="ow">in</span> <span class="n">mle_scores</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+<span class="n">phon_to_ortho</span> <span class="o">=</span> <span class="p">[</span><span class="n">yx</span> <span class="k">for</span> <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="ow">in</span> <span class="n">mle_scores</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Directional Prediction Analysis:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Mean P(phoneme|grapheme): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ortho_to_phon</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Mean P(grapheme|phoneme): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">phon_to_ortho</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Asymmetry ratio: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ortho_to_phon</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">phon_to_ortho</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">x&quot;</span><span class="p">)</span>
+
+<span class="c1"># Find most predictable graphemes</span>
+<span class="n">grapheme_predictability</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="p">(</span><span class="n">p_phon_graph</span><span class="p">,</span> <span class="n">p_graph_phon</span><span class="p">)</span> <span class="ow">in</span> <span class="n">mle_scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">g</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">grapheme_predictability</span><span class="p">:</span>
+        <span class="n">grapheme_predictability</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">grapheme_predictability</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_phon_graph</span><span class="p">)</span>
+
+<span class="n">avg_predictability</span> <span class="o">=</span> <span class="p">{</span><span class="n">g</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">scores</span> <span class="ow">in</span> <span class="n">grapheme_predictability</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">sorted_graphemes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">avg_predictability</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Most predictable graphemes (highest avg P(phoneme|grapheme)):&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">grapheme</span><span class="p">,</span> <span class="n">avg_p</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_graphemes</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. &#39;</span><span class="si">{</span><span class="n">grapheme</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">avg_p</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Least predictable graphemes (lowest avg P(phoneme|grapheme)):&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">grapheme</span><span class="p">,</span> <span class="n">avg_p</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_graphemes</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. &#39;</span><span class="si">{</span><span class="n">grapheme</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">avg_p</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;mle_scores&#39; is not defined
+  at line 124 in code block</pre>
+</div>
+<h3>Step 6: Visualization</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Create comprehensive visualization</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Subplot 1: Directional comparison</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">asymmetries</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">xy</span> <span class="o">-</span> <span class="n">yx</span><span class="p">)</span> <span class="k">for</span> <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="ow">in</span> <span class="n">mle_scores</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">asymmetries</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;|P(phoneme|grapheme) - P(grapheme|phoneme)|&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;(A) Asymmetry Distribution&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">asymmetries</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Mean: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">asymmetries</span><span class="p">)</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Subplot 2: Scatter plot</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ortho_to_phon</span><span class="p">,</span> <span class="n">phon_to_ortho</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;coral&#39;</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;k--&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;y=x&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;P(phoneme|grapheme)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;P(grapheme|phoneme)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;(B) Directional Comparison&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Subplot 3: Top associations heatmap</span>
+<span class="n">ax3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">top_pairs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mle_scores</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">20</span><span class="p">]</span>
+<span class="n">pair_labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">g</span><span class="si">}</span><span class="s2">→</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">top_pairs</span><span class="p">]</span>
+<span class="n">xy_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">scores</span> <span class="ow">in</span> <span class="n">top_pairs</span><span class="p">]</span>
+<span class="n">yx_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">scores</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">scores</span> <span class="ow">in</span> <span class="n">top_pairs</span><span class="p">]</span>
+
+<span class="n">y_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pair_labels</span><span class="p">))</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">y_pos</span> <span class="o">-</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">xy_vals</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;grapheme→phoneme&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">y_pos</span> <span class="o">+</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">yx_vals</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;phoneme→grapheme&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;coral&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">y_pos</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">pair_labels</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Conditional Probability&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;(C) Top 20 Strongest Associations&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+
+<span class="c1"># Subplot 4: Measure correlation</span>
+<span class="n">ax4</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">theil_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">u_xy</span> <span class="k">for</span> <span class="n">u_xy</span><span class="p">,</span> <span class="n">u_yx</span> <span class="ow">in</span> <span class="n">theil_scores</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">ortho_to_phon</span><span class="p">,</span> <span class="n">theil_vals</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;MLE: P(phoneme|grapheme)&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Theil&#39;s U: U(phoneme|grapheme)&quot;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;(D) MLE vs. Theil U Correlation&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">ortho_to_phon</span><span class="p">,</span> <span class="n">theil_vals</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;r = </span><span class="si">{</span><span class="n">corr</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax4</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+         <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;wheat&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Grapheme-Phoneme Correspondence Analysis (English)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;mle_scores&#39; is not defined
+  at line 153 in code block</pre>
+</div>
+<h3>Step 7: Key Findings</h3>
+<p><strong>Linguistic Insights:</strong></p>
+<ol>
+<li>English orthography <strong>moderately predicts</strong> phonology (mean P ≈ 0.5-0.7)</li>
+<li>Graphemes like 'b', 't', 'd' have <strong>high predictability</strong> (consistent sounds)</li>
+<li>Graphemes like 'c', 'g', 'o' have <strong>low predictability</strong> (multiple pronunciations)</li>
+<li><strong>Asymmetry is high</strong>: knowing the letter tells you more about the sound
+than vice versa</li>
+<li>This supports <strong>orthographic depth theory</strong>: English is a &quot;deep&quot; orthography</li>
+</ol>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>3. Case Study 2: Ecology - Species Co-occurrence Patterns</h2>
+<h3>Research Question</h3>
+<p><strong>What are the asymmetric ecological dependencies among Galápagos finches?</strong></p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CASE STUDY 2: ECOLOGICAL ANALYSIS&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+============================================================
+CASE STUDY 2: ECOLOGICAL ANALYSIS
+============================================================</pre>
+</div>
+<h3>Data Preparation</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Load Galápagos finch presence-absence data</span>
+<span class="n">pa_data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_pa_matrix</span><span class="p">(</span><span class="s2">&quot;../resources/galapagos.tsv&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Dataset: Galápagos Finch Species&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Co-occurrence pairs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pa_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Load original matrix for analysis</span>
+<span class="n">galapagos_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../resources/galapagos.tsv&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Islands: </span><span class="si">{</span><span class="n">galapagos_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Species: </span><span class="si">{</span><span class="n">galapagos_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Show matrix structure</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sample of presence-absence matrix:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">galapagos_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
+</pre></div>
+</div>
+<pre class="error">FileNotFoundError: File not found: ../resources/galapagos.tsv
+  at line 234 in code block</pre>
+</div>
+<h3>Exploratory Analysis</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Species prevalence</span>
+<span class="n">species_prevalence</span> <span class="o">=</span> <span class="n">galapagos_df</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">island_richness</span> <span class="o">=</span> <span class="n">galapagos_df</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Ecological Patterns:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Most widespread species:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">sp</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">species_prevalence</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">sp_short</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">sp</span> <span class="k">else</span> <span class="n">sp</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">sp_short</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">count</span><span class="p">)</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">galapagos_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> islands&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  Most species-rich islands:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">island</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">island_richness</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">island</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">count</span><span class="p">)</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">galapagos_df</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> species&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;galapagos_df&#39; is not defined
+  at line 252 in code block</pre>
+</div>
+<h3>Measure Selection</h3>
+<p>For ecological co-occurrence:</p>
+<ul>
+<li><strong>MLE</strong>: P(Species2|Species1) - co-occurrence probability</li>
+<li><strong>Fisher</strong>: Exact odds ratios for small samples</li>
+<li><strong>Jaccard</strong>: Habitat overlap similarity</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Create scorer</span>
+<span class="n">eco_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">pa_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+
+<span class="c1"># Compute measures</span>
+<span class="n">eco_mle</span> <span class="o">=</span> <span class="n">eco_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+<span class="n">eco_fisher</span> <span class="o">=</span> <span class="n">eco_scorer</span><span class="o">.</span><span class="n">fisher</span><span class="p">()</span>
+<span class="n">eco_jaccard</span> <span class="o">=</span> <span class="n">eco_scorer</span><span class="o">.</span><span class="n">jaccard_index</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Computed </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">eco_mle</span><span class="p">)</span><span class="si">}</span><span class="s2"> species pair associations&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;pa_data&#39; is not defined
+  at line 273 in code block</pre>
+</div>
+<h3>Interpretation</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Find strongest associations</span>
+<span class="n">strong_assoc</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pair</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">))</span> <span class="k">for</span> <span class="n">pair</span><span class="p">,</span> <span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">)</span> <span class="ow">in</span> <span class="n">eco_mle</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">]</span>
+<span class="n">strong_assoc</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Strongest Species Associations (MLE &gt; 0.8):&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">sp1</span><span class="p">,</span> <span class="n">sp2</span><span class="p">),</span> <span class="n">strength</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">strong_assoc</span><span class="p">[:</span><span class="mi">15</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">sp1_short</span> <span class="o">=</span> <span class="n">sp1</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">sp1</span> <span class="k">else</span> <span class="n">sp1</span><span class="p">[:</span><span class="mi">15</span><span class="p">]</span>
+    <span class="n">sp2_short</span> <span class="o">=</span> <span class="n">sp2</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">sp2</span> <span class="k">else</span> <span class="n">sp2</span><span class="p">[:</span><span class="mi">15</span><span class="p">]</span>
+    <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="o">=</span> <span class="n">eco_mle</span><span class="p">[(</span><span class="n">sp1</span><span class="p">,</span> <span class="n">sp2</span><span class="p">)]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sp1_short</span><span class="si">:</span><span class="s2">15s</span><span class="si">}</span><span class="s2"> ↔ </span><span class="si">{</span><span class="n">sp2_short</span><span class="si">:</span><span class="s2">15s</span><span class="si">}</span><span class="s2">: max=</span><span class="si">{</span><span class="n">strength</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  [P(2|1)=</span><span class="si">{</span><span class="n">xy</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, P(1|2)=</span><span class="si">{</span><span class="n">yx</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+<span class="c1"># Asymmetry analysis</span>
+<span class="n">eco_asymmetries</span> <span class="o">=</span> <span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">xy</span> <span class="o">-</span> <span class="n">yx</span><span class="p">)</span> <span class="k">for</span> <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="ow">in</span> <span class="n">eco_mle</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+<span class="n">high_asymmetry</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pair</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">xy</span> <span class="o">-</span> <span class="n">yx</span><span class="p">))</span> <span class="k">for</span> <span class="n">pair</span><span class="p">,</span> <span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">)</span> <span class="ow">in</span> <span class="n">eco_mle</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">xy</span> <span class="o">-</span> <span class="n">yx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.3</span><span class="p">]</span>
+<span class="n">high_asymmetry</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Highly Asymmetric Associations (|P(2|1) - P(1|2)| &gt; 0.3):&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">sp1</span><span class="p">,</span> <span class="n">sp2</span><span class="p">),</span> <span class="n">asym</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">high_asymmetry</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">sp1_short</span> <span class="o">=</span> <span class="n">sp1</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">sp1</span> <span class="k">else</span> <span class="n">sp1</span><span class="p">[:</span><span class="mi">15</span><span class="p">]</span>
+    <span class="n">sp2_short</span> <span class="o">=</span> <span class="n">sp2</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">sp2</span> <span class="k">else</span> <span class="n">sp2</span><span class="p">[:</span><span class="mi">15</span><span class="p">]</span>
+    <span class="n">xy</span><span class="p">,</span> <span class="n">yx</span> <span class="o">=</span> <span class="n">eco_mle</span><span class="p">[(</span><span class="n">sp1</span><span class="p">,</span> <span class="n">sp2</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">xy</span> <span class="o">&gt;</span> <span class="n">yx</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sp1_short</span><span class="si">:</span><span class="s2">15s</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">sp2_short</span><span class="si">:</span><span class="s2">15s</span><span class="si">}</span><span class="s2"> stronger  [Δ=</span><span class="si">{</span><span class="n">asym</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sp2_short</span><span class="si">:</span><span class="s2">15s</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">sp1_short</span><span class="si">:</span><span class="s2">15s</span><span class="si">}</span><span class="s2"> stronger  [Δ=</span><span class="si">{</span><span class="n">asym</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;eco_mle&#39; is not defined
+  at line 285 in code block</pre>
+</div>
+<h3>Visualization</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+
+<span class="c1"># Subplot 1: Asymmetry distribution</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">eco_asymmetries</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;forestgreen&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;|P(Species2|Species1) - P(Species1|Species2)|&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;(A) Co-occurrence Asymmetry Distribution&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">eco_asymmetries</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Mean: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">eco_asymmetries</span><span class="p">)</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Subplot 2: Association network (top 30 pairs)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+<span class="n">top_30</span> <span class="o">=</span> <span class="n">strong_assoc</span><span class="p">[:</span><span class="mi">30</span><span class="p">]</span>
+<span class="n">network_text</span> <span class="o">=</span> <span class="s2">&quot;Top 30 Species Association Network:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">sp1</span><span class="p">,</span> <span class="n">sp2</span><span class="p">),</span> <span class="n">strength</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">top_30</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">sp1_s</span> <span class="o">=</span> <span class="n">sp1</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">10</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">sp1</span> <span class="k">else</span> <span class="n">sp1</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+    <span class="n">sp2_s</span> <span class="o">=</span> <span class="n">sp2</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="mi">10</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">sp2</span> <span class="k">else</span> <span class="n">sp2</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+    <span class="n">network_text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sp1_s</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> ↔ </span><span class="si">{</span><span class="n">sp2_s</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="n">strength</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">]</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">network_text</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+                <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">fontfamily</span><span class="o">=</span><span class="s1">&#39;monospace&#39;</span><span class="p">,</span>
+                <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;wheat&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;(B) Strongest Associations&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+
+<span class="c1"># Subplot 3: Prevalence vs. Association</span>
+<span class="n">species_avg_assoc</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">sp1</span><span class="p">,</span> <span class="n">sp2</span><span class="p">),</span> <span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">yx</span><span class="p">)</span> <span class="ow">in</span> <span class="n">eco_mle</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">sp1</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">species_avg_assoc</span><span class="p">:</span>
+        <span class="n">species_avg_assoc</span><span class="p">[</span><span class="n">sp1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">sp2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">species_avg_assoc</span><span class="p">:</span>
+        <span class="n">species_avg_assoc</span><span class="p">[</span><span class="n">sp2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">species_avg_assoc</span><span class="p">[</span><span class="n">sp1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span>
+    <span class="n">species_avg_assoc</span><span class="p">[</span><span class="n">sp2</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yx</span><span class="p">)</span>
+
+<span class="n">avg_assoc</span> <span class="o">=</span> <span class="p">{</span><span class="n">sp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">sp</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">species_avg_assoc</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+<span class="n">prevalence_vals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">assoc_vals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">avg_assoc</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">species_prevalence</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+        <span class="n">prevalence_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">species_prevalence</span><span class="p">[</span><span class="n">sp</span><span class="p">])</span>
+        <span class="n">assoc_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_assoc</span><span class="p">[</span><span class="n">sp</span><span class="p">])</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">prevalence_vals</span><span class="p">,</span> <span class="n">assoc_vals</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+                   <span class="n">c</span><span class="o">=</span><span class="s1">&#39;teal&#39;</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Species Prevalence (# islands)&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Average Association Strength&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;(C) Prevalence vs. Association&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">corr_eco</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">prevalence_vals</span><span class="p">,</span> <span class="n">assoc_vals</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;r = </span><span class="si">{</span><span class="n">corr_eco</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+                <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;wheat&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">))</span>
+
+<span class="c1"># Subplot 4: Island richness distribution</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">island_richness</span><span class="p">)),</span> <span class="n">island_richness</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+               <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Islands (sorted by richness)&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Number of Species&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;(D) Island Species Richness&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Galápagos Finch Co-occurrence Analysis&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;eco_asymmetries&#39; is not defined
+  at line 313 in code block</pre>
+</div>
+<h3>Key Findings</h3>
+<p><strong>Ecological Insights:</strong></p>
+<ol>
+<li><strong>High co-occurrence</strong>: Many species pairs have strong associations (MLE &gt; 0.8)</li>
+<li><strong>Nested patterns</strong>: Widespread species (e.g., <em>Ce. olivacea</em>) co-occur with most others</li>
+<li><strong>Asymmetric dependencies</strong>: Some species predict others better than vice versa</li>
+<li><strong>Island area effect</strong>: Larger islands support more species and stronger networks</li>
+<li><strong>Supports island biogeography theory</strong>: Distance and area shape communities</li>
+</ol>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>4. Case Study 3: Machine Learning - Feature Selection</h2>
+<h3>Research Question</h3>
+<p><strong>Can asymmetric measures improve categorical feature selection?</strong></p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CASE STUDY 3: FEATURE SELECTION&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+============================================================
+CASE STUDY 3: FEATURE SELECTION
+============================================================</pre>
+</div>
+<h3>Data Preparation</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Load mushroom dataset (categorical features predicting edibility)</span>
+<span class="n">mushroom_data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_pa_matrix</span><span class="p">(</span><span class="s2">&quot;../resources/mushroom-small.tsv&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Dataset: Mushroom Classification&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Feature-class co-occurrences: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">mushroom_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Show structure</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sample co-occurrences:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">class_label</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">mushroom_data</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">feature</span><span class="si">:</span><span class="s2">30s</span><span class="si">}</span><span class="s2"> ↔ </span><span class="si">{</span><span class="n">class_label</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">FileNotFoundError: File not found: ../resources/mushroom-small.tsv
+  at line 400 in code block</pre>
+</div>
+<h3>Measure Selection</h3>
+<p>For classification feature selection:</p>
+<ul>
+<li><strong>Theil's U</strong>: U(class|feature) measures predictive value</li>
+<li><strong>Chi-square</strong>: Statistical significance of association</li>
+<li><strong>MLE</strong>: Direct predictability P(class|feature)</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Create scorer</span>
+<span class="n">ml_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">mushroom_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+
+<span class="c1"># Compute measures</span>
+<span class="n">ml_theil</span> <span class="o">=</span> <span class="n">ml_scorer</span><span class="o">.</span><span class="n">theil_u</span><span class="p">()</span>
+<span class="n">ml_chi2</span> <span class="o">=</span> <span class="n">ml_scorer</span><span class="o">.</span><span class="n">chi2</span><span class="p">()</span>
+<span class="n">ml_mle</span> <span class="o">=</span> <span class="n">ml_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;mushroom_data&#39; is not defined
+  at line 418 in code block</pre>
+</div>
+<h3>Feature Ranking</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Extract features predicting class</span>
+<span class="n">feature_importance</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">class_val</span><span class="p">),</span> <span class="p">(</span><span class="n">u_class_feat</span><span class="p">,</span> <span class="n">u_feat_class</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ml_theil</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="c1"># We care about U(class|feature) - how well feature predicts class</span>
+    <span class="k">if</span> <span class="n">feature</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">feature_importance</span><span class="p">:</span>
+        <span class="n">feature_importance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">feature_importance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u_class_feat</span><span class="p">)</span>
+
+<span class="c1"># Average importance across classes</span>
+<span class="n">avg_importance</span> <span class="o">=</span> <span class="p">{</span><span class="n">feat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">feat</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">feature_importance</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<span class="n">sorted_features</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">avg_importance</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Feature Importance Ranking (by Theil&#39;s U):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;Rank&#39;</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}{</span><span class="s1">&#39;Feature&#39;</span><span class="si">:</span><span class="s2">&lt;35</span><span class="si">}{</span><span class="s1">&#39;U(class|feature)&#39;</span><span class="si">:</span><span class="s2">&lt;20</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">importance</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_features</span><span class="p">[:</span><span class="mi">15</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">&lt;6</span><span class="si">}{</span><span class="n">feature</span><span class="si">:</span><span class="s2">&lt;35</span><span class="si">}{</span><span class="n">importance</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;ml_theil&#39; is not defined
+  at line 428 in code block</pre>
+</div>
+<h3>Comparison with Chi-Square</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Extract chi-square scores</span>
+<span class="n">chi2_importance</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">feature</span><span class="p">,</span> <span class="n">class_val</span><span class="p">),</span> <span class="p">(</span><span class="n">chi2_val</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ml_chi2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">feature</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">chi2_importance</span><span class="p">:</span>
+        <span class="n">chi2_importance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">chi2_importance</span><span class="p">[</span><span class="n">feature</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chi2_val</span><span class="p">)</span>
+
+<span class="n">avg_chi2</span> <span class="o">=</span> <span class="p">{</span><span class="n">feat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="k">for</span> <span class="n">feat</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">chi2_importance</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+<span class="c1"># Compare rankings</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Top 10 Features by Different Measures:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="s1">&#39;Theil U Rank&#39;</span><span class="si">:</span><span class="s2">&lt;40</span><span class="si">}{</span><span class="s1">&#39;Chi² Rank&#39;</span><span class="si">:</span><span class="s2">&lt;40</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+
+<span class="n">sorted_chi2</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">avg_chi2</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_features</span><span class="p">))):</span>
+    <span class="n">theil_feat</span><span class="p">,</span> <span class="n">theil_val</span> <span class="o">=</span> <span class="n">sorted_features</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">chi2_feat</span><span class="p">,</span> <span class="n">chi2_val</span> <span class="o">=</span> <span class="n">sorted_chi2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">theil_feat</span><span class="p">[:</span><span class="mi">30</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;35</span><span class="si">}{</span><span class="n">chi2_feat</span><span class="p">[:</span><span class="mi">30</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;35</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;ml_chi2&#39; is not defined
+  at line 450 in code block</pre>
+</div>
+<h3>Visualization</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Subplot 1: Feature importance distribution</span>
+<span class="n">importance_vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">avg_importance</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">importance_vals</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;purple&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Theil&#39;s U (class|feature)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Number of Features&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;(A) Feature Importance Distribution&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Subplot 2: Top features bar chart</span>
+<span class="n">top_n</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">top_feats</span> <span class="o">=</span> <span class="n">sorted_features</span><span class="p">[:</span><span class="n">top_n</span><span class="p">]</span>
+<span class="n">feat_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="p">[:</span><span class="mi">25</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">top_feats</span><span class="p">]</span>
+<span class="n">feat_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">top_feats</span><span class="p">]</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feat_names</span><span class="p">)),</span> <span class="n">feat_vals</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkblue&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feat_names</span><span class="p">)))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">feat_names</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Theil&#39;s U&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(B) Top </span><span class="si">{</span><span class="n">top_n</span><span class="si">}</span><span class="s1"> Most Predictive Features&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+
+<span class="c1"># Subplot 3: Theil U vs Chi²</span>
+<span class="n">theil_vals_comp</span> <span class="o">=</span> <span class="p">[</span><span class="n">avg_importance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">avg_chi2</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+<span class="n">chi2_vals_comp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">avg_chi2</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">theil_vals_comp</span><span class="p">,</span> <span class="n">chi2_vals_comp</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                   <span class="n">c</span><span class="o">=</span><span class="s1">&#39;crimson&#39;</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Theil&#39;s U (avg)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Chi² (avg)&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;(C) Theil&#39;s U vs. Chi² Comparison&quot;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">corr_ml</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">theil_vals_comp</span><span class="p">,</span> <span class="n">chi2_vals_comp</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;r = </span><span class="si">{</span><span class="n">corr_ml</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+                <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;wheat&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">))</span>
+
+<span class="c1"># Subplot 4: Feature selection impact</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+<span class="n">selection_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Feature Selection Summary:</span>
+
+<span class="s2">Top 5 Features (Theil&#39;s U):</span>
+<span class="s2">&quot;&quot;&quot;</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_features</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">selection_text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">feat</span><span class="p">[:</span><span class="mi">35</span><span class="p">]</span><span class="si">:</span><span class="s2">35s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">val</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="n">selection_text</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Interpretation:</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="n">selection_text</span> <span class="o">+=</span> <span class="s2">&quot;• High U(class|feature) = strong predictor</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="n">selection_text</span> <span class="o">+=</span> <span class="s2">&quot;• Asymmetric: feature→class matters</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="n">selection_text</span> <span class="o">+=</span> <span class="s2">&quot;• Use top features for classification</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="n">selection_text</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;• </span><span class="si">{</span><span class="nb">len</span><span class="p">([</span><span class="n">v</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">importance_vals</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.5</span><span class="p">])</span><span class="si">}</span><span class="s2"> features with U &gt; 0.5&quot;</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="n">selection_text</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span>
+                <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">fontfamily</span><span class="o">=</span><span class="s1">&#39;monospace&#39;</span><span class="p">,</span>
+                <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s1">&#39;round&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;lightyellow&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;(D) Feature Selection Strategy&#39;</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s1">&#39;Mushroom Classification: Feature Selection Analysis&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;avg_importance&#39; is not defined
+  at line 473 in code block</pre>
+</div>
+<h3>Key Findings</h3>
+<p><strong>Machine Learning Insights:</strong></p>
+<ol>
+<li><strong>Asymmetric measures</strong> (Theil's U) reveal <strong>directional predictive power</strong></li>
+<li>Top features have <strong>high U(class|feature)</strong> but may have <strong>low U(feature|class)</strong></li>
+<li>This is correct: we want features that <strong>predict</strong> the class, not vice versa</li>
+<li><strong>Chi-square</strong> identifies associations but doesn't reveal directionality</li>
+<li><strong>Feature selection strategy</strong>: Keep features with U(class|feature) &gt; threshold</li>
+</ol>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>5. Best Practices Summary</h2>
+<h3>Data Preparation</h3>
+<p>✓ Validate data format (sequences vs. presence-absence)
+✓ Check for missing values and encoding issues
+✓ Assess sparsity → choose smoothing method</p>
+<h3>Measure Selection</h3>
+<p>✓ <strong>Prediction tasks</strong>: MLE, Theil's U, Goodman-Kruskal λ
+✓ <strong>Association discovery</strong>: PMI, NPMI, Chi-square
+✓ <strong>Small samples</strong>: Fisher exact, smoothing required
+✓ <strong>Linguistic alignment</strong>: Tresoldi measure</p>
+<h3>Interpretation</h3>
+<p>✓ Always report <strong>both directions</strong> (X→Y and Y→X)
+✓ Quantify <strong>asymmetry</strong>: |score_xy - score_yx|
+✓ Consider <strong>domain knowledge</strong> for validation
+✓ Use <strong>multiple measures</strong> for robustness</p>
+<h3>Visualization</h3>
+<p>✓ Heatmaps for <strong>matrix overviews</strong>
+✓ Scatter plots for <strong>measure comparison</strong>
+✓ Asymmetry plots for <strong>directional effects</strong>
+✓ Bar charts for <strong>top associations</strong></p>
+<h3>Reporting</h3>
+<p>✓ State <strong>research question</strong> clearly
+✓ Report <strong>data characteristics</strong> (size, sparsity)
+✓ Justify <strong>measure choice</strong>
+✓ Provide <strong>quantitative results</strong> with effect sizes
+✓ Include <strong>visualizations</strong> for key findings
+✓ Discuss <strong>limitations</strong> and assumptions</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>6. Key Takeaways</h2>
+<p><strong>You've learned:</strong></p>
+<p>✓ Complete analysis workflows for real-world problems
+✓ Linguistics: grapheme-phoneme asymmetry reveals orthographic depth
+✓ Ecology: species co-occurrence patterns support island biogeography
+✓ Machine learning: asymmetric measures improve feature selection
+✓ Interpretation requires domain knowledge + statistical rigor
+✓ Visualization communicates directional relationships effectively</p>
+<h2>Congratulations!</h2>
+<p>You've completed all ASymCat tutorials! You're now ready to:</p>
+<ul>
+<li>Analyze asymmetric associations in your own data</li>
+<li>Choose appropriate measures for different tasks</li>
+<li>Create publication-quality visualizations</li>
+<li>Interpret results with statistical rigor</li>
+</ul>
+<h2>Further Resources</h2>
+<ul>
+<li><strong><a href="USER_GUIDE.md">User Guide</a></strong>: Conceptual foundations</li>
+<li><strong><a href="API_REFERENCE.md">API Reference</a></strong>: Complete function reference</li>
+<li><strong><a href="LLM_DOCUMENTATION.md">LLM Documentation</a></strong>: Quick code patterns</li>
+<li><strong>GitHub Issues</strong>: Questions and community support</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tutorial Series Complete! ✓&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">You&#39;re now an ASymCat expert!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Happy analyzing! 🎉&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+============================================================
+Tutorial Series Complete! ✓
+============================================================
+
+You&#39;re now an ASymCat expert!
+Happy analyzing! 🎉</pre>
+</div>
+</body>
+</html>

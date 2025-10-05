@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>Nhandu Report</title>
+<style>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            color: #333;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .code-block {
+            margin: 1.5rem 0;
+        }
+        .code-input {
+            padding: 1rem;
+            border-radius: 4px 4px 0 0;
+            margin: 0;
+        }
+        .code-input pre {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        .code-output {
+            background: #f8f8f8;
+            border: 1px solid #e1e4e8;
+            border-top: none;
+            padding: 1rem;
+            border-radius: 0 0 4px 4px;
+            margin: 0;
+        }
+        .error {
+            color: #d73a49;
+            background: #ffeef0;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ffdce0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Pygments syntax highlighting */
+        pre { line-height: 125%; }
+td.linenos .normal { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #6e7681 }
+.highlight { background: #0d1117; color: #E6EDF3 }
+.highlight .c { color: #8B949E; font-style: italic } /* Comment */
+.highlight .err { color: #F85149 } /* Error */
+.highlight .esc { color: #E6EDF3 } /* Escape */
+.highlight .g { color: #E6EDF3 } /* Generic */
+.highlight .k { color: #FF7B72 } /* Keyword */
+.highlight .l { color: #A5D6FF } /* Literal */
+.highlight .n { color: #E6EDF3 } /* Name */
+.highlight .o { color: #FF7B72; font-weight: bold } /* Operator */
+.highlight .x { color: #E6EDF3 } /* Other */
+.highlight .p { color: #E6EDF3 } /* Punctuation */
+.highlight .ch { color: #8B949E; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #8B949E; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: #8B949E; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #8B949E; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #FFA198; background-color: #490202 } /* Generic.Deleted */
+.highlight .ge { color: #E6EDF3; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #E6EDF3; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #FFA198 } /* Generic.Error */
+.highlight .gh { color: #79C0FF; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #56D364; background-color: #0F5323 } /* Generic.Inserted */
+.highlight .go { color: #8B949E } /* Generic.Output */
+.highlight .gp { color: #8B949E } /* Generic.Prompt */
+.highlight .gs { color: #E6EDF3; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #79C0FF } /* Generic.Subheading */
+.highlight .gt { color: #FF7B72 } /* Generic.Traceback */
+.highlight .g-Underline { color: #E6EDF3; text-decoration: underline } /* Generic.Underline */
+.highlight .kc { color: #79C0FF } /* Keyword.Constant */
+.highlight .kd { color: #FF7B72 } /* Keyword.Declaration */
+.highlight .kn { color: #FF7B72 } /* Keyword.Namespace */
+.highlight .kp { color: #79C0FF } /* Keyword.Pseudo */
+.highlight .kr { color: #FF7B72 } /* Keyword.Reserved */
+.highlight .kt { color: #FF7B72 } /* Keyword.Type */
+.highlight .ld { color: #79C0FF } /* Literal.Date */
+.highlight .m { color: #A5D6FF } /* Literal.Number */
+.highlight .s { color: #A5D6FF } /* Literal.String */
+.highlight .na { color: #E6EDF3 } /* Name.Attribute */
+.highlight .nb { color: #E6EDF3 } /* Name.Builtin */
+.highlight .nc { color: #F0883E; font-weight: bold } /* Name.Class */
+.highlight .no { color: #79C0FF; font-weight: bold } /* Name.Constant */
+.highlight .nd { color: #D2A8FF; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #FFA657 } /* Name.Entity */
+.highlight .ne { color: #F0883E; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #D2A8FF; font-weight: bold } /* Name.Function */
+.highlight .nl { color: #79C0FF; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #FF7B72 } /* Name.Namespace */
+.highlight .nx { color: #E6EDF3 } /* Name.Other */
+.highlight .py { color: #79C0FF } /* Name.Property */
+.highlight .nt { color: #7EE787 } /* Name.Tag */
+.highlight .nv { color: #79C0FF } /* Name.Variable */
+.highlight .ow { color: #FF7B72; font-weight: bold } /* Operator.Word */
+.highlight .pm { color: #E6EDF3 } /* Punctuation.Marker */
+.highlight .w { color: #6E7681 } /* Text.Whitespace */
+.highlight .mb { color: #A5D6FF } /* Literal.Number.Bin */
+.highlight .mf { color: #A5D6FF } /* Literal.Number.Float */
+.highlight .mh { color: #A5D6FF } /* Literal.Number.Hex */
+.highlight .mi { color: #A5D6FF } /* Literal.Number.Integer */
+.highlight .mo { color: #A5D6FF } /* Literal.Number.Oct */
+.highlight .sa { color: #79C0FF } /* Literal.String.Affix */
+.highlight .sb { color: #A5D6FF } /* Literal.String.Backtick */
+.highlight .sc { color: #A5D6FF } /* Literal.String.Char */
+.highlight .dl { color: #79C0FF } /* Literal.String.Delimiter */
+.highlight .sd { color: #A5D6FF } /* Literal.String.Doc */
+.highlight .s2 { color: #A5D6FF } /* Literal.String.Double */
+.highlight .se { color: #79C0FF } /* Literal.String.Escape */
+.highlight .sh { color: #79C0FF } /* Literal.String.Heredoc */
+.highlight .si { color: #A5D6FF } /* Literal.String.Interpol */
+.highlight .sx { color: #A5D6FF } /* Literal.String.Other */
+.highlight .sr { color: #79C0FF } /* Literal.String.Regex */
+.highlight .s1 { color: #A5D6FF } /* Literal.String.Single */
+.highlight .ss { color: #A5D6FF } /* Literal.String.Symbol */
+.highlight .bp { color: #E6EDF3 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #D2A8FF; font-weight: bold } /* Name.Function.Magic */
+.highlight .vc { color: #79C0FF } /* Name.Variable.Class */
+.highlight .vg { color: #79C0FF } /* Name.Variable.Global */
+.highlight .vi { color: #79C0FF } /* Name.Variable.Instance */
+.highlight .vm { color: #79C0FF } /* Name.Variable.Magic */
+.highlight .il { color: #A5D6FF } /* Literal.Number.Integer.Long */
+        
+</style>
+</head>
+<body>
+<h1>Tutorial 2: Advanced Association Measures</h1>
+<p><strong>Build on the basics</strong> and explore the full range of ASymCat's association measures.</p>
+<h2>What You'll Learn</h2>
+<ol>
+<li>Information-theoretic measures (PMI, NPMI, Mutual Information, Conditional Entropy)</li>
+<li>Statistical measures (Chi-square, Cramér's V, Fisher exact test)</li>
+<li>Specialized measures (Theil's U, Goodman-Kruskal λ, Tresoldi)</li>
+<li>Smoothing methods and their effects</li>
+<li>Measure selection for different tasks</li>
+<li>Comparative analysis</li>
+</ol>
+<h2>Prerequisites</h2>
+<p>Complete Tutorial 1 first to understand basic workflow and MLE.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Import required libraries</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asymcat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">asymcat.scorer</span><span class="w"> </span><span class="kn">import</span> <span class="n">CatScorer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="c1"># Set up plotting</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ASymCat Advanced Measures Tutorial&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">ASymCat Advanced Measures Tutorial
+==================================================</pre>
+</div>
+<h2>1. Review: The Measure Categories</h2>
+<p>ASymCat provides 17+ measures organized into four categories:</p>
+<h3>Probabilistic Measures</h3>
+<ul>
+<li><strong>MLE</strong>: Maximum likelihood estimation P(Y|X)</li>
+<li><strong>Jaccard</strong>: Set overlap similarity</li>
+<li><strong>Goodman-Kruskal λ</strong>: Prediction error reduction</li>
+</ul>
+<h3>Information-Theoretic Measures</h3>
+<ul>
+<li><strong>PMI</strong>: Pointwise mutual information</li>
+<li><strong>NPMI</strong>: Normalized PMI</li>
+<li><strong>Mutual Information</strong>: Average information shared</li>
+<li><strong>Conditional Entropy</strong>: Uncertainty remaining</li>
+<li><strong>Theil's U</strong>: Uncertainty coefficient</li>
+</ul>
+<h3>Statistical Measures</h3>
+<ul>
+<li><strong>Chi-square</strong>: Independence test statistic</li>
+<li><strong>Cramér's V</strong>: Normalized chi-square</li>
+<li><strong>Fisher Exact</strong>: Exact odds ratios</li>
+<li><strong>Log-Likelihood</strong>: G² statistic</li>
+</ul>
+<h3>Specialized Measures</h3>
+<ul>
+<li><strong>Tresoldi</strong>: Custom measure combining MLE and PMI</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>2. Load Sample Data</h2>
+<p>We'll use the toy linguistic data for demonstrations.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Load data</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;../resources/toy.tsv&quot;</span><span class="p">)</span>
+<span class="n">cooccs</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">collect_cooccs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2"> sequence pairs&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total co-occurrences: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cooccs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create scorer with Laplace smoothing</span>
+<span class="n">scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">cooccs</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">,</span> <span class="n">smoothing_alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scorer ready with Laplace smoothing&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">FileNotFoundError: File not found: ../resources/toy.tsv
+  at line 61 in code block</pre>
+</div>
+<h2>3. Information-Theoretic Measures</h2>
+<p>These measures quantify the <strong>information content</strong> of associations.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h3>3.1 PMI (Pointwise Mutual Information)</h3>
+<p>PMI measures how much information we gain about Y when we observe X:</p>
+<p>PMI(X,Y) = log₂[P(X,Y) / (P(X)·P(Y))]</p>
+<ul>
+<li>PMI &gt; 0: X and Y co-occur more than expected (positive association)</li>
+<li>PMI = 0: X and Y are independent</li>
+<li>PMI &lt; 0: X and Y co-occur less than expected (negative association)</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Compute PMI</span>
+<span class="n">pmi_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">pmi</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">PMI (Pointwise Mutual Information):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="c1"># Sort by PMI value and show top associations</span>
+<span class="n">sorted_pmi</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">pmi_scores</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Top 10 strongest associations (highest PMI):&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">pmi_val</span><span class="p">,</span> <span class="n">_</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_pmi</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): PMI = </span><span class="si">{</span><span class="n">pmi_val</span><span class="si">:</span><span class="s2">6.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;scorer&#39; is not defined
+  at line 87 in code block</pre>
+</div>
+<h3>3.2 NPMI (Normalized PMI)</h3>
+<p>NPMI normalizes PMI to the range [-1, 1] for easier interpretation:</p>
+<p>NPMI(X,Y) = PMI(X,Y) / -log₂[P(X,Y)]</p>
+<ul>
+<li>NPMI = 1: Perfect co-occurrence (always together)</li>
+<li>NPMI = 0: Independent</li>
+<li>NPMI = -1: Never co-occur</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Compute NPMI</span>
+<span class="n">npmi_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">npmi</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">NPMI (Normalized PMI):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="n">sorted_npmi</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">npmi_scores</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Top 10 strongest normalized associations:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">npmi_val</span><span class="p">,</span> <span class="n">_</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_npmi</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): NPMI = </span><span class="si">{</span><span class="n">npmi_val</span><span class="si">:</span><span class="s2">6.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;scorer&#39; is not defined
+  at line 110 in code block</pre>
+</div>
+<h3>3.3 Theil's U (Uncertainty Coefficient)</h3>
+<p>Theil's U measures uncertainty reduction - how much knowing X reduces
+uncertainty about Y:</p>
+<p>U(Y|X) = [H(Y) - H(Y|X)] / H(Y)</p>
+<ul>
+<li>U = 0: X tells us nothing about Y</li>
+<li>U = 1: X completely determines Y</li>
+<li><strong>Asymmetric</strong>: U(Y|X) ≠ U(X|Y)</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Compute Theil&#39;s U</span>
+<span class="n">theil_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">theil_u</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Theil&#39;s U (Uncertainty Coefficient):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="c1"># Show asymmetric nature</span>
+<span class="n">sorted_theil</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">theil_scores</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Top 10 predictive relationships (highest U(Y|X)):&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">u_y_x</span><span class="p">,</span> <span class="n">u_x_y</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_theil</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">asymmetry</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">u_y_x</span> <span class="o">-</span> <span class="n">u_x_y</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">→</span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">: U=</span><span class="si">{</span><span class="n">u_y_x</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  |  </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">→</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">: U=</span><span class="si">{</span><span class="n">u_x_y</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  |  Δ=</span><span class="si">{</span><span class="n">asymmetry</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;scorer&#39; is not defined
+  at line 133 in code block</pre>
+</div>
+<h2>4. Statistical Measures</h2>
+<p>These measures test statistical significance and independence.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h3>4.1 Chi-Square Test</h3>
+<p>Chi-square measures deviation from independence:</p>
+<p>χ²(X,Y) = Σ [(observed - expected)² / expected]</p>
+<p>Higher values indicate stronger associations.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Compute chi-square</span>
+<span class="n">chi2_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">chi2</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Chi-Square Statistic:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="n">sorted_chi2</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">chi2_scores</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Top 10 strongest associations (highest χ²):&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">chi2_val</span><span class="p">,</span> <span class="n">_</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_chi2</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): χ² = </span><span class="si">{</span><span class="n">chi2_val</span><span class="si">:</span><span class="s2">8.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;scorer&#39; is not defined
+  at line 159 in code block</pre>
+</div>
+<h3>4.2 Cramér's V</h3>
+<p>Cramér's V normalizes chi-square to [0, 1] range:</p>
+<p>V = √[χ² / (N × min(rows-1, cols-1))]</p>
+<ul>
+<li>V = 0: No association</li>
+<li>V = 1: Perfect association</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Compute Cramér&#39;s V</span>
+<span class="n">cramer_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">cramer_v</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Cramér&#39;s V (Normalized Chi-Square):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="n">sorted_cramer</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cramer_scores</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Top 10 strongest associations:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">v_val</span><span class="p">,</span> <span class="n">_</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_cramer</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): V = </span><span class="si">{</span><span class="n">v_val</span><span class="si">:</span><span class="s2">6.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;scorer&#39; is not defined
+  at line 180 in code block</pre>
+</div>
+<h3>4.3 Fisher Exact Test</h3>
+<p>Fisher's exact test computes exact odds ratios, useful for small samples:</p>
+<p>OR = [P(Y|X) / P(¬Y|X)] / [P(Y|¬X) / P(¬Y|¬X)]</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Compute Fisher exact test</span>
+<span class="n">fisher_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">fisher</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Fisher Exact Test (Odds Ratios):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="n">sorted_fisher</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">fisher_scores</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Top 10 strongest associations:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">or_xy</span><span class="p">,</span> <span class="n">or_yx</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_fisher</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): OR(Y|X) = </span><span class="si">{</span><span class="n">or_xy</span><span class="si">:</span><span class="s2">8.2f</span><span class="si">}</span><span class="s2">, OR(X|Y) = </span><span class="si">{</span><span class="n">or_yx</span><span class="si">:</span><span class="s2">8.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;scorer&#39; is not defined
+  at line 198 in code block</pre>
+</div>
+<h2>5. Comparing Measures</h2>
+<p>Different measures reveal different aspects of associations. Let's compare them.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Select a few representative pairs</span>
+<span class="n">sample_pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cooccs</span><span class="p">)[:</span><span class="mi">20</span><span class="p">]</span>
+
+<span class="c1"># Compute all measures for comparison</span>
+<span class="n">measures_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;MLE&#39;</span><span class="p">:</span> <span class="n">scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">(),</span>
+    <span class="s1">&#39;PMI&#39;</span><span class="p">:</span> <span class="n">scorer</span><span class="o">.</span><span class="n">pmi</span><span class="p">(),</span>
+    <span class="s1">&#39;NPMI&#39;</span><span class="p">:</span> <span class="n">scorer</span><span class="o">.</span><span class="n">npmi</span><span class="p">(),</span>
+    <span class="s1">&#39;Theil_U&#39;</span><span class="p">:</span> <span class="n">scorer</span><span class="o">.</span><span class="n">theil_u</span><span class="p">(),</span>
+    <span class="s1">&#39;Chi2&#39;</span><span class="p">:</span> <span class="n">scorer</span><span class="o">.</span><span class="n">chi2</span><span class="p">(),</span>
+    <span class="s1">&#39;Cramer_V&#39;</span><span class="p">:</span> <span class="n">scorer</span><span class="o">.</span><span class="n">cramer_v</span><span class="p">(),</span>
+<span class="p">}</span>
+
+<span class="c1"># Create comparison dataframe</span>
+<span class="n">comparison_data</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">sample_pairs</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">measures_dict</span><span class="p">[</span><span class="s1">&#39;MLE&#39;</span><span class="p">]:</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">pair</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+            <span class="s1">&#39;Y&#39;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span>
+            <span class="s1">&#39;MLE&#39;</span><span class="p">:</span> <span class="n">measures_dict</span><span class="p">[</span><span class="s1">&#39;MLE&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;PMI&#39;</span><span class="p">:</span> <span class="n">measures_dict</span><span class="p">[</span><span class="s1">&#39;PMI&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;NPMI&#39;</span><span class="p">:</span> <span class="n">measures_dict</span><span class="p">[</span><span class="s1">&#39;NPMI&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;Theil_U&#39;</span><span class="p">:</span> <span class="n">measures_dict</span><span class="p">[</span><span class="s1">&#39;Theil_U&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;Chi2&#39;</span><span class="p">:</span> <span class="n">measures_dict</span><span class="p">[</span><span class="s1">&#39;Chi2&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s1">&#39;Cramer_V&#39;</span><span class="p">:</span> <span class="n">measures_dict</span><span class="p">[</span><span class="s1">&#39;Cramer_V&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">}</span>
+        <span class="n">comparison_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+<span class="n">comparison_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">comparison_data</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Measure Comparison (First 10 pairs):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">comparison_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">float_format</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;cooccs&#39; is not defined
+  at line 214 in code block</pre>
+</div>
+<h3>Correlation Between Measures</h3>
+<p>Let's visualize how different measures correlate with each other.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Compute correlations</span>
+<span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">comparison_df</span><span class="p">[[</span><span class="s1">&#39;MLE&#39;</span><span class="p">,</span> <span class="s1">&#39;PMI&#39;</span><span class="p">,</span> <span class="s1">&#39;NPMI&#39;</span><span class="p">,</span> <span class="s1">&#39;Theil_U&#39;</span><span class="p">,</span> <span class="s1">&#39;Chi2&#39;</span><span class="p">,</span> <span class="s1">&#39;Cramer_V&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
+
+<span class="c1"># Plot correlation heatmap</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;.2f&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;RdYlBu_r&#39;</span><span class="p">,</span>
+            <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Correlation&#39;</span><span class="p">})</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Correlation Between Association Measures&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📊 Correlation insights:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • High correlation = measures capture similar information&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • Low correlation = measures reveal different aspects&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;comparison_df&#39; is not defined
+  at line 254 in code block</pre>
+</div>
+<h2>6. Smoothing Methods Deep Dive</h2>
+<p>Smoothing is crucial for handling sparse data. Let's compare methods systematically.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Create a small sparse dataset</span>
+<span class="n">sparse_data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Smoothing Methods Comparison:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sparse dataset: </span><span class="si">{</span><span class="n">sparse_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create scorers with different smoothing</span>
+<span class="n">smoothing_configs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;MLE (no smoothing)&#39;</span><span class="p">,</span> <span class="s1">&#39;mle&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Laplace (α=1.0)&#39;</span><span class="p">,</span> <span class="s1">&#39;laplace&#39;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Lidstone (α=0.1)&#39;</span><span class="p">,</span> <span class="s1">&#39;lidstone&#39;</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Lidstone (α=0.5)&#39;</span><span class="p">,</span> <span class="s1">&#39;lidstone&#39;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Lidstone (α=2.0)&#39;</span><span class="p">,</span> <span class="s1">&#39;lidstone&#39;</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">smoothing_results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">smoothing_configs</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">smoothing_alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+
+    <span class="n">mle</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+    <span class="n">pmi</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">pmi</span><span class="p">()</span>
+
+    <span class="c1"># Get P(X|A)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">mle</span><span class="p">:</span>
+        <span class="n">p_x_a</span> <span class="o">=</span> <span class="n">mle</span><span class="p">[(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">pmi_val</span> <span class="o">=</span> <span class="n">pmi</span><span class="p">[(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p_x_a</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">pmi_val</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="n">smoothing_results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="s1">&#39;Method&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+        <span class="s1">&#39;P(X|A)&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">p_x_a</span><span class="si">:</span><span class="s1">.4f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;PMI(A,X)&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">pmi_val</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="p">})</span>
+
+<span class="n">smoothing_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">smoothing_results</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">smoothing_df</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📌 Smoothing Trade-offs:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • MLE: Highest precision, but unstable for rare events&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • Laplace: Conservative, adds equal pseudo-counts&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  • Lidstone: Tunable via α - lower α = less smoothing&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+
+Smoothing Methods Comparison:
+============================================================
+Sparse dataset: [(&#39;A&#39;, &#39;X&#39;), (&#39;A&#39;, &#39;X&#39;), (&#39;A&#39;, &#39;X&#39;), (&#39;A&#39;, &#39;X&#39;), (&#39;A&#39;, &#39;X&#39;), (&#39;A&#39;, &#39;Y&#39;), (&#39;B&#39;, &#39;X&#39;), (&#39;C&#39;, &#39;Z&#39;), (&#39;C&#39;, &#39;Z&#39;)]
+
+
+            Method P(X|A) PMI(A,X)
+MLE (no smoothing) 0.8333    0.223
+   Laplace (α=1.0) 0.7500    0.223
+  Lidstone (α=0.1) 0.8226    0.223
+  Lidstone (α=0.5) 0.7857    0.223
+  Lidstone (α=2.0) 0.7000    0.223
+
+📌 Smoothing Trade-offs:
+  • MLE: Highest precision, but unstable for rare events
+  • Laplace: Conservative, adds equal pseudo-counts
+  • Lidstone: Tunable via α - lower α = less smoothing</pre>
+</div>
+<h2>7. Measure Selection Guide</h2>
+<p>Choosing the right measure depends on your task and data characteristics.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MEASURE SELECTION DECISION TREE&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">70</span><span class="p">)</span>
+
+<span class="n">decision_tree</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">┌─────────────────────────────────────┐</span>
+<span class="s2">│ What is your primary goal?         │</span>
+<span class="s2">└──────────────┬──────────────────────┘</span>
+<span class="s2">               │</span>
+<span class="s2">       ┌───────┴────────┐</span>
+<span class="s2">       │                │</span>
+<span class="s2">   PREDICTION       DISCOVERY</span>
+<span class="s2">       │                │</span>
+<span class="s2">       ▼                ▼</span>
+<span class="s2">   ┌───────┐      ┌──────────┐</span>
+<span class="s2">   │  MLE  │      │   PMI    │  ← Information content</span>
+<span class="s2">   └───────┘      │   NPMI   │  ← Normalized [-1,1]</span>
+<span class="s2">       │          │  Chi²    │  ← Statistical significance</span>
+<span class="s2">       │          └──────────┘</span>
+<span class="s2">       ▼</span>
+<span class="s2"> ┌─────────────┐</span>
+<span class="s2"> │ Theil&#39;s U   │  ← Uncertainty reduction</span>
+<span class="s2"> │ Lambda (λ)  │  ← Error reduction</span>
+<span class="s2"> └─────────────┘</span>
+
+<span class="s2">┌─────────────────────────────────────┐</span>
+<span class="s2">│ Data characteristics?               │</span>
+<span class="s2">└──────────────┬──────────────────────┘</span>
+<span class="s2">               │</span>
+<span class="s2">       ┌───────┴────────┐</span>
+<span class="s2">       │                │</span>
+<span class="s2">    SPARSE           DENSE</span>
+<span class="s2">       │                │</span>
+<span class="s2">       ▼                ▼</span>
+<span class="s2">  Use smoothing    Any measure</span>
+<span class="s2">  (Laplace/        works well</span>
+<span class="s2">   Lidstone)</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">decision_tree</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+
+======================================================================
+MEASURE SELECTION DECISION TREE
+======================================================================
+
+┌─────────────────────────────────────┐
+│ What is your primary goal?         │
+└──────────────┬──────────────────────┘
+               │
+       ┌───────┴────────┐
+       │                │
+   PREDICTION       DISCOVERY
+       │                │
+       ▼                ▼
+   ┌───────┐      ┌──────────┐
+   │  MLE  │      │   PMI    │  ← Information content
+   └───────┘      │   NPMI   │  ← Normalized [-1,1]
+       │          │  Chi²    │  ← Statistical significance
+       │          └──────────┘
+       ▼
+ ┌─────────────┐
+ │ Theil&#39;s U   │  ← Uncertainty reduction
+ │ Lambda (λ)  │  ← Error reduction
+ └─────────────┘
+
+┌─────────────────────────────────────┐
+│ Data characteristics?               │
+└──────────────┬──────────────────────┘
+               │
+       ┌───────┴────────┐
+       │                │
+    SPARSE           DENSE
+       │                │
+       ▼                ▼
+  Use smoothing    Any measure
+  (Laplace/        works well
+   Lidstone)</pre>
+</div>
+<h3>Detailed Recommendations</h3>
+<p>| Task | Recommended Measure | Why |
+|------|-------------------|-----|
+| <strong>Predictive modeling</strong> | MLE, Theil's U | Direct conditional probabilities |
+| <strong>Feature selection</strong> | Chi², Cramér's V | Statistical significance |
+| <strong>Information content</strong> | PMI, NPMI | Quantifies surprise/information |
+| <strong>Rare events</strong> | Fisher, MLE+smoothing | Exact tests for small samples |
+| <strong>Linguistic alignment</strong> | Tresoldi | Custom measure for sequences |
+| <strong>Symmetric associations</strong> | Jaccard, PMI | Context overlap |</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>8. Advanced: Custom Measure Combination</h2>
+<p>You can combine multiple measures for richer analysis.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Combine MLE and PMI for a balanced view</span>
+<span class="n">combined_scores</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">mle</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+<span class="n">pmi</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">pmi</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">mle</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">pmi</span><span class="p">:</span>
+        <span class="c1"># Combine: high MLE (predictive) + high PMI (informative)</span>
+        <span class="n">mle_xy</span> <span class="o">=</span> <span class="n">mle</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">pmi_xy</span> <span class="o">=</span> <span class="n">pmi</span><span class="p">[</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Geometric mean of normalized values</span>
+        <span class="n">combined_xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mle_xy</span><span class="p">)</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pmi_xy</span><span class="p">))</span>
+        <span class="n">combined_scores</span><span class="p">[</span><span class="n">pair</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_xy</span>
+
+<span class="c1"># Sort by combined score</span>
+<span class="n">sorted_combined</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">combined_scores</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Combined Score (MLE × PMI):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Top 10 pairs balancing predictiveness and informativeness:&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">score</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_combined</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">mle_val</span> <span class="o">=</span> <span class="n">mle</span><span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">pmi_val</span> <span class="o">=</span> <span class="n">pmi</span><span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">): Combined=</span><span class="si">{</span><span class="n">score</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">  [MLE=</span><span class="si">{</span><span class="n">mle_val</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, PMI=</span><span class="si">{</span><span class="n">pmi_val</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;scorer&#39; is not defined
+  at line 388 in code block</pre>
+</div>
+<h2>9. Key Takeaways</h2>
+<p><strong>You've learned:</strong></p>
+<p>✓ Information-theoretic measures (PMI, NPMI, Theil's U) quantify information content
+✓ Statistical measures (Chi², Cramér's V, Fisher) test significance
+✓ Different measures reveal different aspects of associations
+✓ Smoothing methods handle sparse data (Laplace, Lidstone)
+✓ Measure selection depends on task (prediction vs. discovery)
+✓ Measures can be combined for richer analysis</p>
+<h2>Next Steps</h2>
+<p>Continue to <strong>Tutorial 3: Visualization</strong> to learn:</p>
+<ul>
+<li>Creating heatmaps of association matrices</li>
+<li>Visualizing score distributions</li>
+<li>Comparative measure plots</li>
+<li>Publication-quality figures</li>
+</ul>
+<h2>Quick Reference</h2>
+<pre><code class="language-python">scorer = CatScorer(cooccs, smoothing_method='laplace')
+
+# Information-theoretic
+pmi = scorer.pmi()               # Pointwise mutual information
+npmi = scorer.npmi()             # Normalized PMI [-1,1]
+theil = scorer.theil_u()         # Uncertainty coefficient
+mi = scorer.mutual_information() # Average MI
+
+# Statistical
+chi2 = scorer.chi2()             # Chi-square test
+cramer = scorer.cramer_v()       # Normalized chi-square
+fisher = scorer.fisher()         # Exact odds ratios
+
+# Specialized
+tresoldi = scorer.tresoldi()     # MLE × PMI combined
+lambda_scores = scorer.goodman_kruskal_lambda()  # Error reduction
+</code></pre>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tutorial 2 Complete! ✓&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">You now understand the full spectrum of association measures!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Proceed to Tutorial 3 to master visualization techniques.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+============================================================
+Tutorial 2 Complete! ✓
+============================================================
+
+You now understand the full spectrum of association measures!
+Proceed to Tutorial 3 to master visualization techniques.</pre>
+</div>
+</body>
+</html>

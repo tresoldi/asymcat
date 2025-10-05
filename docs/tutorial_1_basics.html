@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>Nhandu Report</title>
+<style>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            color: #333;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .code-block {
+            margin: 1.5rem 0;
+        }
+        .code-input {
+            padding: 1rem;
+            border-radius: 4px 4px 0 0;
+            margin: 0;
+        }
+        .code-input pre {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        .code-output {
+            background: #f8f8f8;
+            border: 1px solid #e1e4e8;
+            border-top: none;
+            padding: 1rem;
+            border-radius: 0 0 4px 4px;
+            margin: 0;
+        }
+        .error {
+            color: #d73a49;
+            background: #ffeef0;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ffdce0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Pygments syntax highlighting */
+        pre { line-height: 125%; }
+td.linenos .normal { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #6e7681 }
+.highlight { background: #0d1117; color: #E6EDF3 }
+.highlight .c { color: #8B949E; font-style: italic } /* Comment */
+.highlight .err { color: #F85149 } /* Error */
+.highlight .esc { color: #E6EDF3 } /* Escape */
+.highlight .g { color: #E6EDF3 } /* Generic */
+.highlight .k { color: #FF7B72 } /* Keyword */
+.highlight .l { color: #A5D6FF } /* Literal */
+.highlight .n { color: #E6EDF3 } /* Name */
+.highlight .o { color: #FF7B72; font-weight: bold } /* Operator */
+.highlight .x { color: #E6EDF3 } /* Other */
+.highlight .p { color: #E6EDF3 } /* Punctuation */
+.highlight .ch { color: #8B949E; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #8B949E; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: #8B949E; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #8B949E; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #FFA198; background-color: #490202 } /* Generic.Deleted */
+.highlight .ge { color: #E6EDF3; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #E6EDF3; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #FFA198 } /* Generic.Error */
+.highlight .gh { color: #79C0FF; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #56D364; background-color: #0F5323 } /* Generic.Inserted */
+.highlight .go { color: #8B949E } /* Generic.Output */
+.highlight .gp { color: #8B949E } /* Generic.Prompt */
+.highlight .gs { color: #E6EDF3; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #79C0FF } /* Generic.Subheading */
+.highlight .gt { color: #FF7B72 } /* Generic.Traceback */
+.highlight .g-Underline { color: #E6EDF3; text-decoration: underline } /* Generic.Underline */
+.highlight .kc { color: #79C0FF } /* Keyword.Constant */
+.highlight .kd { color: #FF7B72 } /* Keyword.Declaration */
+.highlight .kn { color: #FF7B72 } /* Keyword.Namespace */
+.highlight .kp { color: #79C0FF } /* Keyword.Pseudo */
+.highlight .kr { color: #FF7B72 } /* Keyword.Reserved */
+.highlight .kt { color: #FF7B72 } /* Keyword.Type */
+.highlight .ld { color: #79C0FF } /* Literal.Date */
+.highlight .m { color: #A5D6FF } /* Literal.Number */
+.highlight .s { color: #A5D6FF } /* Literal.String */
+.highlight .na { color: #E6EDF3 } /* Name.Attribute */
+.highlight .nb { color: #E6EDF3 } /* Name.Builtin */
+.highlight .nc { color: #F0883E; font-weight: bold } /* Name.Class */
+.highlight .no { color: #79C0FF; font-weight: bold } /* Name.Constant */
+.highlight .nd { color: #D2A8FF; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #FFA657 } /* Name.Entity */
+.highlight .ne { color: #F0883E; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #D2A8FF; font-weight: bold } /* Name.Function */
+.highlight .nl { color: #79C0FF; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #FF7B72 } /* Name.Namespace */
+.highlight .nx { color: #E6EDF3 } /* Name.Other */
+.highlight .py { color: #79C0FF } /* Name.Property */
+.highlight .nt { color: #7EE787 } /* Name.Tag */
+.highlight .nv { color: #79C0FF } /* Name.Variable */
+.highlight .ow { color: #FF7B72; font-weight: bold } /* Operator.Word */
+.highlight .pm { color: #E6EDF3 } /* Punctuation.Marker */
+.highlight .w { color: #6E7681 } /* Text.Whitespace */
+.highlight .mb { color: #A5D6FF } /* Literal.Number.Bin */
+.highlight .mf { color: #A5D6FF } /* Literal.Number.Float */
+.highlight .mh { color: #A5D6FF } /* Literal.Number.Hex */
+.highlight .mi { color: #A5D6FF } /* Literal.Number.Integer */
+.highlight .mo { color: #A5D6FF } /* Literal.Number.Oct */
+.highlight .sa { color: #79C0FF } /* Literal.String.Affix */
+.highlight .sb { color: #A5D6FF } /* Literal.String.Backtick */
+.highlight .sc { color: #A5D6FF } /* Literal.String.Char */
+.highlight .dl { color: #79C0FF } /* Literal.String.Delimiter */
+.highlight .sd { color: #A5D6FF } /* Literal.String.Doc */
+.highlight .s2 { color: #A5D6FF } /* Literal.String.Double */
+.highlight .se { color: #79C0FF } /* Literal.String.Escape */
+.highlight .sh { color: #79C0FF } /* Literal.String.Heredoc */
+.highlight .si { color: #A5D6FF } /* Literal.String.Interpol */
+.highlight .sx { color: #A5D6FF } /* Literal.String.Other */
+.highlight .sr { color: #79C0FF } /* Literal.String.Regex */
+.highlight .s1 { color: #A5D6FF } /* Literal.String.Single */
+.highlight .ss { color: #A5D6FF } /* Literal.String.Symbol */
+.highlight .bp { color: #E6EDF3 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #D2A8FF; font-weight: bold } /* Name.Function.Magic */
+.highlight .vc { color: #79C0FF } /* Name.Variable.Class */
+.highlight .vg { color: #79C0FF } /* Name.Variable.Global */
+.highlight .vi { color: #79C0FF } /* Name.Variable.Instance */
+.highlight .vm { color: #79C0FF } /* Name.Variable.Magic */
+.highlight .il { color: #A5D6FF } /* Literal.Number.Integer.Long */
+        
+</style>
+</head>
+<body>
+<h1>Tutorial 1: ASymCat Basics</h1>
+<p><strong>Welcome to ASymCat!</strong> This tutorial introduces the fundamentals of asymmetric categorical association analysis.</p>
+<h2>What You'll Learn</h2>
+<ol>
+<li>What asymmetric associations are and why they matter</li>
+<li>Basic ASymCat workflow: load → collect → score</li>
+<li>Simple association measures (MLE, PMI, Jaccard)</li>
+<li>Understanding directional relationships</li>
+<li>Working with different data formats</li>
+</ol>
+<h2>Prerequisites</h2>
+<p>Basic Python knowledge and familiarity with probability concepts.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>1. Introduction: What Are Asymmetric Associations?</h2>
+<p>Traditional association measures treat relationships as <strong>symmetric</strong>: the relationship
+between X and Y is the same as between Y and X. But many real-world relationships
+are <strong>directional</strong>:</p>
+<ul>
+<li><strong>Medicine</strong>: Knowing the doctor tells you the likely treatment, but knowing the
+treatment doesn't uniquely identify the doctor</li>
+<li><strong>Language</strong>: The letter &quot;q&quot; strongly predicts &quot;u&quot; in English, but &quot;u&quot; weakly predicts &quot;q&quot;</li>
+<li><strong>Ecology</strong>: One species' presence may predict another's, but not vice versa</li>
+</ul>
+<p><strong>ASymCat quantifies these directional relationships</strong>, revealing patterns that
+symmetric measures miss.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Import required libraries</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asymcat</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">asymcat.scorer</span><span class="w"> </span><span class="kn">import</span> <span class="n">CatScorer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="c1"># Set up plotting</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ASymCat version:&quot;</span><span class="p">,</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ready to analyze asymmetric associations!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">ASymCat version: 0.4.0
+Ready to analyze asymmetric associations!</pre>
+</div>
+<h2>2. The Basic Workflow</h2>
+<p>ASymCat analysis follows three simple steps:</p>
+<pre><code>1. LOAD data    → read_sequences() or read_pa_matrix()
+2. COLLECT      → collect_cooccs() to count co-occurrences
+3. SCORE        → CatScorer() to compute association measures
+</code></pre>
+<p>Let's demonstrate with a simple example.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h3>Example: Doctor Prescriptions</h3>
+<p>We'll analyze a small dataset of doctor prescriptions to understand who prescribes what.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Create a simple synthetic dataset</span>
+<span class="c1"># Format: list of (X, Y) tuples representing co-occurrences</span>
+<span class="n">medical_data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;Dr_Smith&#39;</span><span class="p">,</span> <span class="s1">&#39;Aspirin&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Dr_Smith&#39;</span><span class="p">,</span> <span class="s1">&#39;Aspirin&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Dr_Smith&#39;</span><span class="p">,</span> <span class="s1">&#39;Aspirin&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Dr_Smith&#39;</span><span class="p">,</span> <span class="s1">&#39;Ibuprofen&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Dr_Jones&#39;</span><span class="p">,</span> <span class="s1">&#39;Morphine&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Dr_Jones&#39;</span><span class="p">,</span> <span class="s1">&#39;Morphine&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Dr_Jones&#39;</span><span class="p">,</span> <span class="s1">&#39;Morphine&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Dr_Brown&#39;</span><span class="p">,</span> <span class="s1">&#39;Aspirin&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Dr_Brown&#39;</span><span class="p">,</span> <span class="s1">&#39;Aspirin&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Dr_Brown&#39;</span><span class="p">,</span> <span class="s1">&#39;Ibuprofen&#39;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># Display the data</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Medical Prescription Data:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">medical_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Doctor&#39;</span><span class="p">,</span> <span class="s1">&#39;Treatment&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Total prescriptions: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">medical_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unique doctors: </span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Doctor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unique treatments: </span><span class="si">{</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Treatment&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">Medical Prescription Data:
+==================================================
+  Doctor Treatment
+Dr_Smith   Aspirin
+Dr_Smith   Aspirin
+Dr_Smith   Aspirin
+Dr_Smith Ibuprofen
+Dr_Jones  Morphine
+Dr_Jones  Morphine
+Dr_Jones  Morphine
+Dr_Brown   Aspirin
+Dr_Brown   Aspirin
+Dr_Brown Ibuprofen
+
+Total prescriptions: 10
+Unique doctors: 3
+Unique treatments: 3</pre>
+</div>
+<h3>Step 1: Create a Scorer</h3>
+<p>The <code>CatScorer</code> class is the heart of ASymCat. It takes co-occurrence data
+and provides methods to compute various association measures.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Create scorer (data is already in co-occurrence format)</span>
+<span class="n">scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">medical_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Scorer created successfully!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Smoothing method: </span><span class="si">{</span><span class="n">scorer</span><span class="o">.</span><span class="n">smoothing_method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+Scorer created successfully!
+Smoothing method: laplace</pre>
+</div>
+<h3>Step 2: Compute Association Measures</h3>
+<p>Let's start with <strong>MLE (Maximum Likelihood Estimation)</strong>, which computes
+conditional probabilities: P(Y|X) and P(X|Y).</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Compute MLE scores</span>
+<span class="n">mle_scores</span> <span class="o">=</span> <span class="n">scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">MLE (Conditional Probability) Results:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">p_y_given_x</span><span class="p">,</span> <span class="n">p_x_given_y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">mle_scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Pair: </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> ↔ </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  P(</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">p_y_given_x</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  P(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">p_x_given_y</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Asymmetry = </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">p_y_given_x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">p_x_given_y</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">p_y_given_x</span> <span class="o">&gt;</span> <span class="n">p_x_given_y</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> better predicts </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2"> better predicts </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+MLE (Conditional Probability) Results:
+============================================================
+
+Pair: Dr_Brown ↔ Aspirin
+  P(Aspirin|Dr_Brown) = 0.429
+  P(Dr_Brown|Aspirin) = 0.600
+  Asymmetry = 0.171
+  → Aspirin better predicts Dr_Brown
+
+Pair: Dr_Brown ↔ Ibuprofen
+  P(Ibuprofen|Dr_Brown) = 0.500
+  P(Dr_Brown|Ibuprofen) = 0.400
+  Asymmetry = 0.100
+  → Dr_Brown better predicts Ibuprofen
+
+Pair: Dr_Brown ↔ Morphine
+  P(Morphine|Dr_Brown) = 0.200
+  P(Dr_Brown|Morphine) = 0.200
+  Asymmetry = 0.000
+  → Morphine better predicts Dr_Brown
+
+Pair: Dr_Jones ↔ Aspirin
+  P(Aspirin|Dr_Jones) = 0.143
+  P(Dr_Jones|Aspirin) = 0.200
+  Asymmetry = 0.057
+  → Aspirin better predicts Dr_Jones
+
+Pair: Dr_Jones ↔ Ibuprofen
+  P(Ibuprofen|Dr_Jones) = 0.250
+  P(Dr_Jones|Ibuprofen) = 0.200
+  Asymmetry = 0.050
+  → Dr_Jones better predicts Ibuprofen
+
+Pair: Dr_Jones ↔ Morphine
+  P(Morphine|Dr_Jones) = 0.800
+  P(Dr_Jones|Morphine) = 0.800
+  Asymmetry = 0.000
+  → Morphine better predicts Dr_Jones
+
+Pair: Dr_Smith ↔ Aspirin
+  P(Aspirin|Dr_Smith) = 0.571
+  P(Dr_Smith|Aspirin) = 0.667
+  Asymmetry = 0.095
+  → Aspirin better predicts Dr_Smith
+
+Pair: Dr_Smith ↔ Ibuprofen
+  P(Ibuprofen|Dr_Smith) = 0.500
+  P(Dr_Smith|Ibuprofen) = 0.333
+  Asymmetry = 0.167
+  → Dr_Smith better predicts Ibuprofen
+
+Pair: Dr_Smith ↔ Morphine
+  P(Morphine|Dr_Smith) = 0.200
+  P(Dr_Smith|Morphine) = 0.167
+  Asymmetry = 0.033
+  → Dr_Smith better predicts Morphine</pre>
+</div>
+<h3>Understanding the Results</h3>
+<p><strong>Key Observations:</strong></p>
+<ul>
+<li><strong>Dr_Smith → Aspirin</strong>: P(Aspirin|Dr_Smith) = 0.75 means 75% of Dr_Smith's
+prescriptions are Aspirin</li>
+<li><strong>Aspirin → Dr_Smith</strong>: P(Dr_Smith|Aspirin) = 0.60 means 60% of Aspirin
+prescriptions come from Dr_Smith</li>
+<li>The <strong>asymmetry</strong> shows these are different relationships!</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>3. Visualizing Asymmetric Relationships</h2>
+<p>Let's visualize the directional nature of these associations.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Prepare data for visualization</span>
+<span class="n">pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">mle_scores</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="n">pair_labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\n</span><span class="s2">↔</span><span class="se">\n</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">]</span>
+<span class="n">xy_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">mle_scores</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">]</span>
+<span class="n">yx_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">mle_scores</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">]</span>
+
+<span class="c1"># Create bar chart</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">x_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pairs</span><span class="p">))</span>
+<span class="n">width</span> <span class="o">=</span> <span class="mf">0.35</span>
+
+<span class="n">bars1</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x_pos</span> <span class="o">-</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">xy_scores</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;X→Y&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">)</span>
+<span class="n">bars2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x_pos</span> <span class="o">+</span> <span class="n">width</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">yx_scores</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Y→X&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;coral&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Pairs&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Conditional Probability P(·|·)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;MLE: Asymmetric Conditional Probabilities&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">x_pos</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">pair_labels</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📊 The different bar heights show the asymmetric nature of associations!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+📊 The different bar heights show the asymmetric nature of associations!</pre>
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABKUAAAJOCAYAAABm7rQwAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjYsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvq6yFwwAAAAlwSFlzAAAPYQAAD2EBqD+naQAAdhlJREFUeJzt3Xt8z/X///H7e2djMzPbnOd8LKcQOdMHSc4JOSWFVpgkyiEqSU4hlFNUUiq+JRRR5FQkJEKGnOa0g7GN7fX7w8X7t7ed3nvvvfe2927Xy+V9sffr9Xy9Xo/3+7m99t7d8/V8mQzDMAQAAAAAAAA4kEtOFwAAAAAAAID8h1AKAAAAAAAADkcoBQAAAAAAAIcjlAIAAAAAAIDDEUoBAAAAAADA4QilAAAAAAAA4HCEUgAAAAAAAHA4QikAAAAAAAA4HKEUAAAAAAAAHI5QCgAA5FkDBgyQyWSSyWRSixYtcrqcXCu99+necpPJpOXLl2d631ndPieFhISYa580aVJOl2Ozbdu2WfRDeHh4rjvW8uXLLbZLrkWLFublAwYMMC8PDw+32Gbbtm2ZqjWr2wMAsh+hFADAwv1/cJhMJj3xxBOptt20aVOKtsn/oJAs/+izJjSYNGlSin2m9siOP37XrFmT4jjz5s2z+3HyO0f+AW1vBw8e1EsvvaQ6derI399f7u7uKlKkiBo0aKDRo0fr4MGDOV2iXeXlwCm73B+uJH/4+Piodu3aevXVVxUREZHTpTo1AicAcA5uOV0AACD3W79+vf7991+VL1/eYvmcOXNyqKLssWzZshTLli9frtDQ0ByoBtZ46qmnVLNmTUlS6dKls+04cXFxGj58uD788MMU6yIjI/Xbb7/pt99+05dffpmnQjZJmj59uvnr+vXrO3x7Z3Ljxg39+eef+vPPP7VkyRJt2bJFDz74YE6XlSvUr1/f4nvFGv7+/hbbVKhQwaHbAwCyH6EUACBDSUlJmjdvnmbOnGle9s8//2jjxo3Zfuxx48apSJEiKZbb+4/fixcvatOmTSmW79u3T4cPHzYHH8gdoqOj5evrq3bt2qldu3bZeqzExEQ9+eST+vbbb83LChcurK5du6pixYqKi4vTwYMH9cMPP2RrHdnl5ZdfztHt87ohQ4aoQoUKunXrljZv3qxffvlFknTlyhX1799ff/zxh1X7ufc97axq1KihGjVqZGobX1/fLH1/ZXV7AED24/I9AEC6XFzu/qpYunSpYmNjzcvnzp0rwzAkSa6urtl2/MGDB+vll19O8bj/j5vklwnefwmhNVauXKnExERJUqFChVSiRAnzurQuW7py5Yq5loIFC8rDw0PBwcFq0KCBQkNDtXv3bkl3R2Ddq83b21tRUVEW+4mMjJSHh4e5zerVqyVZXsoYEhKiCxcuqH///goICJCvr686duyof/75R5K0f/9+tWvXTj4+PipSpIh69Oihs2fPWhzn/svmjh07pokTJ6ps2bLy9vZWgwYNzEHj5cuXNWjQIBUrVkwFChRQkyZNtH379lTfh0uXLmncuHGqXbu2fHx85OXlpYoVK+qFF17QmTNnLNqaTCa1bNnSYlm5cuVS9N39tZ44cULvvfeeqlWrJk9PT/Xr109SxnNKXb16VVOmTNHDDz+sIkWKyNPTUyVLllTbtm3N73NGFi9ebBFINWrUSCdOnNDSpUs1btw4TZ48WWvXrtW5c+c0YsSIFNvv27dP/fr1U7ly5eTl5aVChQqpZs2aGjVqlP77778U7e+fX+f48ePq1auXAgIC5OXlpbp162rdunWp1vrLL7+oRYsWKliwoPz9/dWjRw+dPHky3deX2iV692pIbuDAgRbfj+ltn9yWLVvUvXt3lSpVSp6envL19VXdunU1ceJEXbt2LUX7++d52rdvnx5//HH5+fnJ29tbTZs21Y4dO1Jst3TpUj355JOqVq2aAgIC5O7uLl9fX9WuXVtjxozRlStX0n0fbNWzZ0+9/PLLGj9+vH7++Wc1adLEvO7AgQP6999/JaW87O/mzZt67bXXVL58ebm7u2vChAnm7W7duqVZs2bpkUceUZEiReTh4aGgoCA99thj+uKLLzKsyTAMzZ8/XzVr1pSXl5dKliypsLAwxcTEWLS7du2aXnnlFbVu3VohISHy8fExH+vRRx/VypUrzef5rB4rvTml0pLWJXohISEqV66cRduWLVumOBdYc4nft99+q06dOql48eLy8PBQkSJF1KpVK3366aepvvbt27erS5cuKlmypDw8PFSoUCGFhISoffv2mjRpUorzOwAgAwYAAMls3brVkGR+dO7c2fz1/PnzDcMwjKioKMPHx8eQZNSpU8coW7asuU3//v0t9pd8XfPmzTM8/sSJEy2Of+rUKavqTq8G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leLc9fLLL6tfv36qUKGCOVQ/duyYbt68qWLFiqlTp0565ZVXtGTJEo0fP968LyY7B4DMYaQUAMBqK1as0NGjR+Xu7q5GjRplevt9+/al+OP5nkWLFqlevXoplqd1972aNWuqXbt2ma4huRUrVlj8UdaxY8cU84EkJSVZ3B1v2bJlmjVrlv755x9zUFerVi2VKFFCbm5u2rhxo8X2948S6NOnj8aMGaPr168rLi7OvHzgwIFZei05YcCAAXrzzTd15coV3blzR4888oh69OihihUrKj4+XseOHdO2bdt06dIlbd261TzX1f2XxL3wwgtq27at3Nzc9MQTT6hy5cp2qe2tt94yj9oYO3astmzZokaNGunmzZvavXu3AgICtHbt2gz3NXjwYP3f//2fNmzYIOnuXFoVKlRQ165dVaFCBcXFxengwYP64YcfFBgYqBEjRkiSRo4cqXXr1skwDMXExKh+/frq3bu3bty4oaVLl5r37+/vbzF3kC2eeOIJFStWzBx0DR06VL/99pv57nv3ws/MKlmypDm8mzFjhq5evaoCBQqoTp065jv/pWXUqFHm+YbCw8NVv359i7vv3VO5cmV16NDBpvruqVKlijlgPnjwoHr16qVq1appw4YNKe6Gl5vVqlVLrVu3Nofb7777rv7991/VqFFDP/zwg8WcU8OHD08xJ9U9H330kS5fvqwHH3xQGzZssLib3+DBgyXdvezOz8/PfHndm2++qYiICN25c0dLly5N95K9zB4rOxQrVkzu7u7m7+3XXntNf/75p9zd3dWiRYs0f9dId+86GBYWptdee02S9MUXX+jff//Vo48+Kh8fH128eFG///679uzZoyZNmpjn7Js1a5ZWrlyp1q1bq1y5cgoKCtK1a9csQtbcODIMAHK1HJpgHQCQS6V2972MWHv3vfQe9+6KZO3d99I7jrV336tatap5m0qVKqXZrmnTpuZ2gYGBxu3bt41du3ZlWOP9d+y75+WXX7ZoV7x4cePOnTsp2iV/L8qWLWuxLvld5+5fl9adrNK76939d8ZKvi69On799VeLu1hl1L/31KlTJ9V29+4iaM0d+u5/H+6/q9zevXuNoKCgNGvq1KlTqvtMTWxsrDFo0KAMX+f978+sWbMMFxeXNNsXLlw4xXuTVv8ZRvp3MFu3bp3FHR7vPXx8fIy6deum+T4lb3v/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DUsRSElS6dKlNXToUP31119ZLg4AAAAAAADOyaZQqmzZsoqPj09zfUJCQqqBFQAAAAAAACDZGEpNmDBB77//vg4cOJBi3R9//KG5c+dq0qRJWSwNAAAAAAAAzsqqOaVeeumlFMuCgoJUr149NW7cWBUrVpQkHT9+XLt27VLNmjW1e/du9erVy77VAgAAAAAAwClYFUrNmzcvzXW//vqrfv31V4tlhw4d0uHDhzVnzpysVQcAAAAAAACnZFUolZSUlN11AAAAAAAAIB+xaU4pAAAAAAAAICusGimVllOnTmnDhg06ffq0pLt35Wvfvr3KlStnl+IAAAAAAADgnGwOpUaNGqU5c+akuLTPxcVFI0aM0HvvvZfl4gAAAAAAAOCcbLp8b8aMGZo1a5a6du2qXbt2KTIyUpGRkdq1a5e6d++uWbNmadasWfauFQAAAAAAAE7CppFSH330kZ544gl98cUXFssbNmyozz//XHFxcVq0aJFGjhxplyIBAAAAAADgXGwaKRUeHq62bdumub5t27YKDw+3tSYAAAAAAAA4OZtCqcDAQP35559prv/zzz9VrFgxm4sCAAAAAACAc7MplOrRo4cWL16sd955R7GxseblsbGxmjZtmhYvXqyePXvarUgAAAAAAAA4F5vmlJoyZYoOHDigcePGacKECSpRooQk6fz587pz545atmypyZMn27VQAAAAAAAAOA+bQilvb29t2bJF69at04YNG3T69GlJUrt27fTYY4+pY8eOMplMdi0UAAAAAAAAziPTodTNmzf19NNPq1u3burTp486deqUHXUBkBS6eEdOl5Chec82yekSAAAAkAfxWRdApueU8vb21ubNm3Xz5s3sqAcAAAAAAAD5gE0TnTdp0kS7du2ydy0AAAAAAADIJ2wKpebNm6ft27fr9ddf13///WfvmgAAAAAAAODkbAqlatWqpf/++09Tp05V2bJl5enpKV9fX4tH4cKF7V0rAAAAAAAAnIRNd9/r1q0bd9cDAAAAAACAzWwKpZYvX27nMgAAAAAAAJCfZCqUiouL07p163Tq1CkFBASoQ4cOKl68eHbVBgAAAAAAACdldSgVERGhxo0b69SpUzIMQ5Lk7e2ttWvXqk2bNtlWIAAAAAAAAJyP1ROdT5kyReHh4Ro5cqS+++47zZ49WwUKFNDzzz+fnfUBAAAAAADA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riZNmmjVqlXmNo899phatGghV1dXDRw4UKdPn9bVq1dlGIY++OADzZw5U8WLF5eHh4fefPNN/frrrzp79qzc3d0VFxenv/76S7dv31aZMmX4gzcD9KlzoT+dg62/S4sWLaoqVapo4MCB+uKLL9Icabx69Wp9/fXXOn/+vM6ePauHH35Ybdq00dWrV9W7d28NGTIk1X1v2LBBhQsX1o0bN3Tjxg01bdpUkvTXX3/J29tb586d0+rVqzV69GidPHnSDu+E86BPnQv9mX8QSiFVWfnANXbsWPn5+algwYLq2rWrXn/9dQUGBprX37+/lStX6umnn1azZs3k7u6uESNGqEiRIlq/fr3c3NzUtGlTbd26VdeuXdPFixc1dOhQbd26VUlJSfr5558t/uCtW7eunnzySbm6uqpv375KSEjQP//8Y/83KI+hP50Pfeq8zp07J39/f0mSj4+PTfMW/PfffwoJCbFYVr58ef3333/m58HBweavCxYsKOnuB74rV64oNjZWzZo1k5+fn/z8/BQcHCwPDw+dPXtWLVu21BtvvKHx48crICBA3bp1sxjdgZToU+dCfzoPW36Xmkwmbdu2TbVq1dIbb7yh8uXLq3r16vrxxx8t2g0dOlSlS5dW4cKF9dhjj6lo0aLq2rWrXF1d1bNnTx0+fFgJCQlW1xoQEGAejdyiRQuFhITowIEDNr1uZ0afOhf6M38glEKqsvKBa+rUqYqMjNStW7d07Ngxffzxx1q0aJF5/f37S+2DWbly5cwfzFq2bKmtW7dq69atatasmVq3bq2tW7fqjz/+kIuLix588EHzdsk/wJlMJhUoUIBRGKI/nRF96pzu3LmjdevWqUWLFpIkFxfbfk2XKlVK4eHhFsvCw8NVqlSpDLctWrSovL29tWfPHkVGRpoft27dMg+XHzZsmHbv3q0zZ87I09NTL730kk115gf0qXOhP52Lrb9Lg4ODNWPGDP3111+6fPmy2rdvry5dupj/eJakoKAg89fe3t4pnhuGoZs3b1pda/LtpbtBJb8/U6JPnQv9mT8QSiEFe33gkqSKFSvqscces5hg8/79ZfTBrGXLltq2bZu2bNmiVq1amSet++abb9SiRQuZTCab68sP6E/nQ586p6NHj6p///6KiopSWFhYlvbVs2dPbdu2TevWrdOdO3f09ddf65dffjHPOZMeFxcX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" alt="Figure">
+</div>
+<h2>4. Multiple Association Measures</h2>
+<p>ASymCat provides 17+ association measures. Let's compare a few basic ones:</p>
+<ul>
+<li><strong>MLE</strong>: Conditional probability P(Y|X)</li>
+<li><strong>PMI</strong>: Pointwise Mutual Information (information overlap)</li>
+<li><strong>Jaccard</strong>: Set overlap similarity</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Compute multiple measures</span>
+<span class="n">measures</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;MLE&#39;</span><span class="p">:</span> <span class="n">scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">(),</span>
+    <span class="s1">&#39;PMI&#39;</span><span class="p">:</span> <span class="n">scorer</span><span class="o">.</span><span class="n">pmi</span><span class="p">(),</span>
+    <span class="s1">&#39;Jaccard&#39;</span><span class="p">:</span> <span class="n">scorer</span><span class="o">.</span><span class="n">jaccard_index</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="c1"># Create comparison table</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Association Measures Comparison:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">80</span><span class="p">)</span>
+
+<span class="n">comparison_data</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">pair</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+        <span class="s1">&#39;Y&#39;</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span>
+        <span class="s1">&#39;MLE(Y|X)&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">measures</span><span class="p">[</span><span class="s1">&#39;MLE&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;MLE(X|Y)&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">measures</span><span class="p">[</span><span class="s1">&#39;MLE&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;PMI(X,Y)&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">measures</span><span class="p">[</span><span class="s1">&#39;PMI&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;Jaccard(X,Y)&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">measures</span><span class="p">[</span><span class="s1">&#39;Jaccard&#39;</span><span class="p">][</span><span class="n">pair</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">comparison_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+<span class="n">comparison_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">comparison_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">comparison_df</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+</div>
+<pre class="code-output">
+Association Measures Comparison:
+================================================================================
+       X         Y MLE(Y|X) MLE(X|Y) PMI(X,Y) Jaccard(X,Y)
+Dr_Brown   Aspirin    0.429    0.600    0.288        0.333
+Dr_Brown Ibuprofen    0.500    0.400    0.511        0.250
+Dr_Brown  Morphine    0.200    0.200   -2.197        0.000
+Dr_Jones   Aspirin    0.143    0.200   -2.708        0.000
+Dr_Jones Ibuprofen    0.250    0.200   -1.792        0.000
+Dr_Jones  Morphine    0.800    0.800    1.204        1.000
+Dr_Smith   Aspirin    0.571    0.667    0.405        0.500
+Dr_Smith Ibuprofen    0.500    0.333    0.223        0.200
+Dr_Smith  Morphine    0.200    0.167   -2.485        0.000</pre>
+</div>
+<h3>Measure Properties</h3>
+<p>| Measure | Range | Asymmetric? | Interpretation |
+|---------|-------|-------------|----------------|
+| <strong>MLE</strong> | [0,1] | ✓ Yes | Direct conditional probability |
+| <strong>PMI</strong> | (-∞,+∞) | ✗ No | Information content (0 = independent) |
+| <strong>Jaccard</strong> | [0,1] | ✗ No | Context overlap similarity |</p>
+<p><strong>Note:</strong> Even symmetric measures like PMI return two values in ASymCat for
+consistency, but both values are identical.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>5. Working with Sequence Data</h2>
+<p>ASymCat can load aligned sequences from TSV files. Let's use the toy dataset.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Load sequence data from file</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;../resources/toy.tsv&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sequence Data Loaded:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of sequence pairs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Display first few sequences</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">seq1</span><span class="p">,</span> <span class="n">seq2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Pair </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sequence 1: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sequence 2: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">FileNotFoundError: File not found: ../resources/toy.tsv
+  at line 204 in code block</pre>
+</div>
+<h3>Collecting Co-occurrences</h3>
+<p>From aligned sequences, we extract co-occurrences at each position.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Collect co-occurrences</span>
+<span class="n">cooccs</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">collect_cooccs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Total co-occurrences collected: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cooccs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sample co-occurrences:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cooccs</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create scorer and analyze</span>
+<span class="n">seq_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">cooccs</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+<span class="n">seq_mle</span> <span class="o">=</span> <span class="n">seq_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Top 5 strongest associations (by P(Y|X)):&quot;</span><span class="p">)</span>
+<span class="n">sorted_pairs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">seq_mle</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">p_y_x</span><span class="p">,</span> <span class="n">p_x_y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">sorted_pairs</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">: P(</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">p_y_x</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">NameError: name &#39;data&#39; is not defined
+  at line 221 in code block</pre>
+</div>
+<h2>6. Working with Presence-Absence Data</h2>
+<p>ASymCat can also analyze binary presence-absence matrices, commonly used in ecology.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Load Galápagos finch data</span>
+<span class="n">pa_data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_pa_matrix</span><span class="p">(</span><span class="s2">&quot;../resources/galapagos.tsv&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Galápagos Finch Dataset:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Co-occurrence pairs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">pa_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create scorer for species co-occurrence</span>
+<span class="n">species_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">pa_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+<span class="n">species_mle</span> <span class="o">=</span> <span class="n">species_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Top 10 species associations (by P(Species2|Species1)):&quot;</span><span class="p">)</span>
+<span class="n">sorted_species</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">species_mle</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">sp1</span><span class="p">,</span> <span class="n">sp2</span><span class="p">),</span> <span class="p">(</span><span class="n">p_sp2_sp1</span><span class="p">,</span> <span class="n">p_sp1_sp2</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_species</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># Shorten species names for display</span>
+    <span class="n">sp1_short</span> <span class="o">=</span> <span class="n">sp1</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">sp1</span> <span class="k">else</span> <span class="n">sp1</span>
+    <span class="n">sp2_short</span> <span class="o">=</span> <span class="n">sp2</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">sp2</span> <span class="k">else</span> <span class="n">sp2</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">sp1_short</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">sp2_short</span><span class="si">:</span><span class="s2">20s</span><span class="si">}</span><span class="s2">: P = </span><span class="si">{</span><span class="n">p_sp2_sp1</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="error">FileNotFoundError: File not found: ../resources/galapagos.tsv
+  at line 242 in code block</pre>
+</div>
+<h2>7. Understanding Smoothing</h2>
+<p><strong>Smoothing</strong> handles sparse data by adding pseudo-counts. Let's see the effect.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Create sparse dataset</span>
+<span class="n">sparse_data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;Common&#39;</span><span class="p">,</span> <span class="s1">&#39;Frequent&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Common&#39;</span><span class="p">,</span> <span class="s1">&#39;Frequent&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Common&#39;</span><span class="p">,</span> <span class="s1">&#39;Frequent&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Common&#39;</span><span class="p">,</span> <span class="s1">&#39;Rare&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;Rare_Item&#39;</span><span class="p">,</span> <span class="s1">&#39;Frequent&#39;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sparse Dataset:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Compare different smoothing methods</span>
+<span class="n">smoothing_methods</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;MLE (no smoothing)&#39;</span><span class="p">:</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;mle&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;Laplace (α=1)&#39;</span><span class="p">:</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;Lidstone (α=0.1)&#39;</span><span class="p">:</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">sparse_data</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;lidstone&#39;</span><span class="p">,</span> <span class="n">smoothing_alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Smoothing Effects on P(Frequent|Common):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">method_name</span><span class="p">,</span> <span class="n">smooth_scorer</span> <span class="ow">in</span> <span class="n">smoothing_methods</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">smooth_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;Common&#39;</span><span class="p">,</span> <span class="s1">&#39;Frequent&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">:</span>
+        <span class="n">p_val</span> <span class="o">=</span> <span class="n">scores</span><span class="p">[(</span><span class="s1">&#39;Common&#39;</span><span class="p">,</span> <span class="s1">&#39;Frequent&#39;</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">method_name</span><span class="si">:</span><span class="s2">25s</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">p_val</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+Sparse Dataset:
+  1. (Common, Frequent)
+  2. (Common, Frequent)
+  3. (Common, Frequent)
+  4. (Common, Rare)
+  5. (Rare_Item, Frequent)
+
+Smoothing Effects on P(Frequent|Common):
+==================================================
+MLE (no smoothing)       : 0.7500
+Laplace (α=1)            : 0.6667
+Lidstone (α=0.1)         : 0.7381</pre>
+</div>
+<p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>MLE</strong>: Raw probabilities (3/4 = 0.75) can be unstable for rare events</li>
+<li><strong>Laplace</strong>: Adds 1 pseudo-count to all outcomes (smoother, more conservative)</li>
+<li><strong>Lidstone</strong>: Allows custom α for fine-tuned smoothing</li>
+</ul>
+<p><strong>When to use smoothing:</strong></p>
+<ul>
+<li>Small datasets</li>
+<li>Rare co-occurrences</li>
+<li>When zero probabilities are problematic</li>
+</ul>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<h2>8. Key Takeaways</h2>
+<p><strong>You've learned:</strong></p>
+<p>✓ Asymmetric associations reveal directional relationships
+✓ Basic workflow: load → collect → score
+✓ MLE computes conditional probabilities P(Y|X) ≠ P(X|Y)
+✓ ASymCat handles sequences and presence-absence matrices
+✓ Smoothing stabilizes estimates for sparse data</p>
+<h2>Next Steps</h2>
+<p>Continue to <strong>Tutorial 2: Advanced Measures</strong> to learn:</p>
+<ul>
+<li>Information-theoretic measures (PMI, MI, Theil's U)</li>
+<li>Statistical measures (Chi-square, Fisher exact test)</li>
+<li>Choosing the right measure for your data</li>
+<li>Measure comparison and interpretation</li>
+</ul>
+<h2>Quick Reference</h2>
+<pre><code class="language-python"># Load sequence data
+data = asymcat.read_sequences(&quot;file.tsv&quot;)
+cooccs = asymcat.collect_cooccs(data)
+
+# Load presence-absence data
+pa_data = asymcat.read_pa_matrix(&quot;matrix.tsv&quot;)
+
+# Create scorer
+scorer = CatScorer(cooccs, smoothing_method='laplace')
+
+# Compute measures
+mle = scorer.mle()           # Conditional probabilities
+pmi = scorer.pmi()           # Pointwise mutual information
+jaccard = scorer.jaccard_index()  # Set overlap
+</code></pre>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tutorial 1 Complete! ✓&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">You&#39;re now ready to analyze asymmetric categorical associations!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Proceed to Tutorial 2 to explore advanced measures.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+============================================================
+Tutorial 1 Complete! ✓
+============================================================
+
+You&#39;re now ready to analyze asymmetric categorical associations!
+Proceed to Tutorial 2 to explore advanced measures.</pre>
+</div>
+</body>
+</html>
