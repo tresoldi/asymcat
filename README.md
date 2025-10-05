@@ -73,48 +73,59 @@ pip install -e ".[dev]"  # Install with all optional dependencies
 - **Development**: pytest, ruff, mypy, jupyter
 - **Optional**: plotly, bokeh, altair (for enhanced visualization)
 
-## 📚 Documentation & Interactive Examples
+## 📚 Documentation & Resources
 
-ASymCat provides comprehensive documentation through executable tutorials that demonstrate all features with real examples and visualizations:
+ASymCat provides comprehensive documentation organized for different needs:
 
-### 🎯 Simple Examples
-**Perfect starting point** - Core functionality demonstrations with synthetic data
-📄 [Python source](docs/Simple_Examples.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/Simple_Examples.html)
-- Basic asymmetric analysis workflow
-- All 17+ association measures with examples
-- Smoothing methods comparison
-- Real-world interpretation guidelines
+### Core Documentation
 
-### 🎨 Interactive Demo
-**Visualization showcase** - Interactive plotting and data exploration
-📄 [Python source](docs/Demo.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/Demo.html)
-- Heatmap visualizations of asymmetric relationships
-- Score distribution analysis
-- Comparative measure evaluation
-- Matrix transformation examples
+| Document | Purpose | Audience |
+|----------|---------|----------|
+| **[User Guide](docs/USER_GUIDE.md)** | Conceptual foundations, theory, best practices | Everyone - start here |
+| **[API Reference](docs/API_REFERENCE.md)** | Complete technical API documentation | Developers |
+| **[LLM Documentation](docs/LLM_DOCUMENTATION.md)** | Quick integration and code patterns | AI agents, rapid development |
 
-### 🔬 Academic Analysis Tutorial
-**Research-grade examples** - Comprehensive statistical validation
-📄 [Python source](docs/Academic_Analysis_Tutorial.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/Academic_Analysis_Tutorial.html)
-- **Historical Linguistics**: Grapheme-phoneme correspondence analysis
-- **Island Biogeography**: Darwin's finch species co-occurrence patterns
-- **Machine Learning**: Feature selection for categorical classification
-- Bootstrap confidence intervals and permutation testing
+### Progressive Interactive Tutorials
 
-### 📊 Advanced Examples with Plots
-**Publication-ready analysis** - Advanced smoothing and visualization
-📄 [Python source](docs/EXAMPLES_WITH_PLOTS.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/EXAMPLES_WITH_PLOTS.html)
-- Smoothing effects comparison (MLE, Laplace, Lidstone)
-- Statistical significance testing and validation
-- Publication-quality plots and figures
-- Real dataset analysis workflows
+Learn ASymCat through hands-on Nhandu tutorials with executable code and visualizations:
+
+#### 📘 Tutorial 1: Basics
+**Foundation** - Get started with asymmetric analysis
+📄 [Python source](docs/tutorial_1_basics.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/tutorial_1_basics.html)
+- What are asymmetric associations and why they matter
+- Basic workflow: load → collect → score
+- Simple measures (MLE, PMI, Jaccard)
+- Working with sequences and presence-absence data
+
+#### 📗 Tutorial 2: Advanced Measures
+**Depth** - Master all 17+ association measures
+📄 [Python source](docs/tutorial_2_advanced_measures.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/tutorial_2_advanced_measures.html)
+- Information-theoretic measures (PMI, NPMI, Theil's U)
+- Statistical measures (Chi-square, Cramér's V, Fisher)
+- Smoothing methods and their effects
+- Measure selection decision tree
+
+#### 📙 Tutorial 3: Visualization
+**Communication** - Create publication-quality figures
+📄 [Python source](docs/tutorial_3_visualization.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/tutorial_3_visualization.html)
+- Heatmap visualizations of association matrices
+- Score distribution and asymmetry plots
+- Matrix transformations (scaling, inversion)
+- Multi-measure comparison panels
+
+#### 📕 Tutorial 4: Real-World Applications
+**Application** - Complete analysis workflows
+📄 [Python source](docs/tutorial_4_real_world.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/tutorial_4_real_world.html)
+- **Linguistics**: Grapheme-phoneme correspondence analysis
+- **Ecology**: Galápagos finch species co-occurrence patterns
+- **Machine Learning**: Feature selection with asymmetric measures
+- Interpretation best practices and reporting strategies
 
 > **💡 All tutorials are fully executed with committed outputs** - view the HTML files online via the links above, or run the Python source files locally to explore and modify. Generate fresh documentation with `make docs`.
 
-### 📖 Additional Documentation
-- **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Theory and formulas
-- **[API Documentation](https://asymcat.readthedocs.io/)**: Complete API reference  
-- **[Developer Guide](DEVELOPER.md)**: Comprehensive contributor guide
+### Additional Resources
+- **[Documentation Index](docs/README.md)**: Complete navigation guide
+- **[CHANGELOG](CHANGELOG.md)**: Version history and migration guides
 
 ## 🎮 Usage
 
@@ -344,9 +355,11 @@ make quality && make test-cov
 
 ## 📚 Documentation
 
-- **[Tutorial Examples](docs/)**: Executable Python tutorials with HTML reports (see section above)
+- **[Documentation Index](docs/README.md)**: Complete navigation and quick reference
+- **[User Guide](docs/USER_GUIDE.md)**: Conceptual foundations and best practices
+- **[API Reference](docs/API_REFERENCE.md)**: Complete technical API documentation
+- **[Interactive Tutorials](docs/)**: Four progressive Nhandu tutorials with HTML reports
 - **[CHANGELOG](CHANGELOG.md)**: Version history and migration guides
-- **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Theory and formulas (if available)
 
 ## 🤝 Contributing
 
