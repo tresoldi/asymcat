@@ -77,35 +77,39 @@ pip install -e ".[dev]"  # Install with all optional dependencies
 
 ASymCat provides comprehensive documentation through executable tutorials that demonstrate all features with real examples and visualizations:
 
-### 🎯 **[Simple Examples](docs/Simple_Examples.html)** ([source](docs/Simple_Examples.py))
-**Perfect starting point** - Core functionality demonstrations with synthetic data:
+### 🎯 Simple Examples
+**Perfect starting point** - Core functionality demonstrations with synthetic data
+📄 [Python source](docs/Simple_Examples.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/Simple_Examples.html)
 - Basic asymmetric analysis workflow
 - All 17+ association measures with examples
 - Smoothing methods comparison
 - Real-world interpretation guidelines
 
-### 🎨 **[Interactive Demo](docs/Demo.html)** ([source](docs/Demo.py))
-**Visualization showcase** - Interactive plotting and data exploration:
+### 🎨 Interactive Demo
+**Visualization showcase** - Interactive plotting and data exploration
+📄 [Python source](docs/Demo.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/Demo.html)
 - Heatmap visualizations of asymmetric relationships
 - Score distribution analysis
 - Comparative measure evaluation
 - Matrix transformation examples
 
-### 🔬 **[Academic Analysis Tutorial](docs/Academic_Analysis_Tutorial.html)** ([source](docs/Academic_Analysis_Tutorial.py))
-**Research-grade examples** - Comprehensive statistical validation:
+### 🔬 Academic Analysis Tutorial
+**Research-grade examples** - Comprehensive statistical validation
+📄 [Python source](docs/Academic_Analysis_Tutorial.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/Academic_Analysis_Tutorial.html)
 - **Historical Linguistics**: Grapheme-phoneme correspondence analysis
 - **Island Biogeography**: Darwin's finch species co-occurrence patterns
 - **Machine Learning**: Feature selection for categorical classification
 - Bootstrap confidence intervals and permutation testing
 
-### 📊 **[Advanced Examples with Plots](docs/EXAMPLES_WITH_PLOTS.html)** ([source](docs/EXAMPLES_WITH_PLOTS.py))
-**Publication-ready analysis** - Advanced smoothing and visualization:
+### 📊 Advanced Examples with Plots
+**Publication-ready analysis** - Advanced smoothing and visualization
+📄 [Python source](docs/EXAMPLES_WITH_PLOTS.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/EXAMPLES_WITH_PLOTS.html)
 - Smoothing effects comparison (MLE, Laplace, Lidstone)
 - Statistical significance testing and validation
 - Publication-quality plots and figures
 - Real dataset analysis workflows
 
-> **💡 All tutorials are fully executed with committed outputs** - view the HTML files for immediate results, or run the Python source files locally to explore and modify. Generate fresh documentation with `make docs`.
+> **💡 All tutorials are fully executed with committed outputs** - view the HTML files online via the links above, or run the Python source files locally to explore and modify. Generate fresh documentation with `make docs`.
 
 ### 📖 Additional Documentation
 - **[Mathematical Foundations](docs/MATHEMATICAL_FOUNDATIONS.md)**: Theory and formulas
