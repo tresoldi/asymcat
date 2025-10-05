@@ -79,7 +79,7 @@ ASymCat provides comprehensive documentation through executable tutorials that d
 
 ### 🎯 Simple Examples
 **Perfect starting point** - Core functionality demonstrations with synthetic data
-📄 [Python source](docs/Simple_Examples.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/Simple_Examples.html)
+📄 [Python source](docs/Simple_Examples.py) | 🌐 [View HTML](https://raw.githack.com/tresoldi/asymcat/master/docs/Simple_Examples.html)
 - Basic asymmetric analysis workflow
 - All 17+ association measures with examples
 - Smoothing methods comparison
@@ -87,7 +87,7 @@ ASymCat provides comprehensive documentation through executable tutorials that d
 
 ### 🎨 Interactive Demo
 **Visualization showcase** - Interactive plotting and data exploration
-📄 [Python source](docs/Demo.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/Demo.html)
+📄 [Python source](docs/Demo.py) | 🌐 [View HTML](https://raw.githack.com/tresoldi/asymcat/master/docs/Demo.html)
 - Heatmap visualizations of asymmetric relationships
 - Score distribution analysis
 - Comparative measure evaluation
@@ -95,7 +95,7 @@ ASymCat provides comprehensive documentation through executable tutorials that d
 
 ### 🔬 Academic Analysis Tutorial
 **Research-grade examples** - Comprehensive statistical validation
-📄 [Python source](docs/Academic_Analysis_Tutorial.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/Academic_Analysis_Tutorial.html)
+📄 [Python source](docs/Academic_Analysis_Tutorial.py) | 🌐 [View HTML](https://raw.githack.com/tresoldi/asymcat/master/docs/Academic_Analysis_Tutorial.html)
 - **Historical Linguistics**: Grapheme-phoneme correspondence analysis
 - **Island Biogeography**: Darwin's finch species co-occurrence patterns
 - **Machine Learning**: Feature selection for categorical classification
@@ -103,7 +103,7 @@ ASymCat provides comprehensive documentation through executable tutorials that d
 
 ### 📊 Advanced Examples with Plots
 **Publication-ready analysis** - Advanced smoothing and visualization
-📄 [Python source](docs/EXAMPLES_WITH_PLOTS.py) | 🌐 [View HTML](https://htmlpreview.github.io/?https://github.com/tresoldi/asymcat/blob/master/docs/EXAMPLES_WITH_PLOTS.html)
+📄 [Python source](docs/EXAMPLES_WITH_PLOTS.py) | 🌐 [View HTML](https://raw.githack.com/tresoldi/asymcat/master/docs/EXAMPLES_WITH_PLOTS.html)
 - Smoothing effects comparison (MLE, Laplace, Lidstone)
 - Statistical significance testing and validation
 - Publication-quality plots and figures
