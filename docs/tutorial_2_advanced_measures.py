@@ -109,7 +109,7 @@ for i, ((x, y), (pmi_val, _)) in enumerate(sorted_pmi[:10], 1):
 #' - NPMI = -1: Never co-occur
 
 # Compute NPMI
-npmi_scores = scorer.npmi()
+npmi_scores = scorer.pmi(normalized=True)
 
 print("\n\nNPMI (Normalized PMI):")
 print("=" * 60)
@@ -179,7 +179,7 @@ for i, ((x, y), (chi2_val, _)) in enumerate(sorted_chi2[:10], 1):
 #' - V = 1: Perfect association
 
 # Compute Cramér's V
-cramer_scores = scorer.cramer_v()
+cramer_scores = scorer.cramers_v()
 
 print("\n\nCramér's V (Normalized Chi-Square):")
 print("=" * 60)
@@ -219,10 +219,10 @@ sample_pairs = list(cooccs)[:20]
 measures_dict = {
     'MLE': scorer.mle(),
     'PMI': scorer.pmi(),
-    'NPMI': scorer.npmi(),
+    'NPMI': scorer.pmi(normalized=True),
     'Theil_U': scorer.theil_u(),
     'Chi2': scorer.chi2(),
-    'Cramer_V': scorer.cramer_v(),
+    'Cramer_V': scorer.cramers_v(),
 }
 
 # Create comparison dataframe
@@ -439,13 +439,13 @@ for i, ((x, y), score) in enumerate(sorted_combined[:10], 1):
 #'
 #' # Information-theoretic
 #' pmi = scorer.pmi()               # Pointwise mutual information
-#' npmi = scorer.npmi()             # Normalized PMI [-1,1]
+#' npmi = scorer.pmi(normalized=True)  # Normalized PMI [-1,1]
 #' theil = scorer.theil_u()         # Uncertainty coefficient
 #' mi = scorer.mutual_information() # Average MI
 #'
 #' # Statistical
 #' chi2 = scorer.chi2()             # Chi-square test
-#' cramer = scorer.cramer_v()       # Normalized chi-square
+#' cramer = scorer.cramers_v()      # Normalized chi-square
 #' fisher = scorer.fisher()         # Exact odds ratios
 #'
 #' # Specialized

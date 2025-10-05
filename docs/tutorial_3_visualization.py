@@ -135,7 +135,7 @@ measures = {
     'PMI': scorer.pmi(),
     'Theil_U': scorer.theil_u(),
     'Chi2': scorer.chi2(),
-    'Cramer_V': scorer.cramer_v(),
+    'Cramer_V': scorer.cramers_v(),
 }
 
 # Extract all scores
@@ -317,10 +317,10 @@ print("  • Standardization across measures")
 comparison_measures = {
     'MLE': scorer.mle(),
     'PMI': scorer.pmi(),
-    'NPMI': scorer.npmi(),
+    'NPMI': scorer.pmi(normalized=True),
     'Theil_U': scorer.theil_u(),
     'Chi2': scorer.chi2(),
-    'Cramer_V': scorer.cramer_v(),
+    'Cramer_V': scorer.cramers_v(),
 }
 
 # Create 2×3 grid
