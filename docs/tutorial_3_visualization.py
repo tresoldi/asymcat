@@ -379,10 +379,10 @@ print("  • Theil's U balances both")
 #' Customize plots for publication with fine-grained control.
 
 # Select specific measures
-pmi_scores = scorer.pmi()
+theil_scores = scorer.theil_u()
 tresoldi_scores = scorer.tresoldi()
 
-xy_pmi, yx_pmi, x_labels_pmi, y_labels_pmi = scorer_utils.scorer2matrices(pmi_scores)
+xy_theil, yx_theil, x_labels_theil, y_labels_theil = scorer_utils.scorer2matrices(theil_scores)
 xy_tres, yx_tres, x_labels_tres, y_labels_tres = scorer_utils.scorer2matrices(tresoldi_scores)
 
 # Create publication figure
@@ -394,23 +394,23 @@ ax2 = fig.add_subplot(gs[1])
 
 # Subset
 subset = 12
-xy_pmi_sub = xy_pmi[:subset, :subset]
+xy_theil_sub = xy_theil[:subset, :subset]
 xy_tres_sub = xy_tres[:subset, :subset]
-x_sub_pmi = x_labels_pmi[:subset]
-y_sub_pmi = y_labels_pmi[:subset]
+x_sub_theil = x_labels_theil[:subset]
+y_sub_theil = y_labels_theil[:subset]
 x_sub_tres = x_labels_tres[:subset]
 y_sub_tres = y_labels_tres[:subset]
 
-# Left panel: PMI X→Y
-im1 = ax1.imshow(xy_pmi_sub, cmap='viridis', aspect='auto', interpolation='nearest')
-ax1.set_xticks(np.arange(len(y_sub_pmi)))
-ax1.set_yticks(np.arange(len(x_sub_pmi)))
-ax1.set_xticklabels(y_sub_pmi, fontsize=9)
-ax1.set_yticklabels(x_sub_pmi, fontsize=9)
+# Left panel: Theil's U X→Y
+im1 = ax1.imshow(xy_theil_sub, cmap='viridis', aspect='auto', interpolation='nearest')
+ax1.set_xticks(np.arange(len(y_sub_theil)))
+ax1.set_yticks(np.arange(len(x_sub_theil)))
+ax1.set_xticklabels(y_sub_theil, fontsize=9)
+ax1.set_yticklabels(x_sub_theil, fontsize=9)
 ax1.set_xlabel('Y (Phoneme)', fontsize=11, fontweight='bold')
 ax1.set_ylabel('X (Grapheme)', fontsize=11, fontweight='bold')
-ax1.set_title('(A) PMI Measure: X → Y', fontsize=12, fontweight='bold', loc='left')
-plt.colorbar(im1, ax=ax1, label='PMI Score')
+ax1.set_title("(A) Theil's U Measure: X → Y", fontsize=12, fontweight='bold', loc='left')
+plt.colorbar(im1, ax=ax1, label="Theil's U")
 
 # Right panel: Tresoldi X→Y
 im2 = ax2.imshow(xy_tres_sub, cmap='viridis', aspect='auto', interpolation='nearest')
@@ -423,7 +423,7 @@ ax2.set_ylabel('X (Grapheme)', fontsize=11, fontweight='bold')
 ax2.set_title('(B) Tresoldi Measure: X → Y', fontsize=12, fontweight='bold', loc='left')
 plt.colorbar(im2, ax=ax2, label='Tresoldi Score')
 
-plt.suptitle('Asymmetric Grapheme-Phoneme Associations: PMI vs Tresoldi',
+plt.suptitle("Asymmetric Grapheme-Phoneme Associations: Theil's U vs Tresoldi",
              fontsize=14, fontweight='bold', y=1.02)
 
 plt.tight_layout()
