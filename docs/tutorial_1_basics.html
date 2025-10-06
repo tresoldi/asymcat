@@ -515,7 +515,7 @@ orthography-to-pronunciation mappings to understand how letters map to sounds.</
 <pre class="code-output">
 English Orthography → Phonology Data:
 ============================================================
-Number of words: 5
+Number of words: 7
 
 1. FLEX       → /f l ɛ k s/
    Letters: F L E X
@@ -535,7 +535,15 @@ Number of words: 5
 
 5. RAILS      → /ɹ eɪ l z/
    Letters: R A I L S
-   Sounds:  ɹ eɪ l z</pre>
+   Sounds:  ɹ eɪ l z
+
+6. SINGING    → /s ɪ ŋ ɪ ŋ/
+   Letters: S I N G I N G
+   Sounds:  s ɪ ŋ ɪ ŋ
+
+7. FLEET      → /f l i t/
+   Letters: F L E E T
+   Sounds:  f l i t</pre>
 </div>
 <h3>Understanding the Examples</h3>
 <p>These words demonstrate interesting orthography-phoneme patterns:</p>
@@ -545,6 +553,8 @@ Number of words: 5
 <li><strong>SINGH</strong>: Silent GH, NG cluster becomes /ŋ/</li>
 <li><strong>WIGHT</strong>: Silent GH, I+GH digraph becomes /aɪ/</li>
 <li><strong>RAILS</strong>: AI digraph becomes /eɪ/, S becomes /z/</li>
+<li><strong>SINGING</strong>: Shows NG mapping to /ŋ/ twice, demonstrates morphological patterns</li>
+<li><strong>FLEET</strong>: Double E becomes /i/, final T preserves /t/</li>
 </ul>
 
 <h3>Collecting Co-occurrences</h3>
@@ -567,7 +577,7 @@ data-agnostic and treats each sequence pair independently.</p>
 </div>
 <pre class="code-output">
 
-Total letter-sound co-occurrences: 82
+Total letter-sound co-occurrences: 137
 
 All co-occurrences:
    1. (F, f  )
@@ -651,7 +661,62 @@ All co-occurrences:
   79. (S, ɹ  )
   80. (S, eɪ )
   81. (S, l  )
-  82. (S, z  )</pre>
+  82. (S, z  )
+  83. (S, s  )
+  84. (S, ɪ  )
+  85. (S, ŋ  )
+  86. (S, ɪ  )
+  87. (S, ŋ  )
+  88. (I, s  )
+  89. (I, ɪ  )
+  90. (I, ŋ  )
+  91. (I, ɪ  )
+  92. (I, ŋ  )
+  93. (N, s  )
+  94. (N, ɪ  )
+  95. (N, ŋ  )
+  96. (N, ɪ  )
+  97. (N, ŋ  )
+  98. (G, s  )
+  99. (G, ɪ  )
+  100. (G, ŋ  )
+  101. (G, ɪ  )
+  102. (G, ŋ  )
+  103. (I, s  )
+  104. (I, ɪ  )
+  105. (I, ŋ  )
+  106. (I, ɪ  )
+  107. (I, ŋ  )
+  108. (N, s  )
+  109. (N, ɪ  )
+  110. (N, ŋ  )
+  111. (N, ɪ  )
+  112. (N, ŋ  )
+  113. (G, s  )
+  114. (G, ɪ  )
+  115. (G, ŋ  )
+  116. (G, ɪ  )
+  117. (G, ŋ  )
+  118. (F, f  )
+  119. (F, l  )
+  120. (F, i  )
+  121. (F, t  )
+  122. (L, f  )
+  123. (L, l  )
+  124. (L, i  )
+  125. (L, t  )
+  126. (E, f  )
+  127. (E, l  )
+  128. (E, i  )
+  129. (E, t  )
+  130. (E, f  )
+  131. (E, l  )
+  132. (E, i  )
+  133. (E, t  )
+  134. (T, f  )
+  135. (T, l  )
+  136. (T, i  )
+  137. (T, t  )</pre>
 </div>
 <h3>Analyzing Orthography-Phonology Associations</h3>
 <p>Now we can quantify how predictable the letter-sound mappings are.</p>
@@ -673,16 +738,16 @@ All co-occurrences:
 
 Letter → Sound Associations (Top 10 by P(Sound|Letter)):
 ============================================================
- 1. E → dʒ : P(dʒ|E) = 0.500, P(E|dʒ) = 0.231
- 2. E → i  : P(i|E) = 0.500, P(E|i) = 0.231
- 3. E → f  : P(f|E) = 0.333, P(E|f) = 0.154
- 4. E → k  : P(k|E) = 0.333, P(E|k) = 0.154
- 5. E → ɛ  : P(ɛ|E) = 0.333, P(E|ɛ) = 0.154
- 6. F → f  : P(f|F) = 0.333, P(F|f) = 0.286
- 7. F → k  : P(k|F) = 0.333, P(F|k) = 0.286
- 8. F → ɛ  : P(ɛ|F) = 0.333, P(F|ɛ) = 0.286
- 9. G → dʒ : P(dʒ|G) = 0.333, P(G|dʒ) = 0.182
-10. G → i  : P(i|G) = 0.333, P(G|i) = 0.182</pre>
+ 1. E → dʒ : P(dʒ|E) = 0.500, P(E|dʒ) = 0.143
+ 2. E → i  : P(i|E) = 0.455, P(E|i) = 0.238
+ 3. E → f  : P(f|E) = 0.364, P(E|f) = 0.190
+ 4. E → k  : P(k|E) = 0.333, P(E|k) = 0.095
+ 5. E → ɛ  : P(ɛ|E) = 0.333, P(E|ɛ) = 0.095
+ 6. F → k  : P(k|F) = 0.333, P(F|k) = 0.182
+ 7. F → ɛ  : P(ɛ|F) = 0.333, P(F|ɛ) = 0.182
+ 8. G → dʒ : P(dʒ|G) = 0.333, P(G|dʒ) = 0.095
+ 9. L → k  : P(k|L) = 0.333, P(L|k) = 0.133
+10. L → ɛ  : P(ɛ|L) = 0.333, P(L|ɛ) = 0.133</pre>
 </div>
 <h3>Key Observations</h3>
 <ul>

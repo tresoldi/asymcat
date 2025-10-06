@@ -227,6 +227,8 @@ for i, (letters, phones) in enumerate(data, 1):
 #' - **SINGH**: Silent GH, NG cluster becomes /ŋ/
 #' - **WIGHT**: Silent GH, I+GH digraph becomes /aɪ/
 #' - **RAILS**: AI digraph becomes /eɪ/, S becomes /z/
+#' - **SINGING**: Shows NG mapping to /ŋ/ twice, demonstrates morphological patterns
+#' - **FLEET**: Double E becomes /i/, final T preserves /t/
 
 #' ### Collecting Co-occurrences
 #'
