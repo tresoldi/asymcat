@@ -207,10 +207,12 @@ D O G                   d ɔ g
 seqs = asymcat.read_sequences("grapheme_phoneme.tsv")
 # seqs = [[['C', 'A', 'T'], ['k', 'æ', 't']], ...]
 
-# Collect all element pairs
+# Collect all element pairs (Cartesian product of each sequence pair)
 cooccs = asymcat.collect_cooccs(seqs)
 # Yields: [('C', 'k'), ('C', 'æ'), ('C', 't'), ('A', 'k'), ...]
 ```
+
+**Note:** `collect_cooccs()` creates the Cartesian product of all elements in each sequence pair. If you need position-aligned pairs, sub-windows, or other structures, preprocess your data before calling this function.
 
 **3. Presence-Absence Matrices**
 

@@ -200,41 +200,73 @@ print(comparison_df.to_string(index=False))
 
 #' ## 5. Working with Sequence Data
 #'
-#' ASymCat can load aligned sequences from TSV files. Let's use the toy dataset.
+#' ASymCat can load aligned sequences from TSV files. Let's analyze English
+#' orthography-to-pronunciation mappings to understand how letters map to sounds.
 
 # Load sequence data from file
-data = asymcat.read_sequences("resources/toy.tsv")
+data = asymcat.read_sequences("resources/english_phonology.tsv")
 
-print("\nSequence Data Loaded:")
-print("=" * 50)
-print(f"Number of sequence pairs: {len(data)}")
+print("\nEnglish Orthography → Phonology Data:")
+print("=" * 60)
+print(f"Number of words: {len(data)}")
 
-# Display first few sequences
-for i, (seq1, seq2) in enumerate(data[:3], 1):
-    print(f"\nPair {i}:")
-    print(f"  Sequence 1: {' '.join(seq1)}")
-    print(f"  Sequence 2: {' '.join(seq2)}")
+# Display all word examples
+for i, (letters, phones) in enumerate(data, 1):
+    word = ''.join(letters)
+    pronunciation = ' '.join(phones)
+    print(f"\n{i}. {word:10s} → /{pronunciation}/")
+    print(f"   Letters: {' '.join(letters)}")
+    print(f"   Sounds:  {' '.join(phones)}")
+
+#' ### Understanding the Examples
+#'
+#' These words demonstrate interesting orthography-phoneme patterns:
+#'
+#' - **FLEX**: Letter X maps to two sounds /k s/
+#' - **GEES**: Letter G becomes /dʒ/, double E becomes /i/
+#' - **SINGH**: Silent GH, NG cluster becomes /ŋ/
+#' - **WIGHT**: Silent GH, I+GH digraph becomes /aɪ/
+#' - **RAILS**: AI digraph becomes /eɪ/, S becomes /z/
 
 #' ### Collecting Co-occurrences
 #'
 #' From aligned sequences, we extract co-occurrences at each position.
+#' Each letter-sound pair becomes a data point for association analysis.
+#'
+#' **Note:** `collect_cooccs()` creates the Cartesian product of all elements
+#' in each sequence pair. If you need aligned positions, sub-windows, or other
+#' structures, preprocess your data before calling this function—ASymCat is
+#' data-agnostic and treats each sequence pair independently.
 
 # Collect co-occurrences
 cooccs = asymcat.collect_cooccs(data)
 
-print(f"\nTotal co-occurrences collected: {len(cooccs)}")
-print("\nSample co-occurrences:")
-for i, (x, y) in enumerate(list(cooccs)[:10]):
-    print(f"  {i+1}. ({x}, {y})")
+print(f"\n\nTotal letter-sound co-occurrences: {len(cooccs)}")
+print("\nAll co-occurrences:")
+for i, (letter, sound) in enumerate(list(cooccs), 1):
+    print(f"  {i:2d}. ({letter:1s}, {sound:3s})")
+
+#' ### Analyzing Orthography-Phonology Associations
+#'
+#' Now we can quantify how predictable the letter-sound mappings are.
 
 # Create scorer and analyze
 seq_scorer = CatScorer(cooccs, smoothing_method='laplace')
 seq_mle = seq_scorer.mle()
 
-print("\nTop 5 strongest associations (by P(Y|X)):")
+print("\n\nLetter → Sound Associations (Top 10 by P(Sound|Letter)):")
+print("=" * 60)
 sorted_pairs = sorted(seq_mle.items(), key=lambda x: x[1][0], reverse=True)
-for (x, y), (p_y_x, p_x_y) in sorted_pairs[:5]:
-    print(f"  {x} → {y}: P({y}|{x}) = {p_y_x:.3f}")
+for i, ((letter, sound), (p_sound_letter, p_letter_sound)) in enumerate(sorted_pairs[:10], 1):
+    print(f"{i:2d}. {letter} → {sound:3s}: P({sound}|{letter}) = {p_sound_letter:.3f}, "
+          f"P({letter}|{sound}) = {p_letter_sound:.3f}")
+
+#' ### Key Observations
+#'
+#' - **High P(Sound|Letter)**: When you see this letter, you reliably get this sound
+#' - **Asymmetry**: P(Sound|Letter) ≠ P(Letter|Sound) reveals directional complexity
+#' - **Example**: Letter 'S' might reliably map to /s/, but /s/ could come from
+#'   'S', 'C', or 'SS' (lower reverse probability)
 
 #' ## 6. Working with Presence-Absence Data
 #'

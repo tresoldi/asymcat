@@ -240,10 +240,11 @@ cooccs = asymcat.collect_cooccs(seqs, order=2, pad='#')
 ```
 
 **Notes:**
-- Without order: collects Cartesian product of each sequence pair
+- Without order: collects Cartesian product of each sequence pair (this is intentional—if you need position-aligned pairs, sub-windows, or other structures, preprocess your data first)
 - With order: collects aligned n-gram pairs from sequences of equal length
 - Padding symbol must not conflict with symbols in the data
 - Pairs containing the padding symbol are automatically removed
+- ASymCat is data-agnostic and treats each sequence pair independently
 
 **Raises:**
 - `ValueError` - If seqs is empty or sequences have mismatched lengths (when order is specified)

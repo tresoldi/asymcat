@@ -669,6 +669,10 @@ data = asymcat.read_sequences("data.tsv")
 data = asymcat.read_sequences("data.tsv", cols=["grapheme", "phoneme"])
 ```
 
+**Important:** When you call `collect_cooccs()` on sequence data, it creates the **Cartesian product** of all elements in each sequence pair. This means every element in the first sequence is paired with every element in the second sequence.
+
+If you need specific alignments (position-by-position), sub-windows, or other structures, preprocess your data before calling `collect_cooccs()`—ASymCat is data-agnostic and treats each sequence pair independently.
+
 ### Presence-Absence Matrices
 
 Binary data indicating presence (1) or absence (0).
