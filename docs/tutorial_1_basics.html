@@ -492,80 +492,206 @@ Dr_Smith  Morphine    0.200    0.167   -2.485        0.000</pre>
 consistency, but both values are identical.</p>
 
 <h2>5. Working with Sequence Data</h2>
-<p>ASymCat can load aligned sequences from TSV files. Let's use the toy dataset.</p>
+<p>ASymCat can load aligned sequences from TSV files. Let's analyze English
+orthography-to-pronunciation mappings to understand how letters map to sounds.</p>
 
 <div class="code-block">
 <div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Load sequence data from file</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;resources/toy.tsv&quot;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">read_sequences</span><span class="p">(</span><span class="s2">&quot;resources/english_phonology.tsv&quot;</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sequence Data Loaded:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of sequence pairs: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">English Orthography → Phonology Data:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of words: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Display first few sequences</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">seq1</span><span class="p">,</span> <span class="n">seq2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Pair </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sequence 1: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq1</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Sequence 2: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">seq2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Display all word examples</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">letters</span><span class="p">,</span> <span class="n">phones</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">word</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">letters</span><span class="p">)</span>
+    <span class="n">pronunciation</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">phones</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">word</span><span class="si">:</span><span class="s2">10s</span><span class="si">}</span><span class="s2"> → /</span><span class="si">{</span><span class="n">pronunciation</span><span class="si">}</span><span class="s2">/&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Letters: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">letters</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Sounds:  </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">phones</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <pre class="code-output">
-Sequence Data Loaded:
-==================================================
-Number of sequence pairs: 2
+English Orthography → Phonology Data:
+============================================================
+Number of words: 5
 
-Pair 1:
-  Sequence 1: p e p e p e u
-  Sequence 2: B J E B E P E E
+1. FLEX       → /f l ɛ k s/
+   Letters: F L E X
+   Sounds:  f l ɛ k s
 
-Pair 2:
-  Sequence 1: o
-  Sequence 2: O</pre>
+2. GEES       → /dʒ i s/
+   Letters: G E E S
+   Sounds:  dʒ i s
+
+3. SINGH      → /s ɪ ŋ/
+   Letters: S I N G H
+   Sounds:  s ɪ ŋ
+
+4. WIGHT      → /w aɪ t/
+   Letters: W I G H T
+   Sounds:  w aɪ t
+
+5. RAILS      → /ɹ eɪ l z/
+   Letters: R A I L S
+   Sounds:  ɹ eɪ l z</pre>
 </div>
+<h3>Understanding the Examples</h3>
+<p>These words demonstrate interesting orthography-phoneme patterns:</p>
+<ul>
+<li><strong>FLEX</strong>: Letter X maps to two sounds /k s/</li>
+<li><strong>GEES</strong>: Letter G becomes /dʒ/, double E becomes /i/</li>
+<li><strong>SINGH</strong>: Silent GH, NG cluster becomes /ŋ/</li>
+<li><strong>WIGHT</strong>: Silent GH, I+GH digraph becomes /aɪ/</li>
+<li><strong>RAILS</strong>: AI digraph becomes /eɪ/, S becomes /z/</li>
+</ul>
+
 <h3>Collecting Co-occurrences</h3>
-<p>From aligned sequences, we extract co-occurrences at each position.</p>
+<p>From aligned sequences, we extract co-occurrences at each position.
+Each letter-sound pair becomes a data point for association analysis.</p>
+<p><strong>Note:</strong> <code>collect_cooccs()</code> creates the Cartesian product of all elements
+in each sequence pair. If you need aligned positions, sub-windows, or other
+structures, preprocess your data before calling this function—ASymCat is
+data-agnostic and treats each sequence pair independently.</p>
 
 <div class="code-block">
 <div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Collect co-occurrences</span>
 <span class="n">cooccs</span> <span class="o">=</span> <span class="n">asymcat</span><span class="o">.</span><span class="n">collect_cooccs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Total co-occurrences collected: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cooccs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sample co-occurrences:&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cooccs</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-
-<span class="c1"># Create scorer and analyze</span>
-<span class="n">seq_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">cooccs</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
-<span class="n">seq_mle</span> <span class="o">=</span> <span class="n">seq_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Top 5 strongest associations (by P(Y|X)):&quot;</span><span class="p">)</span>
-<span class="n">sorted_pairs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">seq_mle</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">for</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">p_y_x</span><span class="p">,</span> <span class="n">p_x_y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">sorted_pairs</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">: P(</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">p_y_x</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Total letter-sound co-occurrences: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cooccs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">All co-occurrences:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">letter</span><span class="p">,</span> <span class="n">sound</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cooccs</span><span class="p">),</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. (</span><span class="si">{</span><span class="n">letter</span><span class="si">:</span><span class="s2">1s</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">sound</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <pre class="code-output">
-Total co-occurrences collected: 57
 
-Sample co-occurrences:
-  1. (p, B)
-  2. (p, J)
-  3. (p, E)
-  4. (p, B)
-  5. (p, E)
-  6. (p, P)
-  7. (p, E)
-  8. (p, E)
-  9. (e, B)
-  10. (e, J)
+Total letter-sound co-occurrences: 82
 
-Top 5 strongest associations (by P(Y|X)):
-  o → O: P(O|o) = 0.667
-  e → J: P(J|e) = 0.444
-  e → P: P(P|e) = 0.444
-  p → J: P(J|p) = 0.444
-  p → P: P(P|p) = 0.444</pre>
+All co-occurrences:
+   1. (F, f  )
+   2. (F, l  )
+   3. (F, ɛ  )
+   4. (F, k  )
+   5. (F, s  )
+   6. (L, f  )
+   7. (L, l  )
+   8. (L, ɛ  )
+   9. (L, k  )
+  10. (L, s  )
+  11. (E, f  )
+  12. (E, l  )
+  13. (E, ɛ  )
+  14. (E, k  )
+  15. (E, s  )
+  16. (X, f  )
+  17. (X, l  )
+  18. (X, ɛ  )
+  19. (X, k  )
+  20. (X, s  )
+  21. (G, dʒ )
+  22. (G, i  )
+  23. (G, s  )
+  24. (E, dʒ )
+  25. (E, i  )
+  26. (E, s  )
+  27. (E, dʒ )
+  28. (E, i  )
+  29. (E, s  )
+  30. (S, dʒ )
+  31. (S, i  )
+  32. (S, s  )
+  33. (S, s  )
+  34. (S, ɪ  )
+  35. (S, ŋ  )
+  36. (I, s  )
+  37. (I, ɪ  )
+  38. (I, ŋ  )
+  39. (N, s  )
+  40. (N, ɪ  )
+  41. (N, ŋ  )
+  42. (G, s  )
+  43. (G, ɪ  )
+  44. (G, ŋ  )
+  45. (H, s  )
+  46. (H, ɪ  )
+  47. (H, ŋ  )
+  48. (W, w  )
+  49. (W, aɪ )
+  50. (W, t  )
+  51. (I, w  )
+  52. (I, aɪ )
+  53. (I, t  )
+  54. (G, w  )
+  55. (G, aɪ )
+  56. (G, t  )
+  57. (H, w  )
+  58. (H, aɪ )
+  59. (H, t  )
+  60. (T, w  )
+  61. (T, aɪ )
+  62. (T, t  )
+  63. (R, ɹ  )
+  64. (R, eɪ )
+  65. (R, l  )
+  66. (R, z  )
+  67. (A, ɹ  )
+  68. (A, eɪ )
+  69. (A, l  )
+  70. (A, z  )
+  71. (I, ɹ  )
+  72. (I, eɪ )
+  73. (I, l  )
+  74. (I, z  )
+  75. (L, ɹ  )
+  76. (L, eɪ )
+  77. (L, l  )
+  78. (L, z  )
+  79. (S, ɹ  )
+  80. (S, eɪ )
+  81. (S, l  )
+  82. (S, z  )</pre>
 </div>
+<h3>Analyzing Orthography-Phonology Associations</h3>
+<p>Now we can quantify how predictable the letter-sound mappings are.</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="c1"># Create scorer and analyze</span>
+<span class="n">seq_scorer</span> <span class="o">=</span> <span class="n">CatScorer</span><span class="p">(</span><span class="n">cooccs</span><span class="p">,</span> <span class="n">smoothing_method</span><span class="o">=</span><span class="s1">&#39;laplace&#39;</span><span class="p">)</span>
+<span class="n">seq_mle</span> <span class="o">=</span> <span class="n">seq_scorer</span><span class="o">.</span><span class="n">mle</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Letter → Sound Associations (Top 10 by P(Sound|Letter)):&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="n">sorted_pairs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">seq_mle</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">((</span><span class="n">letter</span><span class="p">,</span> <span class="n">sound</span><span class="p">),</span> <span class="p">(</span><span class="n">p_sound_letter</span><span class="p">,</span> <span class="n">p_letter_sound</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sorted_pairs</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">2d</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">letter</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">sound</span><span class="si">:</span><span class="s2">3s</span><span class="si">}</span><span class="s2">: P(</span><span class="si">{</span><span class="n">sound</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">letter</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">p_sound_letter</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;P(</span><span class="si">{</span><span class="n">letter</span><span class="si">}</span><span class="s2">|</span><span class="si">{</span><span class="n">sound</span><span class="si">}</span><span class="s2">) = </span><span class="si">{</span><span class="n">p_letter_sound</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<pre class="code-output">
+
+Letter → Sound Associations (Top 10 by P(Sound|Letter)):
+============================================================
+ 1. E → dʒ : P(dʒ|E) = 0.500, P(E|dʒ) = 0.231
+ 2. E → i  : P(i|E) = 0.500, P(E|i) = 0.231
+ 3. E → f  : P(f|E) = 0.333, P(E|f) = 0.154
+ 4. E → k  : P(k|E) = 0.333, P(E|k) = 0.154
+ 5. E → ɛ  : P(ɛ|E) = 0.333, P(E|ɛ) = 0.154
+ 6. F → f  : P(f|F) = 0.333, P(F|f) = 0.286
+ 7. F → k  : P(k|F) = 0.333, P(F|k) = 0.286
+ 8. F → ɛ  : P(ɛ|F) = 0.333, P(F|ɛ) = 0.286
+ 9. G → dʒ : P(dʒ|G) = 0.333, P(G|dʒ) = 0.182
+10. G → i  : P(i|G) = 0.333, P(G|i) = 0.182</pre>
+</div>
+<h3>Key Observations</h3>
+<ul>
+<li><strong>High P(Sound|Letter)</strong>: When you see this letter, you reliably get this sound</li>
+<li><strong>Asymmetry</strong>: P(Sound|Letter) ≠ P(Letter|Sound) reveals directional complexity</li>
+<li><strong>Example</strong>: Letter 'S' might reliably map to /s/, but /s/ could come from
+'S', 'C', or 'SS' (lower reverse probability)</li>
+</ul>
+
 <h2>6. Working with Presence-Absence Data</h2>
 <p>ASymCat can also analyze binary presence-absence matrices, commonly used in ecology.</p>
 
