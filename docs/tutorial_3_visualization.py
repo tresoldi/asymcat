@@ -65,9 +65,6 @@ print(f"  Y→X matrix: {yx_matrix.shape} ({len(y_labels)} × {len(x_labels)})")
 
 #' ### Creating the Heatmap
 
-# Create side-by-side heatmaps
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
-
 # Select subset for better visualization
 subset_size = 15
 xy_subset = xy_matrix[:subset_size, :subset_size]
@@ -76,6 +73,7 @@ x_labels_subset = x_labels[:subset_size]
 y_labels_subset = y_labels[:subset_size]
 
 # X→Y heatmap
+fig1, ax1 = plt.subplots(figsize=(10, 10))
 sns.heatmap(xy_subset, annot=True, fmt='.2f', linewidths=0.5,
             cmap='YlOrRd', center=0.5, vmin=0, vmax=1,
             xticklabels=y_labels_subset, yticklabels=x_labels_subset,
@@ -83,8 +81,11 @@ sns.heatmap(xy_subset, annot=True, fmt='.2f', linewidths=0.5,
 ax1.set_title("X → Y: U(Y|X)", fontsize=16, fontweight='bold', pad=15)
 ax1.set_xlabel("Y (Predicted)", fontsize=12)
 ax1.set_ylabel("X (Predictor)", fontsize=12)
+plt.tight_layout()
+plt.show()
 
 # Y→X heatmap
+fig2, ax2 = plt.subplots(figsize=(10, 10))
 sns.heatmap(yx_subset, annot=True, fmt='.2f', linewidths=0.5,
             cmap='YlOrRd', center=0.5, vmin=0, vmax=1,
             xticklabels=x_labels_subset, yticklabels=y_labels_subset,
@@ -92,7 +93,6 @@ sns.heatmap(yx_subset, annot=True, fmt='.2f', linewidths=0.5,
 ax2.set_title("Y → X: U(X|Y)", fontsize=16, fontweight='bold', pad=15)
 ax2.set_xlabel("X (Predicted)", fontsize=12)
 ax2.set_ylabel("Y (Predictor)", fontsize=12)
-
 plt.tight_layout()
 plt.show()
 
