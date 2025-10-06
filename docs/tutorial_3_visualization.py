@@ -136,6 +136,7 @@ measures = {
     'Theil_U': scorer.theil_u(),
     'Chi2': scorer.chi2(),
     'Cramer_V': scorer.cramers_v(),
+    'Tresoldi': scorer.tresoldi(),
 }
 
 # Extract all scores
@@ -170,6 +171,8 @@ for idx, measure_name in enumerate(measures.keys()):
         measure_data = measure_data[measure_data['Score'] < 100]
     elif measure_name == 'PMI':
         measure_data = measure_data[measure_data['Score'].abs() < 10]
+    elif measure_name == 'Tresoldi':
+        measure_data = measure_data[measure_data['Score'].abs() < 10]
 
     sns.violinplot(data=measure_data, x='Direction', y='Score',
                    palette='Set2', ax=axes[idx])
@@ -178,10 +181,6 @@ for idx, measure_name in enumerate(measures.keys()):
     axes[idx].set_xlabel('Direction')
     axes[idx].set_ylabel('Score Value')
     axes[idx].grid(True, alpha=0.3, axis='y')
-
-# Remove empty subplot if any
-if len(measures) < len(axes):
-    fig.delaxes(axes[-1])
 
 plt.tight_layout()
 plt.show()
@@ -379,8 +378,11 @@ print("  • Theil's U balances both")
 #'
 #' Customize plots for publication with fine-grained control.
 
-# Select specific measure
+# Select specific measures
+pmi_scores = scorer.pmi()
 tresoldi_scores = scorer.tresoldi()
+
+xy_pmi, yx_pmi, x_labels_pmi, y_labels_pmi = scorer_utils.scorer2matrices(pmi_scores)
 xy_tres, yx_tres, x_labels_tres, y_labels_tres = scorer_utils.scorer2matrices(tresoldi_scores)
 
 # Create publication figure
@@ -392,34 +394,36 @@ ax2 = fig.add_subplot(gs[1])
 
 # Subset
 subset = 12
-xy_sub = xy_tres[:subset, :subset]
-yx_sub = yx_tres[:subset, :subset]
-x_sub = x_labels_tres[:subset]
-y_sub = y_labels_tres[:subset]
+xy_pmi_sub = xy_pmi[:subset, :subset]
+xy_tres_sub = xy_tres[:subset, :subset]
+x_sub_pmi = x_labels_pmi[:subset]
+y_sub_pmi = y_labels_pmi[:subset]
+x_sub_tres = x_labels_tres[:subset]
+y_sub_tres = y_labels_tres[:subset]
 
-# Left panel: X→Y
-im1 = ax1.imshow(xy_sub, cmap='viridis', aspect='auto', interpolation='nearest')
-ax1.set_xticks(np.arange(len(y_sub)))
-ax1.set_yticks(np.arange(len(x_sub)))
-ax1.set_xticklabels(y_sub, fontsize=9)
-ax1.set_yticklabels(x_sub, fontsize=9)
+# Left panel: PMI X→Y
+im1 = ax1.imshow(xy_pmi_sub, cmap='viridis', aspect='auto', interpolation='nearest')
+ax1.set_xticks(np.arange(len(y_sub_pmi)))
+ax1.set_yticks(np.arange(len(x_sub_pmi)))
+ax1.set_xticklabels(y_sub_pmi, fontsize=9)
+ax1.set_yticklabels(x_sub_pmi, fontsize=9)
 ax1.set_xlabel('Y (Phoneme)', fontsize=11, fontweight='bold')
 ax1.set_ylabel('X (Grapheme)', fontsize=11, fontweight='bold')
-ax1.set_title('(A) Tresoldi Measure: X → Y', fontsize=12, fontweight='bold', loc='left')
-plt.colorbar(im1, ax=ax1, label='Tresoldi Score')
+ax1.set_title('(A) PMI Measure: X → Y', fontsize=12, fontweight='bold', loc='left')
+plt.colorbar(im1, ax=ax1, label='PMI Score')
 
-# Right panel: Y→X
-im2 = ax2.imshow(yx_sub, cmap='viridis', aspect='auto', interpolation='nearest')
-ax2.set_xticks(np.arange(len(x_sub)))
-ax2.set_yticks(np.arange(len(y_sub)))
-ax2.set_xticklabels(x_sub, fontsize=9)
-ax2.set_yticklabels(y_sub, fontsize=9)
-ax2.set_xlabel('X (Grapheme)', fontsize=11, fontweight='bold')
-ax2.set_ylabel('Y (Phoneme)', fontsize=11, fontweight='bold')
-ax2.set_title('(B) Tresoldi Measure: Y → X', fontsize=12, fontweight='bold', loc='left')
+# Right panel: Tresoldi X→Y
+im2 = ax2.imshow(xy_tres_sub, cmap='viridis', aspect='auto', interpolation='nearest')
+ax2.set_xticks(np.arange(len(y_sub_tres)))
+ax2.set_yticks(np.arange(len(x_sub_tres)))
+ax2.set_xticklabels(y_sub_tres, fontsize=9)
+ax2.set_yticklabels(x_sub_tres, fontsize=9)
+ax2.set_xlabel('Y (Phoneme)', fontsize=11, fontweight='bold')
+ax2.set_ylabel('X (Grapheme)', fontsize=11, fontweight='bold')
+ax2.set_title('(B) Tresoldi Measure: X → Y', fontsize=12, fontweight='bold', loc='left')
 plt.colorbar(im2, ax=ax2, label='Tresoldi Score')
 
-plt.suptitle('Asymmetric Grapheme-Phoneme Associations (Tresoldi Measure)',
+plt.suptitle('Asymmetric Grapheme-Phoneme Associations: PMI vs Tresoldi',
              fontsize=14, fontweight='bold', y=1.02)
 
 plt.tight_layout()
