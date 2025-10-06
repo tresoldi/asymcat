@@ -458,11 +458,36 @@ Dr_Smith Ibuprofen    0.500    0.333    0.223        0.200
 Dr_Smith  Morphine    0.200    0.167   -2.485        0.000</pre>
 </div>
 <h3>Measure Properties</h3>
-<p>| Measure | Range | Asymmetric? | Interpretation |
-|---------|-------|-------------|----------------|
-| <strong>MLE</strong> | [0,1] | ✓ Yes | Direct conditional probability |
-| <strong>PMI</strong> | (-∞,+∞) | ✗ No | Information content (0 = independent) |
-| <strong>Jaccard</strong> | [0,1] | ✗ No | Context overlap similarity |</p>
+<table>
+<thead>
+<tr>
+  <th>Measure</th>
+  <th>Range</th>
+  <th>Asymmetric?</th>
+  <th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>MLE</strong></td>
+  <td>[0,1]</td>
+  <td>✓ Yes</td>
+  <td>Direct conditional probability</td>
+</tr>
+<tr>
+  <td><strong>PMI</strong></td>
+  <td>(-∞,+∞)</td>
+  <td>✗ No</td>
+  <td>Information content (0 = independent)</td>
+</tr>
+<tr>
+  <td><strong>Jaccard</strong></td>
+  <td>[0,1]</td>
+  <td>✗ No</td>
+  <td>Context overlap similarity</td>
+</tr>
+</tbody>
+</table>
 <p><strong>Note:</strong> Even symmetric measures like PMI return two values in ASymCat for
 consistency, but both values are identical.</p>
 
