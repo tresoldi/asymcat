@@ -57,10 +57,10 @@ print("=" * 50)
 
 #' ## 2. Load Sample Data
 #'
-#' We'll use the toy linguistic data for demonstrations.
+#' We'll use English orthography-to-pronunciation data to demonstrate the measures.
 
 # Load data
-data = asymcat.read_sequences("resources/toy.tsv")
+data = asymcat.read_sequences("resources/english_phonology.tsv")
 cooccs = asymcat.collect_cooccs(data)
 
 print(f"Loaded {len(data)} sequence pairs")
