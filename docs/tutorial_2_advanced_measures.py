@@ -208,7 +208,57 @@ print("Top 10 strongest associations:")
 for i, ((x, y), (or_xy, or_yx)) in enumerate(sorted_fisher[:10], 1):
     print(f"{i:2d}. ({x:3s}, {y:3s}): OR(Y|X) = {or_xy:8.2f}, OR(X|Y) = {or_yx:8.2f}")
 
-#' ## 5. Comparing Measures
+#' ## 5. Specialized Measures
+#'
+#' These measures are designed for specific types of analysis.
+
+#' ### 5.1 Goodman-Kruskal λ (Lambda)
+#'
+#' Lambda measures **prediction error reduction** - how much better we can predict
+#' Y when we know X compared to guessing without X:
+#'
+#' λ(Y|X) = [E₀ - E₁] / E₀
+#'
+#' - λ = 0: Knowing X doesn't help predict Y
+#' - λ = 1: Knowing X perfectly predicts Y
+#' - **Asymmetric**: λ(Y|X) ≠ λ(X|Y)
+
+# Compute Goodman-Kruskal lambda
+lambda_scores = scorer.goodman_kruskal_lambda()
+
+print("\n\nGoodman-Kruskal λ (Prediction Error Reduction):")
+print("=" * 60)
+
+sorted_lambda = sorted(lambda_scores.items(), key=lambda x: x[1][0], reverse=True)
+
+print("Top 10 predictive relationships (highest λ(Y|X)):")
+for i, ((x, y), (lambda_yx, lambda_xy)) in enumerate(sorted_lambda[:10], 1):
+    asymmetry = abs(lambda_yx - lambda_xy)
+    print(f"{i:2d}. {x:3s}→{y:3s}: λ={lambda_yx:.3f}  |  {y:3s}→{x:3s}: λ={lambda_xy:.3f}  |  Δ={asymmetry:.3f}")
+
+#' ### 5.2 Tresoldi Measure
+#'
+#' The Tresoldi measure is a **custom measure for linguistic alignments** that
+#' combines conditional probability (MLE) and information content (PMI):
+#'
+#' Tresoldi(X,Y) = MLE(Y|X) × PMI(X,Y)
+#'
+#' This balances predictiveness (how often X → Y) with informativeness (how
+#' surprising the association is).
+
+# Compute Tresoldi measure
+tresoldi_scores = scorer.tresoldi()
+
+print("\n\nTresoldi Measure (MLE × PMI):")
+print("=" * 60)
+
+sorted_tresoldi = sorted(tresoldi_scores.items(), key=lambda x: x[1][0], reverse=True)
+
+print("Top 10 strongest associations:")
+for i, ((x, y), (tres_xy, tres_yx)) in enumerate(sorted_tresoldi[:10], 1):
+    print(f"{i:2d}. ({x:3s}, {y:3s}): Tresoldi(Y|X) = {tres_xy:6.3f}, Tresoldi(X|Y) = {tres_yx:6.3f}")
+
+#' ## 6. Comparing Measures
 #'
 #' Different measures reveal different aspects of associations. Let's compare them.
 
@@ -223,6 +273,8 @@ measures_dict = {
     'Theil_U': scorer.theil_u(),
     'Chi2': scorer.chi2(),
     'Cramer_V': scorer.cramers_v(),
+    'Lambda': lambda_scores,
+    'Tresoldi': tresoldi_scores,
 }
 
 # Create comparison dataframe
@@ -239,6 +291,8 @@ for pair in sample_pairs:
             'Theil_U': measures_dict['Theil_U'][pair][0],
             'Chi2': measures_dict['Chi2'][pair][0],
             'Cramer_V': measures_dict['Cramer_V'][pair][0],
+            'Lambda': measures_dict['Lambda'][pair][0],
+            'Tresoldi': measures_dict['Tresoldi'][pair][0],
         }
         comparison_data.append(row)
 
@@ -253,13 +307,13 @@ print(comparison_df.head(10).to_string(index=False, float_format=lambda x: f'{x:
 #' Let's visualize how different measures correlate with each other.
 
 # Compute correlations
-corr_matrix = comparison_df[['MLE', 'PMI', 'NPMI', 'Theil_U', 'Chi2', 'Cramer_V']].corr()
+corr_matrix = comparison_df[['MLE', 'PMI', 'NPMI', 'Theil_U', 'Chi2', 'Cramer_V', 'Lambda', 'Tresoldi']].corr()
 
 # Plot correlation heatmap
-fig, ax = plt.subplots(figsize=(10, 8))
+fig, ax = plt.subplots(figsize=(12, 10))
 sns.heatmap(corr_matrix, annot=True, fmt='.2f', cmap='RdYlBu_r',
             center=0, vmin=-1, vmax=1, square=True, ax=ax,
-            cbar_kws={'label': 'Correlation'})
+            cbar_kws={'label': 'Correlation'}, annot_kws={'size': 9})
 ax.set_title('Correlation Between Association Measures', fontsize=14, fontweight='bold', pad=20)
 plt.tight_layout()
 plt.show()
