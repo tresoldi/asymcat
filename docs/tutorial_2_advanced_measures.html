@@ -59,6 +59,23 @@
             height: auto;
         }
 
+        /* Footer */
+        .nhandu-footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e1e4e8;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .nhandu-footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .nhandu-footer a:hover {
+            text-decoration: underline;
+        }
+
         /* Pygments syntax highlighting */
         pre { line-height: 125%; }
 td.linenos .normal { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
@@ -212,11 +229,6 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
 <li><strong>Tresoldi</strong>: Custom measure combining MLE and PMI</li>
 </ul>
 
-<div class="code-block">
-<div class="code-input"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 <h2>2. Load Sample Data</h2>
 <p>We'll use the toy linguistic data for demonstrations.</p>
 
@@ -241,11 +253,6 @@ Scorer ready with Laplace smoothing</pre>
 <h2>3. Information-Theoretic Measures</h2>
 <p>These measures quantify the <strong>information content</strong> of associations.</p>
 
-<div class="code-block">
-<div class="code-input"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 <h3>3.1 PMI (Pointwise Mutual Information)</h3>
 <p>PMI measures how much information we gain about Y when we observe X:</p>
 <p>PMI(X,Y) = log₂[P(X,Y) / (P(X)·P(Y))]</p>
@@ -276,12 +283,12 @@ PMI (Pointwise Mutual Information):
 Top 10 strongest associations (highest PMI):
  1. (o  , O  ): PMI =  4.043
  2. (e  , B  ): PMI =  0.018
- 3. (e  , E  ): PMI =  0.018
- 4. (e  , J  ): PMI =  0.018
+ 3. (e  , J  ): PMI =  0.018
+ 4. (e  , E  ): PMI =  0.018
  5. (e  , P  ): PMI =  0.018
  6. (p  , B  ): PMI =  0.018
- 7. (p  , E  ): PMI =  0.018
- 8. (p  , J  ): PMI =  0.018
+ 7. (p  , J  ): PMI =  0.018
+ 8. (p  , E  ): PMI =  0.018
  9. (p  , P  ): PMI =  0.018
 10. (u  , B  ): PMI =  0.018</pre>
 </div>
@@ -369,11 +376,6 @@ Top 10 predictive relationships (highest U(Y|X)):
 <h2>4. Statistical Measures</h2>
 <p>These measures test statistical significance and independence.</p>
 
-<div class="code-block">
-<div class="code-input"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 <h3>4.1 Chi-Square Test</h3>
 <p>Chi-square measures deviation from independence:</p>
 <p>χ²(X,Y) = Σ [(observed - expected)² / expected]</p>
@@ -399,15 +401,15 @@ Chi-Square Statistic:
 ============================================================
 Top 10 strongest associations (highest χ²):
  1. (o  , O  ): χ² =    13.75
- 2. (u  , B  ): χ² =     0.00
- 3. (u  , E  ): χ² =     0.00
- 4. (u  , J  ): χ² =     0.00
- 5. (u  , P  ): χ² =     0.00
+ 2. (o  , B  ): χ² =     0.00
+ 3. (o  , J  ): χ² =     0.00
+ 4. (o  , E  ): χ² =     0.00
+ 5. (o  , P  ): χ² =     0.00
  6. (u  , O  ): χ² =     0.00
- 7. (o  , B  ): χ² =     0.00
- 8. (o  , E  ): χ² =     0.00
- 9. (o  , J  ): χ² =     0.00
-10. (o  , P  ): χ² =     0.00</pre>
+ 7. (u  , B  ): χ² =     0.00
+ 8. (u  , J  ): χ² =     0.00
+ 9. (u  , E  ): χ² =     0.00
+10. (u  , P  ): χ² =     0.00</pre>
 </div>
 <h3>4.2 Cramér's V</h3>
 <p>Cramér's V normalizes chi-square to [0, 1] range:</p>
@@ -437,15 +439,15 @@ Cramér&#39;s V (Normalized Chi-Square):
 ============================================================
 Top 10 strongest associations:
  1. (o  , O  ): V =  0.477
- 2. (u  , B  ): V =  0.000
- 3. (u  , E  ): V =  0.000
- 4. (u  , J  ): V =  0.000
- 5. (u  , P  ): V =  0.000
+ 2. (o  , B  ): V =  0.000
+ 3. (o  , J  ): V =  0.000
+ 4. (o  , E  ): V =  0.000
+ 5. (o  , P  ): V =  0.000
  6. (u  , O  ): V =  0.000
- 7. (o  , B  ): V =  0.000
- 8. (o  , E  ): V =  0.000
- 9. (o  , J  ): V =  0.000
-10. (o  , P  ): V =  0.000</pre>
+ 7. (u  , B  ): V =  0.000
+ 8. (u  , J  ): V =  0.000
+ 9. (u  , E  ): V =  0.000
+10. (u  , P  ): V =  0.000</pre>
 </div>
 <h3>4.3 Fisher Exact Test</h3>
 <p>Fisher's exact test computes exact odds ratios, useful for small samples:</p>
@@ -738,11 +740,6 @@ MEASURE SELECTION DECISION TREE
 | <strong>Linguistic alignment</strong> | Tresoldi | Custom measure for sequences |
 | <strong>Symmetric associations</strong> | Jaccard, PMI | Context overlap |</p>
 
-<div class="code-block">
-<div class="code-input"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 <h2>8. Advanced: Custom Measure Combination</h2>
 <p>You can combine multiple measures for richer analysis.</p>
 
@@ -842,5 +839,8 @@ Tutorial 2 Complete! ✓
 You now understand the full spectrum of association measures!
 Proceed to Tutorial 3 to master visualization techniques.</pre>
 </div>
+<footer class="nhandu-footer">
+Made with <a href="https://pypi.org/project/nhandu" target="_blank" rel="noopener noreferrer">Nhandu</a>
+</footer>
 </body>
 </html>

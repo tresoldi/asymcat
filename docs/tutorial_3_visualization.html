@@ -59,6 +59,23 @@
             height: auto;
         }
 
+        /* Footer */
+        .nhandu-footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e1e4e8;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .nhandu-footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .nhandu-footer a:hover {
+            text-decoration: underline;
+        }
+
         /* Pygments syntax highlighting */
         pre { line-height: 125%; }
 td.linenos .normal { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
@@ -428,11 +445,6 @@ Matrix shapes:
 <h2>5. Matrix Transformations</h2>
 <p>ASymCat provides utilities to transform score matrices for different analyses.</p>
 
-<div class="code-block">
-<div class="code-input"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 <h3>Scaling</h3>
 <p>Scale scores to [0, 1] range for normalization.</p>
 
@@ -454,18 +466,18 @@ Matrix shapes:
 </div>
 <pre class="code-output">
 Original PMI scores (sample):
-  (&#39;H&#39;, &#39;p&#39;): X→Y =  -0.69, Y→X =  -0.69
-  (&#39;H&#39;, &#39;oʊ&#39;): X→Y =  -0.25, Y→X =  -0.25
-  (&#39;H&#39;, &#39;ɹ&#39;): X→Y =  -0.07, Y→X =  -0.07
-  (&#39;H&#39;, &#39;m&#39;): X→Y =   0.35, Y→X =   0.35
-  (&#39;H&#39;, &#39;n&#39;): X→Y =  -0.42, Y→X =  -0.42
+  (&#39;B&#39;, &#39;i&#39;): X→Y =   0.12, Y→X =   0.12
+  (&#39;B&#39;, &#39;æ&#39;): X→Y =   0.38, Y→X =   0.38
+  (&#39;B&#39;, &#39;n&#39;): X→Y =  -0.82, Y→X =  -0.82
+  (&#39;B&#39;, &#39;l&#39;): X→Y =   0.35, Y→X =   0.35
+  (&#39;B&#39;, &#39;z&#39;): X→Y =  -0.41, Y→X =  -0.41
 
 Scaled PMI scores [0, 1] (same pairs):
-  (&#39;H&#39;, &#39;p&#39;): X→Y =  0.696, Y→X =  0.696
-  (&#39;H&#39;, &#39;oʊ&#39;): X→Y =  0.730, Y→X =  0.730
-  (&#39;H&#39;, &#39;ɹ&#39;): X→Y =  0.743, Y→X =  0.743
-  (&#39;H&#39;, &#39;m&#39;): X→Y =  0.775, Y→X =  0.775
-  (&#39;H&#39;, &#39;n&#39;): X→Y =  0.717, Y→X =  0.717</pre>
+  (&#39;B&#39;, &#39;i&#39;): X→Y =  0.758, Y→X =  0.758
+  (&#39;B&#39;, &#39;æ&#39;): X→Y =  0.777, Y→X =  0.777
+  (&#39;B&#39;, &#39;n&#39;): X→Y =  0.687, Y→X =  0.687
+  (&#39;B&#39;, &#39;l&#39;): X→Y =  0.775, Y→X =  0.775
+  (&#39;B&#39;, &#39;z&#39;): X→Y =  0.718, Y→X =  0.718</pre>
 </div>
 <h3>Inversion</h3>
 <p>Invert scores to reverse their interpretation (high becomes low).</p>
@@ -735,5 +747,8 @@ Tutorial 3 Complete! ✓
 You can now create compelling visualizations of asymmetric associations!
 Proceed to Tutorial 4 for real-world application examples.</pre>
 </div>
+<footer class="nhandu-footer">
+Made with <a href="https://pypi.org/project/nhandu" target="_blank" rel="noopener noreferrer">Nhandu</a>
+</footer>
 </body>
 </html>

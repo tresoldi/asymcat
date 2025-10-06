@@ -59,6 +59,23 @@
             height: auto;
         }
 
+        /* Footer */
+        .nhandu-footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e1e4e8;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .nhandu-footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .nhandu-footer a:hover {
+            text-decoration: underline;
+        }
+
         /* Pygments syntax highlighting */
         pre { line-height: 125%; }
 td.linenos .normal { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
@@ -163,11 +180,6 @@ span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 
 <h2>Prerequisites</h2>
 <p>Basic Python knowledge and familiarity with probability concepts.</p>
 
-<div class="code-block">
-<div class="code-input"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 <h2>1. Introduction: What Are Asymmetric Associations?</h2>
 <p>Traditional association measures treat relationships as <strong>symmetric</strong>: the relationship
 between X and Y is the same as between Y and X. But many real-world relationships
@@ -208,11 +220,6 @@ Ready to analyze asymmetric associations!</pre>
 </code></pre>
 <p>Let's demonstrate with a simple example.</p>
 
-<div class="code-block">
-<div class="code-input"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 <h3>Example: Doctor Prescriptions</h3>
 <p>We'll analyze a small dataset of doctor prescriptions to understand who prescribes what.</p>
 
@@ -362,11 +369,6 @@ prescriptions come from Dr_Smith</li>
 <li>The <strong>asymmetry</strong> shows these are different relationships!</li>
 </ul>
 
-<div class="code-block">
-<div class="code-input"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 <h2>3. Visualizing Asymmetric Relationships</h2>
 <p>Let's visualize the directional nature of these associations.</p>
 
@@ -464,11 +466,6 @@ Dr_Smith  Morphine    0.200    0.167   -2.485        0.000</pre>
 <p><strong>Note:</strong> Even symmetric measures like PMI return two values in ASymCat for
 consistency, but both values are identical.</p>
 
-<div class="code-block">
-<div class="code-input"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 <h2>5. Working with Sequence Data</h2>
 <p>ASymCat can load aligned sequences from TSV files. Let's use the toy dataset.</p>
 
@@ -646,11 +643,6 @@ Lidstone (α=0.1)         : 0.7381</pre>
 <li>When zero probabilities are problematic</li>
 </ul>
 
-<div class="code-block">
-<div class="code-input"><div class="highlight"><pre><span></span>
-</pre></div>
-</div>
-</div>
 <h2>8. Key Takeaways</h2>
 <p><strong>You've learned:</strong></p>
 <p>✓ Asymmetric associations reveal directional relationships
@@ -699,5 +691,8 @@ Tutorial 1 Complete! ✓
 You&#39;re now ready to analyze asymmetric categorical associations!
 Proceed to Tutorial 2 to explore advanced measures.</pre>
 </div>
+<footer class="nhandu-footer">
+Made with <a href="https://pypi.org/project/nhandu" target="_blank" rel="noopener noreferrer">Nhandu</a>
+</footer>
 </body>
 </html>
