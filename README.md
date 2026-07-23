@@ -201,6 +201,19 @@ ASymCat implements 17+ association measures organized by type:
 - **Tresoldi**: Custom measure designed for sequence alignment
 - **Goodman-Kruskal λ**: Proportional reduction in error
 
+### Statistical Significance (p-values)
+Significance counterparts to the statistical tests, returning the same
+`{(x, y): (p, p)}` shape (a small value indicates a significant association):
+- **`chi2_pvalue()`**: p-value of the chi-square test of independence
+- **`fisher_pvalue()`**: p-value of Fisher's exact test
+- **`log_likelihood_ratio_pvalue()`**: p-value of the G² test
+
+```python
+scorer = asymcat.CatScorer(cooccs)
+chi2_scores = scorer.chi2()            # test statistics
+chi2_pvals  = scorer.chi2_pvalue()     # matching p-values
+```
+
 ## 🔬 Scientific Applications
 
 ### Linguistics & Language Evolution
@@ -421,7 +434,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔮 Roadmap
 
-- **Statistical Significance**: P-value calculations for all measures
+- **Statistical Significance**: P-values for the statistical tests (chi-square,
+  Fisher, G²) are available; permutation-based p-values for the
+  information-theoretic measures are planned
 - **Confidence Intervals**: Uncertainty quantification
 - **GPU Acceleration**: CUDA support for massive datasets
 - **Interactive Dashboards**: Web-based exploration tools

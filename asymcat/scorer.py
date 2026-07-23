@@ -399,6 +399,37 @@ def compute_log_likelihood_ratio(cont_table: list[list[float]]) -> float:
     return 2.0 * g2
 
 
+def compute_log_likelihood_ratio_pvalue(cont_table: list[list[float]]) -> float:
+    """
+    Compute the p-value of the Log-Likelihood Ratio (G²) statistic.
+
+    Under the null hypothesis of independence, G² is asymptotically
+    chi-square distributed with ``(rows - 1) * (cols - 1)`` degrees of freedom.
+
+    Parameters
+    ----------
+    cont_table : List[List[float]]
+        The contingency table for computation.
+
+    Returns
+    -------
+    float
+        The p-value for the Log-Likelihood Ratio statistic, in range [0, 1].
+    """
+    g2 = compute_log_likelihood_ratio(cont_table)
+
+    rows = len(cont_table)
+    cols = len(cont_table[0]) if rows else 0
+    dof = (rows - 1) * (cols - 1)
+
+    # A degenerate table with no degrees of freedom carries no evidence
+    # against independence.
+    if dof <= 0:
+        return 1.0
+
+    return float(ss.chi2.sf(g2, dof))
+
+
 # TODO: allow independent scaling over `x` and independent over `y` (currently doing all)
 # TODO: allow scaling withing percentile borders
 # TODO: see if we can vectorize numpy operations (now on dicts)
@@ -623,6 +654,13 @@ class CatScorer:
         self._goodman_kruskal_lambda: dict[tuple[Any, Any], tuple[float, float]] | None = None
         self._log_likelihood_ratio: dict[tuple[Any, Any], tuple[float, float]] | None = None
         self._log_likelihood_ratio_nonsquare: dict[tuple[Any, Any], tuple[float, float]] | None = None
+
+        # p-value scorers for the statistical tests, lazily computed
+        self._chi2_pvalue: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._chi2_pvalue_nonsquare: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._fisher_pvalue: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._log_likelihood_ratio_pvalue: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._log_likelihood_ratio_pvalue_nonsquare: dict[tuple[Any, Any], tuple[float, float]] | None = None
 
     def _compute_contingency_table_scorer(
         self, square: bool, computation_func, square_cache_attr: str, nonsquare_cache_attr: str
@@ -940,6 +978,30 @@ class CatScorer:
             square_ct, lambda ct: ss.chi2_contingency(ct)[0], "_chi2", "_chi2_nonsquare"
         )
 
+    def chi2_pvalue(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
+        """
+        Return the p-values of the chi-square test of independence.
+
+        This is the significance counterpart to :meth:`chi2`: for each pair it
+        returns the p-value from ``scipy.stats.chi2_contingency`` (a small value
+        indicates a statistically significant association). As with the other
+        symmetric statistical tests, both tuple entries hold the same value.
+
+        Parameters
+        ----------
+        square_ct : bool
+            Whether to compute the p-value over a squared (2x2) or non-squared
+            (3x2) contingency table (default: True).
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to (p-value, p-value) tuples.
+        """
+        return self._compute_contingency_table_scorer(
+            square_ct, lambda ct: ss.chi2_contingency(ct)[1], "_chi2_pvalue", "_chi2_pvalue_nonsquare"
+        )
+
     def cramers_v(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Cramér's V scorer.
@@ -977,6 +1039,33 @@ class CatScorer:
                 self._fisher[pair] = (fisher, fisher)
 
         return self._fisher
+
+    def fisher_pvalue(self) -> dict[tuple[Any, Any], tuple[float, float]]:
+        """
+        Return the p-values of Fisher's exact test.
+
+        This is the significance counterpart to :meth:`fisher`: for each pair it
+        returns the (two-sided) p-value from ``scipy.stats.fisher_exact`` over
+        the 2x2 contingency table. As with the other symmetric statistical
+        tests, both tuple entries hold the same value.
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to (p-value, p-value) tuples.
+        """
+
+        # Compute the square contingency table, if necessary
+        self._compute_contingency_table(True)
+
+        if not self._fisher_pvalue:
+            assert self._square_ct is not None, "Square contingency table should have been computed"  # nosec
+            self._fisher_pvalue = {}
+            for pair in self.obs:
+                pvalue = ss.fisher_exact(self._square_ct[pair])[1]
+                self._fisher_pvalue[pair] = (pvalue, pvalue)
+
+        return self._fisher_pvalue
 
     def _joint_counts(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
@@ -1366,4 +1455,32 @@ class CatScorer:
         """
         return self._compute_contingency_table_scorer(
             square_ct, compute_log_likelihood_ratio, "_log_likelihood_ratio", "_log_likelihood_ratio_nonsquare"
+        )
+
+    def log_likelihood_ratio_pvalue(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
+        """
+        Return the p-values of the Log-Likelihood Ratio (G²) test.
+
+        This is the significance counterpart to :meth:`log_likelihood_ratio`:
+        under the null hypothesis of independence, G² is asymptotically
+        chi-square distributed, and this returns the corresponding p-value for
+        each pair. As with the other symmetric statistical tests, both tuple
+        entries hold the same value.
+
+        Parameters
+        ----------
+        square_ct : bool
+            Whether to compute the p-value over a squared (2x2) or non-squared
+            (3x2) contingency table (default: True).
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to (p-value, p-value) tuples.
+        """
+        return self._compute_contingency_table_scorer(
+            square_ct,
+            compute_log_likelihood_ratio_pvalue,
+            "_log_likelihood_ratio_pvalue",
+            "_log_likelihood_ratio_pvalue_nonsquare",
         )

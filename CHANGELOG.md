@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Corrected the stale `version = {0.3.0}` in the README citation to `0.4.0`.
 
 ### Added
+- Statistical-significance scorers `CatScorer.chi2_pvalue()`,
+  `fisher_pvalue()` and `log_likelihood_ratio_pvalue()`, returning the p-value
+  of the corresponding test for each pair in the usual `{(x, y): (p, p)}` shape
+  (chi-square and Fisher p-values were already computed by SciPy and discarded;
+  the G² p-value uses its chi-square distribution). Also exposes the
+  `compute_log_likelihood_ratio_pvalue()` helper.
 - Regression tests for the `asymcat.correlation` module (`conditional_entropy`,
   `theil_u`, and `cramers_v` wrappers), bringing the module to full coverage.
 - Validation/error-path tests for `asymcat.common` data-loading helpers,
