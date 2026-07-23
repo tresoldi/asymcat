@@ -33,6 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `two-sided` tails, a reproducible `seed`, and the `(count + 1) / (n + 1)`
   correction. Now practical thanks to the vectorized scorers (~1000
   permutations of `theil_u` run in about a second).
+- `CatScorer.bootstrap_ci(measure, ...)`, bootstrap confidence intervals for any
+  association measure. It resamples the co-occurrences with replacement and
+  returns the percentile interval per pair and direction as
+  `{(x, y): ((xy_low, xy_high), (yx_low, yx_high))}`, with configurable
+  `confidence_level` and a reproducible `seed`. Shares its resampling loop with
+  `permutation_pvalue` via an internal helper.
 - Regression tests for the `asymcat.correlation` module (`conditional_entropy`,
   `theil_u`, and `cramers_v` wrappers), bringing the module to full coverage.
 - Validation/error-path tests for `asymcat.common` data-loading helpers,
@@ -41,9 +47,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `mutual_information`, `normalized_mutual_information` and
   `goodman_kruskal_lambda` scorers to their original per-pair algorithms across
   several datasets and degenerate cases.
-- Tests for the p-value scorers (parametric and permutation-based), covering
-  correctness against SciPy, value ranges, tails, reproducibility, and the
-  response to strong vs. independent association.
+- Tests for the p-value scorers (parametric and permutation-based) and the
+  bootstrap confidence intervals, covering correctness against SciPy, value
+  ranges, tails, reproducibility, interval coverage/ordering, the expected
+  narrowing with more data, and the response to strong vs. independent
+  association.
 - Performance benchmark suite (`tests/performance/`) built on `pytest-benchmark`
   measuring the main scoring measures. Benchmarks are opt-in (skipped by
   default) and run with `pytest tests/performance --run-slow --no-cov

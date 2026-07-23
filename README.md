@@ -226,6 +226,16 @@ theil_pvals = scorer.permutation_pvalue("theil_u", n_permutations=1000, seed=0)
 ce_pvals = scorer.permutation_pvalue("cond_entropy", alternative="less", seed=0)
 ```
 
+**`bootstrap_ci()`** quantifies the uncertainty *around* a score by resampling
+the co-occurrences with replacement, returning a percentile confidence interval
+per pair and direction as `{(x, y): ((xy_low, xy_high), (yx_low, yx_high))}`:
+
+```python
+# 95% confidence intervals for each Theil's U score
+theil_ci = scorer.bootstrap_ci("theil_u", n_bootstrap=1000, confidence_level=0.95, seed=0)
+low, high = theil_ci[("a", "x")][0]   # interval for the x→y direction
+```
+
 ## 🔬 Scientific Applications
 
 ### Linguistics & Language Evolution
@@ -449,7 +459,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Statistical Significance**: ✅ P-values for the statistical tests
   (chi-square, Fisher, G²) and permutation-based p-values for any measure are
   available
-- **Confidence Intervals**: Uncertainty quantification
+- **Confidence Intervals**: ✅ Bootstrap confidence intervals for any measure
+  are available (`bootstrap_ci`)
 - **GPU Acceleration**: CUDA support for massive datasets
 - **Interactive Dashboards**: Web-based exploration tools
 - **Extended Measures**: Additional domain-specific association metrics

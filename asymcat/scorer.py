@@ -13,9 +13,11 @@ Defines the various scorers for categorical co-occurrence analysis.
 # TODO: allow to combine scalers? log within range?
 
 import math
+import warnings
 
 # Import Python standard libraries
 from collections import Counter
+from collections.abc import Callable, Iterator
 from itertools import chain, product
 from typing import Any, NamedTuple
 
@@ -1485,10 +1487,10 @@ class CatScorer:
             "_log_likelihood_ratio_pvalue_nonsquare",
         )
 
-    #: Association measures for which :meth:`permutation_pvalue` can build a null
-    #: distribution. Each is a method returning ``{(x, y): (xy, yx)}`` computed
-    #: with its default parameters.
-    PERMUTABLE_MEASURES = frozenset(
+    #: Association measures supported by the resampling-based methods
+    #: (:meth:`permutation_pvalue` and :meth:`bootstrap_ci`). Each is a method
+    #: returning ``{(x, y): (xy, yx)}`` computed with its default parameters.
+    RESAMPLABLE_MEASURES = frozenset(
         {
             "mle",
             "pmi",
@@ -1506,6 +1508,31 @@ class CatScorer:
             "log_likelihood_ratio",
         }
     )
+
+    def _resampled_scores(
+        self,
+        measure: str,
+        n_resamples: int,
+        resampler: Callable[[np.random.Generator, list[Any], list[Any]], list[tuple[Any, Any]]],
+        seed: int | None,
+    ) -> Iterator[dict[tuple[Any, Any], tuple[float, float]]]:
+        """
+        Yield ``measure`` recomputed on ``n_resamples`` resampled co-occurrence sets.
+
+        ``resampler(rng, x_values, y_values)`` returns the co-occurrence pairs for
+        a single replicate -- e.g. a marginal-preserving shuffle (permutation
+        test) or a with-replacement draw (bootstrap). Each replicate is scored
+        with the same smoothing configuration as this scorer, so the permutation
+        and bootstrap methods share this resampling loop.
+        """
+        x_values = [pair[0] for pair in self.cooccs]
+        y_values = [pair[1] for pair in self.cooccs]
+        rng = np.random.default_rng(seed)
+
+        for _ in range(n_resamples):
+            resampled_cooccs = resampler(rng, x_values, y_values)
+            resampled_scorer = CatScorer(resampled_cooccs, self.smoothing_method, self.smoothing_alpha)
+            yield getattr(resampled_scorer, measure)()
 
     def permutation_pvalue(
         self,
@@ -1540,7 +1567,7 @@ class CatScorer:
         ----------
         measure : str
             Name of the association measure to test; must be one of
-            :attr:`PERMUTABLE_MEASURES`. It is computed with its default
+            :attr:`RESAMPLABLE_MEASURES`. It is computed with its default
             parameters.
         n_permutations : int
             Number of random permutations forming the null distribution
@@ -1573,8 +1600,8 @@ class CatScorer:
             If ``measure`` is not supported, ``alternative`` is invalid, or
             ``n_permutations`` is not a positive integer.
         """
-        if measure not in self.PERMUTABLE_MEASURES:
-            raise ValueError(f"Unsupported measure {measure!r}. Choose one of: {sorted(self.PERMUTABLE_MEASURES)}")
+        if measure not in self.RESAMPLABLE_MEASURES:
+            raise ValueError(f"Unsupported measure {measure!r}. Choose one of: {sorted(self.RESAMPLABLE_MEASURES)}")
 
         if alternative not in ("greater", "less", "two-sided"):
             raise ValueError(f"Invalid alternative {alternative!r}. Use 'greater', 'less', or 'two-sided'.")
@@ -1596,16 +1623,13 @@ class CatScorer:
         count_le_xy = np.zeros(len(keys))
         count_le_yx = np.zeros(len(keys))
 
-        x_values = [pair[0] for pair in self.cooccs]
-        y_values = [pair[1] for pair in self.cooccs]
-        rng = np.random.default_rng(seed)
-
-        for _ in range(n_permutations):
+        # A permutation preserves the marginals, so every symbol (and therefore
+        # every pair key) is still present in each replicate.
+        def _permute(rng: np.random.Generator, x_values: list[Any], y_values: list[Any]) -> list[tuple[Any, Any]]:
             permuted_y = [y_values[i] for i in rng.permutation(len(y_values))]
-            permuted_cooccs = list(zip(x_values, permuted_y, strict=True))
-            permuted_scorer = CatScorer(permuted_cooccs, self.smoothing_method, self.smoothing_alpha)
+            return list(zip(x_values, permuted_y, strict=True))
 
-            permuted = getattr(permuted_scorer, measure)()
+        for permuted in self._resampled_scores(measure, n_permutations, _permute, seed):
             perm_xy = np.array([permuted[k][0] for k in keys], dtype=float)
             perm_yx = np.array([permuted[k][1] for k in keys], dtype=float)
 
@@ -1629,3 +1653,101 @@ class CatScorer:
         p_yx = _pvalues(count_ge_yx, count_le_yx)
 
         return {key: (float(p_xy[i]), float(p_yx[i])) for i, key in enumerate(keys)}
+
+    def bootstrap_ci(
+        self,
+        measure: str,
+        n_bootstrap: int = 1000,
+        confidence_level: float = 0.95,
+        seed: int | None = None,
+    ) -> dict[tuple[Any, Any], tuple[tuple[float, float], tuple[float, float]]]:
+        """
+        Estimate bootstrap confidence intervals for an association measure.
+
+        Whereas :meth:`permutation_pvalue` tests whether an association differs
+        from independence, this quantifies the sampling uncertainty *around* the
+        observed score. A bootstrap distribution is built by resampling the
+        co-occurrences with replacement (``n`` draws from the ``n`` observed
+        pairs, preserving each pair's ``x``/``y`` link) and recomputing the
+        measure; the confidence interval is taken as the percentile interval of
+        that distribution, per pair and direction.
+
+        The point estimate itself is not returned -- obtain it from the measure
+        method directly (e.g. ``scorer.theil_u()``).
+
+        Because resampling can drop a rarely-seen symbol from a replicate, a pair
+        may be absent from some replicates; such replicates simply do not
+        contribute to that pair's interval. As with :meth:`permutation_pvalue`,
+        co-occurrences are treated as exchangeable, so sequence data that expands
+        into many correlated co-occurrences yields intervals that are somewhat
+        too narrow.
+
+        Parameters
+        ----------
+        measure : str
+            Name of the association measure; must be one of
+            :attr:`RESAMPLABLE_MEASURES`. It is computed with its default
+            parameters.
+        n_bootstrap : int
+            Number of bootstrap replicates (default: 1000).
+        confidence_level : float
+            Confidence level in the open interval ``(0, 1)`` (default: 0.95 for a
+            95% interval, i.e. the 2.5th and 97.5th percentiles).
+        seed : Optional[int]
+            Seed for the random number generator, for reproducible results
+            (default: None, i.e. non-deterministic).
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[Tuple[float, float], Tuple[float, float]]]
+            Dictionary mapping symbol pairs to ``((xy_low, xy_high), (yx_low,
+            yx_high))`` -- a lower/upper bound for each direction, aligned with
+            the measure's own output.
+
+        Raises
+        ------
+        ValueError
+            If ``measure`` is not supported, ``confidence_level`` is not in
+            ``(0, 1)``, or ``n_bootstrap`` is not a positive integer.
+        """
+        if measure not in self.RESAMPLABLE_MEASURES:
+            raise ValueError(f"Unsupported measure {measure!r}. Choose one of: {sorted(self.RESAMPLABLE_MEASURES)}")
+
+        if not 0.0 < confidence_level < 1.0:
+            raise ValueError(f"confidence_level must be in the open interval (0, 1), got {confidence_level!r}")
+
+        if not isinstance(n_bootstrap, int) or n_bootstrap < 1:
+            raise ValueError(f"n_bootstrap must be a positive integer, got {n_bootstrap!r}")
+
+        # Fixed key ordering; each replicate fills one row. Missing pairs stay
+        # NaN and are ignored by the percentile computation.
+        keys = list(getattr(self, measure)())
+        boot_xy = np.full((n_bootstrap, len(keys)), np.nan)
+        boot_yx = np.full((n_bootstrap, len(keys)), np.nan)
+
+        # Resample the observed co-occurrence pairs with replacement, keeping
+        # each pair's x/y link intact.
+        def _bootstrap(rng: np.random.Generator, x_values: list[Any], y_values: list[Any]) -> list[tuple[Any, Any]]:
+            indices = rng.integers(0, len(x_values), size=len(x_values))
+            return [(x_values[i], y_values[i]) for i in indices]
+
+        for row, resampled in enumerate(self._resampled_scores(measure, n_bootstrap, _bootstrap, seed)):
+            boot_xy[row] = [resampled.get(key, (np.nan, np.nan))[0] for key in keys]
+            boot_yx[row] = [resampled.get(key, (np.nan, np.nan))[1] for key in keys]
+
+        lower_q = 100.0 * (1.0 - confidence_level) / 2.0
+        upper_q = 100.0 * (1.0 + confidence_level) / 2.0
+
+        # A pair absent from every replicate yields an all-NaN column; suppress
+        # the resulting warning and let its interval be (NaN, NaN).
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            xy_low = np.nanpercentile(boot_xy, lower_q, axis=0)
+            xy_high = np.nanpercentile(boot_xy, upper_q, axis=0)
+            yx_low = np.nanpercentile(boot_yx, lower_q, axis=0)
+            yx_high = np.nanpercentile(boot_yx, upper_q, axis=0)
+
+        return {
+            key: ((float(xy_low[i]), float(xy_high[i])), (float(yx_low[i]), float(yx_high[i])))
+            for i, key in enumerate(keys)
+        }

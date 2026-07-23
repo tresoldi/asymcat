@@ -108,7 +108,7 @@ class TestPermutationValidation:
         with pytest.raises(ValueError, match="n_permutations must be a positive integer"):
             _strong_scorer().permutation_pvalue("pmi", n_permutations=0)
 
-    def test_permutable_measures_are_real_methods(self):
+    def test_resamplable_measures_are_real_methods(self):
         scorer = _strong_scorer()
-        for measure in CatScorer.PERMUTABLE_MEASURES:
+        for measure in CatScorer.RESAMPLABLE_MEASURES:
             assert callable(getattr(scorer, measure))
