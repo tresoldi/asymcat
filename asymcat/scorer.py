@@ -7,7 +7,6 @@ Defines the various scorers for categorical co-occurrence analysis.
 """
 
 # TODO: have a function for checking if we have enough data for a chi2, combined with smoothing
-# TODO: improve the speed of theil's u computation
 # TODO: extend scipy options in chi2_contingency
 # TODO: investigate if it is worth reusing chi2 statistics for cramer
 # TODO: include a logarithmic scaler (instead of percentile one)
@@ -958,36 +957,104 @@ class CatScorer:
     def theil_u(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Theil's U uncertainty scorer.
+
+        For every pair ``(x, y)`` this computes Theil's U in both directions
+        over the subset of co-occurrences where ``pair[0] == x`` or
+        ``pair[1] == y``, matching ``compute_theil_u(Y, X)`` and
+        ``compute_theil_u(X, Y)`` on that subset.
+
+        The result is computed with a vectorized formulation (see
+        :meth:`_compute_theil_u_matrix`) that evaluates all pairs at once from
+        the global joint-count matrix, rather than re-filtering the full
+        co-occurrence list for each of the ``|X| * |Y|`` pairs.
         """
 
-        # Compute theil u, if necessary; optimize with numpy arrays when possible
         if not self._theil_u:
-            self._theil_u = {}
-
-            # Convert to numpy arrays for potentially faster filtering
-            import numpy as np
-
-            cooccs_array = np.array(self.cooccs)
-
-            for x in self.alphabet_x:
-                for y in self.alphabet_y:
-                    # Use numpy boolean indexing for faster filtering on large datasets
-                    if len(self.cooccs) > 1000:  # Only use numpy for larger datasets
-                        mask = (cooccs_array[:, 0] == x) | (cooccs_array[:, 1] == y)
-                        subset = cooccs_array[mask].tolist()
-                    else:
-                        subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
-
-                    X = [pair[0] for pair in subset]
-                    Y = [pair[1] for pair in subset]
-
-                    # run theil's
-                    self._theil_u[(x, y)] = (
-                        compute_theil_u(Y, X),
-                        compute_theil_u(X, Y),
-                    )
+            self._theil_u = self._compute_theil_u_matrix()
 
         return self._theil_u
+
+    def _compute_theil_u_matrix(self) -> dict[tuple[Any, Any], tuple[float, float]]:
+        """
+        Vectorized computation backing :meth:`theil_u`.
+
+        The subset selected for a pair ``(x, y)`` -- co-occurrences whose first
+        element is ``x`` or whose second element is ``y`` -- has a joint
+        distribution shaped like a "cross": the whole row ``x`` and the whole
+        column ``y`` of the global joint-count matrix ``J``, with every other
+        cell empty. That structure lets each of the four entropies needed by
+        Theil's U be written in closed form from ``J``'s row/column sums and a
+        handful of precomputed per-row / per-column vectors, so all pairs are
+        evaluated together with array broadcasting.
+
+        This reduces the cost from ``O(|X| * |Y| * n)`` (re-scanning the ``n``
+        co-occurrences for every pair) to ``O(|X| * |Y|)``, while reproducing
+        the original per-pair results to floating-point precision.
+        """
+
+        # Index the alphabets and accumulate the joint-count matrix J[i, j],
+        # the number of times co-occurrence (alphabet_x[i], alphabet_y[j]) is
+        # observed. R and C are the row and column marginals (i.e. the global
+        # counts of each x and each y symbol).
+        x_index = {x: i for i, x in enumerate(self.alphabet_x)}
+        y_index = {y: j for j, y in enumerate(self.alphabet_y)}
+        n_x, n_y = len(self.alphabet_x), len(self.alphabet_y)
+
+        joint = np.zeros((n_x, n_y))
+        for (a, b), count in Counter(self.cooccs).items():
+            joint[x_index[a], y_index[b]] += count
+
+        row_sum = joint.sum(axis=1)  # R[i]: global count of x symbol i
+        col_sum = joint.sum(axis=0)  # C[j]: global count of y symbol j
+
+        # `J log J` (with the standard 0 * log 0 == 0 convention), plus its row
+        # and column sums; every logarithm below guards zeros explicitly.
+        with np.errstate(divide="ignore", invalid="ignore"):
+            joint_log = joint * np.where(joint > 0, np.log(joint), 0.0)
+        row_log_sum = joint_log.sum(axis=1)
+        col_log_sum = joint_log.sum(axis=0)
+
+        # rowTerm[i] = sum_j J[i,j] log(R[i] / J[i,j]); colTerm[j] analogous.
+        # These are the (unnormalized) conditional-entropy contributions of a
+        # full row / column and, divided by the subset size, give H(Y|X) and
+        # H(X|Y) respectively.
+        row_term = row_sum * np.log(row_sum) - row_log_sum
+        col_term = col_sum * np.log(col_sum) - col_log_sum
+
+        # Broadcast the marginals over the |X| x |Y| grid. Ntot[i,j] is the size
+        # of the subset for pair (i, j): |{first == x}| + |{second == y}| minus
+        # the doubly-counted (x, y) cell. It is always positive because every
+        # alphabet symbol occurs at least once.
+        row_col = row_sum[:, None]
+        col_row = col_sum[None, :]
+        n_total = row_col + col_row - joint
+        log_n_total = np.log(n_total)
+
+        # The four entropies over each subset (see the derivation above).
+        h_y_given_x = row_term[:, None] / n_total
+        h_x_given_y = col_term[None, :] / n_total
+        h_x = -(row_col * np.log(row_col) + col_log_sum[None, :] - joint_log) / n_total + log_n_total
+        h_y = -(col_row * np.log(col_row) + row_log_sum[:, None] - joint_log) / n_total + log_n_total
+
+        # H(X) is exactly zero iff the subset's x-marginal is a single symbol,
+        # i.e. column j is concentrated in row i (C[j] == J[i,j]); likewise
+        # H(Y) is zero iff R[i] == J[i,j]. Detecting this from the integer
+        # counts reproduces the scalar code's `h_x == 0.0 -> 1.0` branch exactly
+        # and avoids dividing by a (floating-point) zero entropy.
+        h_y_zero = row_col == joint
+        h_x_zero = col_row == joint
+
+        with np.errstate(divide="ignore", invalid="ignore"):
+            u_y_given_x = np.where(h_y_zero, 1.0, (h_y - h_y_given_x) / h_y)
+            u_x_given_y = np.where(h_x_zero, 1.0, (h_x - h_x_given_y) / h_x)
+
+        # Assemble the result dict, preserving the (compute_theil_u(Y, X),
+        # compute_theil_u(X, Y)) ordering of the original implementation.
+        return {
+            (x, y): (float(u_y_given_x[i, j]), float(u_x_given_y[i, j]))
+            for i, x in enumerate(self.alphabet_x)
+            for j, y in enumerate(self.alphabet_y)
+        }
 
     def cond_entropy(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
