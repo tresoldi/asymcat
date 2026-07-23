@@ -425,7 +425,7 @@ If you use ASymCat in your research, please cite:
   author = {Tresoldi, Tiago},
   year = {2024},
   url = {https://github.com/tresoldi/asymcat},
-  version = {0.4.0}
+  version = {0.5.0}
 }
 ```
 
@@ -439,20 +439,25 @@ If you use ASymCat in your research, please cite:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🚀 What's New in v0.4.0
+## 🚀 What's New in v0.5.0
 
-- ✅ **Simplified Dependencies**: Consolidated to `[viz]` and `[dev]` groups - easier installation
-- ✅ **Modern Tooling**: Unified linting/formatting with Ruff, replacing black/isort/flake8
-- ✅ **Enhanced CI/CD**: Simplified quality workflow with faster feedback
-- ✅ **Coverage Enforcement**: 78% minimum threshold (goal: 80%)
-- ✅ **Keep a Changelog**: Semantic versioning with full version history
-- ✅ **Developer-Friendly Makefile**: Self-documenting help, automated version bumping
-- ✅ **Library-Only Focus**: Removed CLI tool for better coverage and maintainability
+- ✅ **Statistical Significance**: p-value scorers for the statistical tests
+  (`chi2_pvalue`, `fisher_pvalue`, `log_likelihood_ratio_pvalue`) plus a generic
+  permutation test (`permutation_pvalue`) for any measure
+- ✅ **Confidence Intervals**: bootstrap confidence intervals for any measure
+  (`bootstrap_ci`)
+- ⚡ **Much Faster Scorers**: `theil_u`, `cond_entropy`, `mutual_information`,
+  `normalized_mutual_information` and `goodman_kruskal_lambda` were vectorized
+  (hundreds of times faster; every measure is now sub-millisecond on the sample
+  data), which also makes the resampling-based methods practical
+- 🐛 **Bug Fixes**: `correlation.theil_u()` now returns Theil's U (not raw
+  conditional entropy); the data loaders no longer mask their validation errors
+  as generic `OSError`
+- ✅ **Higher Coverage**: enforced test-coverage threshold raised to 80%
+  (actual coverage ~87%)
 
-**Migration from v0.3.1:**
-- Use `pip install asymcat[dev]` instead of multiple dependency groups
-- Use library API directly instead of CLI tool (see examples above)
-- See [CHANGELOG.md](CHANGELOG.md) for detailed migration guide
+All changes are backwards compatible with v0.4.0. See [CHANGELOG.md](CHANGELOG.md)
+for the full list.
 
 ## 🔮 Roadmap
 

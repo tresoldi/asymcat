@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-07-23
+
 ### Fixed
 - `correlation.theil_u()` now computes Theil's U (uncertainty coefficient)
   instead of mistakenly returning the raw conditional entropy. The previous
@@ -17,7 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (e.g. "Column not found", "Missing required 'ID' column", "Invalid
   presence-absence value") as a generic `OSError`, contradicting the documented
   behavior; these now propagate as `ValueError` as intended.
-- Corrected the stale `version = {0.3.0}` in the README citation to `0.4.0`.
+- Corrected the stale `version = {0.3.0}` in the README citation to the current
+  release.
 
 ### Added
 - Statistical-significance scorers `CatScorer.chi2_pvalue()`,
@@ -257,7 +260,8 @@ All APIs remain the same, only the package name changed.
 - **0.2.1** - Double series correlation
 - **0.2.0** - Initial release
 
-[Unreleased]: https://github.com/tresoldi/asymcat/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/tresoldi/asymcat/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/tresoldi/asymcat/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/tresoldi/asymcat/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/tresoldi/asymcat/releases/tag/v0.3.1
 [0.3.0]: https://github.com/tresoldi/asymcat/releases/tag/v0.3.0
