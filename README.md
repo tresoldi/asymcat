@@ -16,7 +16,7 @@ ASymCat is a comprehensive Python library for analyzing **asymmetric association
 - **Robust Smoothing**: FreqProb integration for numerical stability
 - **Multiple Data Formats**: Sequences, presence-absence matrices, n-grams
 - **Scalable Architecture**: Optimized for large datasets with efficient algorithms
-- **Comprehensive Testing**: 75+ tests with 78%+ coverage ensuring reliability and accuracy
+- **Comprehensive Testing**: 100+ tests with 80%+ coverage ensuring reliability and accuracy
 
 ## 🎯 Why Asymmetric Measures Matter
 
@@ -300,7 +300,7 @@ make docs-clean
 
 ### Testing
 ```bash
-# Full test suite (75+ tests)
+# Full test suite (100+ tests)
 pytest
 
 # Specific categories
@@ -309,7 +309,10 @@ pytest tests/integration/    # Integration tests only
 pytest -m slow              # Performance tests
 pytest -m "not slow"        # Skip slow tests
 
-# Coverage with threshold enforcement (78%)
+# Performance benchmarks (opt-in; skipped by default)
+pytest tests/performance --run-slow --no-cov --benchmark-only
+
+# Coverage with threshold enforcement (80%)
 make test-cov
 ```
 
@@ -346,7 +349,7 @@ All code must pass:
 - **Ruff formatting**: `ruff format --check asymcat/ tests/`
 - **Ruff linting**: `ruff check asymcat/ tests/`
 - **MyPy type checking**: `mypy asymcat/ tests/`
-- **Test coverage**: Minimum 78% coverage (goal: 80%)
+- **Test coverage**: Minimum 80% coverage
 
 Run all checks before committing:
 ```bash

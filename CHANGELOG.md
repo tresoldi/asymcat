@@ -12,14 +12,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   instead of mistakenly returning the raw conditional entropy. The previous
   implementation delegated to `scorer.conditional_entropy`, silently returning
   an unbounded value under the `theil_u` name.
+- `read_sequences()` and `read_pa_matrix()` no longer mask their own validation
+  errors. A broad `except Exception` was re-wrapping the specific `ValueError`s
+  (e.g. "Column not found", "Missing required 'ID' column", "Invalid
+  presence-absence value") as a generic `OSError`, contradicting the documented
+  behavior; these now propagate as `ValueError` as intended.
 
 ### Added
 - Regression tests for the `asymcat.correlation` module (`conditional_entropy`,
   `theil_u`, and `cramers_v` wrappers), bringing the module to full coverage.
+- Validation/error-path tests for `asymcat.common` data-loading helpers,
+  raising overall coverage above 80%.
+- Performance benchmark suite (`tests/performance/`) built on `pytest-benchmark`
+  measuring the main scoring measures. Benchmarks are opt-in (skipped by
+  default) and run with `pytest tests/performance --run-slow --no-cov
+  --benchmark-only`.
 
 ### Changed
 - Corrected the `asymcat.correlation` module docstring and added per-function
   docstrings clarifying which measures are symmetric vs. directional.
+- Raised the enforced test-coverage threshold from 78% to 80% in
+  `pyproject.toml` (applies to `pytest` and `make test-cov`).
 
 ### Removed
 - Stale references to non-existent `AUTHORS.md`, `AGENTS.md`, and `DEVELOPER.md`

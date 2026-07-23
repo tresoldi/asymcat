@@ -252,7 +252,7 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
-    "--cov-fail-under=78",  # TODO: Increase to 80 after testing correlation.py or removing it
+    "--cov-fail-under=80",
 ]
 markers = [
     "slow: marks tests as slow (may take several seconds)",
