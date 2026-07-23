@@ -111,13 +111,10 @@ include = [
     "tests/",
     "README.md",
     "LICENSE",
-    "AUTHORS.md",
     "CHANGELOG.md",
     "pyproject.toml",
     "requirements.txt",
     "Makefile",
-    "AGENTS.md",
-    "DEVELOPER.md",
 ]
 
 [tool.hatch.build.targets.wheel.shared-data]

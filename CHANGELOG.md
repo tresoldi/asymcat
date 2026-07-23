@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `correlation.theil_u()` now computes Theil's U (uncertainty coefficient)
+  instead of mistakenly returning the raw conditional entropy. The previous
+  implementation delegated to `scorer.conditional_entropy`, silently returning
+  an unbounded value under the `theil_u` name.
+
+### Added
+- Regression tests for the `asymcat.correlation` module (`conditional_entropy`,
+  `theil_u`, and `cramers_v` wrappers), bringing the module to full coverage.
+
+### Changed
+- Corrected the `asymcat.correlation` module docstring and added per-function
+  docstrings clarifying which measures are symmetric vs. directional.
+
+### Removed
+- Stale references to non-existent `AUTHORS.md`, `AGENTS.md`, and `DEVELOPER.md`
+  files from the sdist packaging config (`pyproject.toml` and `MANIFEST.in`).
+
 ## [0.4.0] - 2025-01-XX
 
 ### Added
