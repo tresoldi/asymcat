@@ -1484,3 +1484,148 @@ class CatScorer:
             "_log_likelihood_ratio_pvalue",
             "_log_likelihood_ratio_pvalue_nonsquare",
         )
+
+    #: Association measures for which :meth:`permutation_pvalue` can build a null
+    #: distribution. Each is a method returning ``{(x, y): (xy, yx)}`` computed
+    #: with its default parameters.
+    PERMUTABLE_MEASURES = frozenset(
+        {
+            "mle",
+            "pmi",
+            "pmi_smoothed",
+            "chi2",
+            "cramers_v",
+            "fisher",
+            "theil_u",
+            "cond_entropy",
+            "tresoldi",
+            "mutual_information",
+            "normalized_mutual_information",
+            "jaccard_index",
+            "goodman_kruskal_lambda",
+            "log_likelihood_ratio",
+        }
+    )
+
+    def permutation_pvalue(
+        self,
+        measure: str,
+        n_permutations: int = 1000,
+        alternative: str = "greater",
+        seed: int | None = None,
+    ) -> dict[tuple[Any, Any], tuple[float, float]]:
+        """
+        Estimate permutation-based p-values for an association measure.
+
+        Unlike the parametric tests (:meth:`chi2_pvalue`, :meth:`fisher_pvalue`,
+        :meth:`log_likelihood_ratio_pvalue`), this works for any per-pair
+        association measure -- including the information-theoretic ones (PMI,
+        mutual information, Theil's U, ...) that have no closed-form null
+        distribution.
+
+        The null hypothesis is that the two variables are independent. A null
+        distribution is built by repeatedly shuffling the pairing between the
+        ``x`` and ``y`` elements of the co-occurrences (which preserves both
+        marginal frequency distributions and the total count while destroying
+        the joint association) and recomputing the measure. For each pair and
+        direction, the p-value is the fraction of permutations whose score is at
+        least as extreme as the observed one, using the ``(count + 1) /
+        (n_permutations + 1)`` correction so the estimate is never exactly zero.
+
+        Because the co-occurrences are treated as exchangeable, sequences that
+        expand into many correlated co-occurrences (e.g. n-gram collection) make
+        this test slightly anti-conservative; interpret accordingly.
+
+        Parameters
+        ----------
+        measure : str
+            Name of the association measure to test; must be one of
+            :attr:`PERMUTABLE_MEASURES`. It is computed with its default
+            parameters.
+        n_permutations : int
+            Number of random permutations forming the null distribution
+            (default: 1000). Larger values give finer-grained p-values (the
+            smallest reportable p-value is ``1 / (n_permutations + 1)``).
+        alternative : str
+            Which tail to test, matching SciPy's convention:
+
+            * ``"greater"`` (default): significant when the observed score is
+              unusually high -- appropriate for measures where a larger value
+              means stronger association (PMI, mutual information, Theil's U,
+              chi-square, ...).
+            * ``"less"``: significant when the observed score is unusually low
+              -- appropriate for measures where a smaller value means stronger
+              association (e.g. ``cond_entropy``).
+            * ``"two-sided"``: significant in either tail.
+        seed : Optional[int]
+            Seed for the random number generator, for reproducible results
+            (default: None, i.e. non-deterministic).
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to ``(p_xy, p_yx)`` p-values, one
+            per direction, aligned with the measure's own output.
+
+        Raises
+        ------
+        ValueError
+            If ``measure`` is not supported, ``alternative`` is invalid, or
+            ``n_permutations`` is not a positive integer.
+        """
+        if measure not in self.PERMUTABLE_MEASURES:
+            raise ValueError(f"Unsupported measure {measure!r}. Choose one of: {sorted(self.PERMUTABLE_MEASURES)}")
+
+        if alternative not in ("greater", "less", "two-sided"):
+            raise ValueError(f"Invalid alternative {alternative!r}. Use 'greater', 'less', or 'two-sided'.")
+
+        if not isinstance(n_permutations, int) or n_permutations < 1:
+            raise ValueError(f"n_permutations must be a positive integer, got {n_permutations!r}")
+
+        # Observed scores, and fixed key ordering so all comparisons vectorize.
+        observed = getattr(self, measure)()
+        keys = list(observed)
+        obs_xy = np.array([observed[k][0] for k in keys], dtype=float)
+        obs_yx = np.array([observed[k][1] for k in keys], dtype=float)
+
+        # Count, per pair and direction, how many permutations reach or exceed
+        # (>=) and how many fall at or below (<=) the observed score. Ties are
+        # counted on both sides, matching the standard conservative convention.
+        count_ge_xy = np.zeros(len(keys))
+        count_ge_yx = np.zeros(len(keys))
+        count_le_xy = np.zeros(len(keys))
+        count_le_yx = np.zeros(len(keys))
+
+        x_values = [pair[0] for pair in self.cooccs]
+        y_values = [pair[1] for pair in self.cooccs]
+        rng = np.random.default_rng(seed)
+
+        for _ in range(n_permutations):
+            permuted_y = [y_values[i] for i in rng.permutation(len(y_values))]
+            permuted_cooccs = list(zip(x_values, permuted_y, strict=True))
+            permuted_scorer = CatScorer(permuted_cooccs, self.smoothing_method, self.smoothing_alpha)
+
+            permuted = getattr(permuted_scorer, measure)()
+            perm_xy = np.array([permuted[k][0] for k in keys], dtype=float)
+            perm_yx = np.array([permuted[k][1] for k in keys], dtype=float)
+
+            count_ge_xy += perm_xy >= obs_xy
+            count_ge_yx += perm_yx >= obs_yx
+            count_le_xy += perm_xy <= obs_xy
+            count_le_yx += perm_yx <= obs_yx
+
+        denom = n_permutations + 1.0
+
+        def _pvalues(count_ge: np.ndarray, count_le: np.ndarray) -> np.ndarray:
+            p_greater = (count_ge + 1.0) / denom
+            p_less = (count_le + 1.0) / denom
+            if alternative == "greater":
+                return p_greater
+            if alternative == "less":
+                return p_less
+            return np.minimum(1.0, 2.0 * np.minimum(p_greater, p_less))
+
+        p_xy = _pvalues(count_ge_xy, count_le_xy)
+        p_yx = _pvalues(count_ge_yx, count_le_yx)
+
+        return {key: (float(p_xy[i]), float(p_yx[i])) for i, key in enumerate(keys)}

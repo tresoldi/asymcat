@@ -214,6 +214,18 @@ chi2_scores = scorer.chi2()            # test statistics
 chi2_pvals  = scorer.chi2_pvalue()     # matching p-values
 ```
 
+For the information-theoretic and other measures without a closed-form null,
+**`permutation_pvalue()`** estimates significance by repeatedly shuffling the
+`x`↔`y` pairing (preserving both marginals) and recomputing the measure:
+
+```python
+# Per-pair, per-direction p-values for any association measure
+theil_pvals = scorer.permutation_pvalue("theil_u", n_permutations=1000, seed=0)
+
+# Use alternative="less" for measures where a SMALL value means association
+ce_pvals = scorer.permutation_pvalue("cond_entropy", alternative="less", seed=0)
+```
+
 ## 🔬 Scientific Applications
 
 ### Linguistics & Language Evolution
@@ -434,9 +446,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔮 Roadmap
 
-- **Statistical Significance**: P-values for the statistical tests (chi-square,
-  Fisher, G²) are available; permutation-based p-values for the
-  information-theoretic measures are planned
+- **Statistical Significance**: ✅ P-values for the statistical tests
+  (chi-square, Fisher, G²) and permutation-based p-values for any measure are
+  available
 - **Confidence Intervals**: Uncertainty quantification
 - **GPU Acceleration**: CUDA support for massive datasets
 - **Interactive Dashboards**: Web-based exploration tools
