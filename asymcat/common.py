@@ -450,7 +450,11 @@ def read_sequences(
 
     except UnicodeDecodeError as e:
         raise ValueError(f"File encoding error: {e}")
-    except Exception as e:
+    except (ValueError, TypeError):
+        # Preserve specific validation errors raised above instead of
+        # masking them as a generic OSError.
+        raise
+    except OSError as e:
         raise OSError(f"Error reading file {filename}: {e}")
 
     if not data:
@@ -533,7 +537,11 @@ def read_pa_matrix(filename: str, delimiter: str = "\t") -> list[tuple]:
 
     except UnicodeDecodeError as e:
         raise ValueError(f"File encoding error: {e}")
-    except Exception as e:
+    except (ValueError, TypeError):
+        # Preserve specific validation errors raised above instead of
+        # masking them as a generic OSError.
+        raise
+    except OSError as e:
         raise OSError(f"Error reading file {filename}: {e}")
 
     if not matrix:

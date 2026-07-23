@@ -16,7 +16,7 @@ ASymCat is a comprehensive Python library for analyzing **asymmetric association
 - **Robust Smoothing**: FreqProb integration for numerical stability
 - **Multiple Data Formats**: Sequences, presence-absence matrices, n-grams
 - **Scalable Architecture**: Optimized for large datasets with efficient algorithms
-- **Comprehensive Testing**: 75+ tests with 78%+ coverage ensuring reliability and accuracy
+- **Comprehensive Testing**: 100+ tests with 80%+ coverage ensuring reliability and accuracy
 
 ## 🎯 Why Asymmetric Measures Matter
 
@@ -201,6 +201,41 @@ ASymCat implements 17+ association measures organized by type:
 - **Tresoldi**: Custom measure designed for sequence alignment
 - **Goodman-Kruskal λ**: Proportional reduction in error
 
+### Statistical Significance (p-values)
+Significance counterparts to the statistical tests, returning the same
+`{(x, y): (p, p)}` shape (a small value indicates a significant association):
+- **`chi2_pvalue()`**: p-value of the chi-square test of independence
+- **`fisher_pvalue()`**: p-value of Fisher's exact test
+- **`log_likelihood_ratio_pvalue()`**: p-value of the G² test
+
+```python
+scorer = asymcat.CatScorer(cooccs)
+chi2_scores = scorer.chi2()            # test statistics
+chi2_pvals  = scorer.chi2_pvalue()     # matching p-values
+```
+
+For the information-theoretic and other measures without a closed-form null,
+**`permutation_pvalue()`** estimates significance by repeatedly shuffling the
+`x`↔`y` pairing (preserving both marginals) and recomputing the measure:
+
+```python
+# Per-pair, per-direction p-values for any association measure
+theil_pvals = scorer.permutation_pvalue("theil_u", n_permutations=1000, seed=0)
+
+# Use alternative="less" for measures where a SMALL value means association
+ce_pvals = scorer.permutation_pvalue("cond_entropy", alternative="less", seed=0)
+```
+
+**`bootstrap_ci()`** quantifies the uncertainty *around* a score by resampling
+the co-occurrences with replacement, returning a percentile confidence interval
+per pair and direction as `{(x, y): ((xy_low, xy_high), (yx_low, yx_high))}`:
+
+```python
+# 95% confidence intervals for each Theil's U score
+theil_ci = scorer.bootstrap_ci("theil_u", n_bootstrap=1000, confidence_level=0.95, seed=0)
+low, high = theil_ci[("a", "x")][0]   # interval for the x→y direction
+```
+
 ## 🔬 Scientific Applications
 
 ### Linguistics & Language Evolution
@@ -300,7 +335,7 @@ make docs-clean
 
 ### Testing
 ```bash
-# Full test suite (75+ tests)
+# Full test suite (100+ tests)
 pytest
 
 # Specific categories
@@ -309,7 +344,10 @@ pytest tests/integration/    # Integration tests only
 pytest -m slow              # Performance tests
 pytest -m "not slow"        # Skip slow tests
 
-# Coverage with threshold enforcement (78%)
+# Performance benchmarks (opt-in; skipped by default)
+pytest tests/performance --run-slow --no-cov --benchmark-only
+
+# Coverage with threshold enforcement (80%)
 make test-cov
 ```
 
@@ -346,7 +384,7 @@ All code must pass:
 - **Ruff formatting**: `ruff format --check asymcat/ tests/`
 - **Ruff linting**: `ruff check asymcat/ tests/`
 - **MyPy type checking**: `mypy asymcat/ tests/`
-- **Test coverage**: Minimum 78% coverage (goal: 80%)
+- **Test coverage**: Minimum 80% coverage
 
 Run all checks before committing:
 ```bash
@@ -387,7 +425,7 @@ If you use ASymCat in your research, please cite:
   author = {Tresoldi, Tiago},
   year = {2024},
   url = {https://github.com/tresoldi/asymcat},
-  version = {0.3.0}
+  version = {0.5.0}
 }
 ```
 
@@ -401,25 +439,33 @@ If you use ASymCat in your research, please cite:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🚀 What's New in v0.4.0
+## 🚀 What's New in v0.5.0
 
-- ✅ **Simplified Dependencies**: Consolidated to `[viz]` and `[dev]` groups - easier installation
-- ✅ **Modern Tooling**: Unified linting/formatting with Ruff, replacing black/isort/flake8
-- ✅ **Enhanced CI/CD**: Simplified quality workflow with faster feedback
-- ✅ **Coverage Enforcement**: 78% minimum threshold (goal: 80%)
-- ✅ **Keep a Changelog**: Semantic versioning with full version history
-- ✅ **Developer-Friendly Makefile**: Self-documenting help, automated version bumping
-- ✅ **Library-Only Focus**: Removed CLI tool for better coverage and maintainability
+- ✅ **Statistical Significance**: p-value scorers for the statistical tests
+  (`chi2_pvalue`, `fisher_pvalue`, `log_likelihood_ratio_pvalue`) plus a generic
+  permutation test (`permutation_pvalue`) for any measure
+- ✅ **Confidence Intervals**: bootstrap confidence intervals for any measure
+  (`bootstrap_ci`)
+- ⚡ **Much Faster Scorers**: `theil_u`, `cond_entropy`, `mutual_information`,
+  `normalized_mutual_information` and `goodman_kruskal_lambda` were vectorized
+  (hundreds of times faster; every measure is now sub-millisecond on the sample
+  data), which also makes the resampling-based methods practical
+- 🐛 **Bug Fixes**: `correlation.theil_u()` now returns Theil's U (not raw
+  conditional entropy); the data loaders no longer mask their validation errors
+  as generic `OSError`
+- ✅ **Higher Coverage**: enforced test-coverage threshold raised to 80%
+  (actual coverage ~87%)
 
-**Migration from v0.3.1:**
-- Use `pip install asymcat[dev]` instead of multiple dependency groups
-- Use library API directly instead of CLI tool (see examples above)
-- See [CHANGELOG.md](CHANGELOG.md) for detailed migration guide
+All changes are backwards compatible with v0.4.0. See [CHANGELOG.md](CHANGELOG.md)
+for the full list.
 
 ## 🔮 Roadmap
 
-- **Statistical Significance**: P-value calculations for all measures
-- **Confidence Intervals**: Uncertainty quantification
+- **Statistical Significance**: ✅ P-values for the statistical tests
+  (chi-square, Fisher, G²) and permutation-based p-values for any measure are
+  available
+- **Confidence Intervals**: ✅ Bootstrap confidence intervals for any measure
+  are available (`bootstrap_ci`)
 - **GPU Acceleration**: CUDA support for massive datasets
 - **Interactive Dashboards**: Web-based exploration tools
 - **Extended Measures**: Additional domain-specific association metrics

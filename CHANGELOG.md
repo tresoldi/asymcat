@@ -7,6 +7,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-07-23
+
+### Fixed
+- `correlation.theil_u()` now computes Theil's U (uncertainty coefficient)
+  instead of mistakenly returning the raw conditional entropy. The previous
+  implementation delegated to `scorer.conditional_entropy`, silently returning
+  an unbounded value under the `theil_u` name.
+- `read_sequences()` and `read_pa_matrix()` no longer mask their own validation
+  errors. A broad `except Exception` was re-wrapping the specific `ValueError`s
+  (e.g. "Column not found", "Missing required 'ID' column", "Invalid
+  presence-absence value") as a generic `OSError`, contradicting the documented
+  behavior; these now propagate as `ValueError` as intended.
+- Corrected the stale `version = {0.3.0}` in the README citation to the current
+  release.
+
+### Added
+- Statistical-significance scorers `CatScorer.chi2_pvalue()`,
+  `fisher_pvalue()` and `log_likelihood_ratio_pvalue()`, returning the p-value
+  of the corresponding test for each pair in the usual `{(x, y): (p, p)}` shape
+  (chi-square and Fisher p-values were already computed by SciPy and discarded;
+  the G² p-value uses its chi-square distribution). Also exposes the
+  `compute_log_likelihood_ratio_pvalue()` helper.
+- `CatScorer.permutation_pvalue(measure, ...)`, a generic permutation test that
+  estimates significance for any association measure (including the
+  information-theoretic ones with no closed-form null) by shuffling the `x`↔`y`
+  pairing while preserving both marginals. Supports `greater` / `less` /
+  `two-sided` tails, a reproducible `seed`, and the `(count + 1) / (n + 1)`
+  correction. Now practical thanks to the vectorized scorers (~1000
+  permutations of `theil_u` run in about a second).
+- `CatScorer.bootstrap_ci(measure, ...)`, bootstrap confidence intervals for any
+  association measure. It resamples the co-occurrences with replacement and
+  returns the percentile interval per pair and direction as
+  `{(x, y): ((xy_low, xy_high), (yx_low, yx_high))}`, with configurable
+  `confidence_level` and a reproducible `seed`. Shares its resampling loop with
+  `permutation_pvalue` via an internal helper.
+- Regression tests for the `asymcat.correlation` module (`conditional_entropy`,
+  `theil_u`, and `cramers_v` wrappers), bringing the module to full coverage.
+- Validation/error-path tests for `asymcat.common` data-loading helpers,
+  raising overall coverage above 80%.
+- Regression tests pinning the vectorized `theil_u`, `cond_entropy`,
+  `mutual_information`, `normalized_mutual_information` and
+  `goodman_kruskal_lambda` scorers to their original per-pair algorithms across
+  several datasets and degenerate cases.
+- Tests for the p-value scorers (parametric and permutation-based) and the
+  bootstrap confidence intervals, covering correctness against SciPy, value
+  ranges, tails, reproducibility, interval coverage/ordering, the expected
+  narrowing with more data, and the response to strong vs. independent
+  association.
+- Performance benchmark suite (`tests/performance/`) built on `pytest-benchmark`
+  measuring the main scoring measures. Benchmarks are opt-in (skipped by
+  default) and run with `pytest tests/performance --run-slow --no-cov
+  --benchmark-only`.
+
+### Changed
+- Vectorized the per-pair scorers `CatScorer.theil_u()`, `cond_entropy()`,
+  `mutual_information()`, `normalized_mutual_information()` and
+  `goodman_kruskal_lambda()`. Each previously re-scanned the full co-occurrence
+  list for every one of the `|X| * |Y|` symbol pairs (`O(|X|*|Y|*n)`); they now
+  derive all pairs at once from the global joint-count matrix (`O(|X|*|Y|)`) --
+  the entropy-based measures via a shared helper, lambda via an analogous
+  mode-based one. Results match the previous implementations to floating-point
+  precision (Goodman-Kruskal lambda matches exactly, being integer-count based).
+  Measured speed-ups on the benchmark dataset are ~650x for `theil_u` and ~330x
+  for `mutual_information`; every measure is now sub-millisecond, with the gap
+  widening as the dataset grows.
+- Corrected the `asymcat.correlation` module docstring and added per-function
+  docstrings clarifying which measures are symmetric vs. directional.
+- Raised the enforced test-coverage threshold from 78% to 80% in
+  `pyproject.toml` (applies to `pytest` and `make test-cov`).
+
+### Removed
+- Stale references to non-existent `AUTHORS.md`, `AGENTS.md`, and `DEVELOPER.md`
+  files from the sdist packaging config (`pyproject.toml` and `MANIFEST.in`).
+
 ## [0.4.0] - 2025-01-XX
 
 ### Added
@@ -186,7 +260,8 @@ All APIs remain the same, only the package name changed.
 - **0.2.1** - Double series correlation
 - **0.2.0** - Initial release
 
-[Unreleased]: https://github.com/tresoldi/asymcat/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/tresoldi/asymcat/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/tresoldi/asymcat/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/tresoldi/asymcat/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/tresoldi/asymcat/releases/tag/v0.3.1
 [0.3.0]: https://github.com/tresoldi/asymcat/releases/tag/v0.3.0

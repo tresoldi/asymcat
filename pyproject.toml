@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "asymcat"
-version = "0.4.0"
+version = "0.5.0"
 description = "A Python library for obtaining asymmetric measures of association between categorical variables in data exploration and description"
 readme = "README.md"
 license = {text = "MIT"}
@@ -111,13 +111,10 @@ include = [
     "tests/",
     "README.md",
     "LICENSE",
-    "AUTHORS.md",
     "CHANGELOG.md",
     "pyproject.toml",
     "requirements.txt",
     "Makefile",
-    "AGENTS.md",
-    "DEVELOPER.md",
 ]
 
 [tool.hatch.build.targets.wheel.shared-data]
@@ -255,7 +252,7 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
-    "--cov-fail-under=78",  # TODO: Increase to 80 after testing correlation.py or removing it
+    "--cov-fail-under=80",
 ]
 markers = [
     "slow: marks tests as slow (may take several seconds)",

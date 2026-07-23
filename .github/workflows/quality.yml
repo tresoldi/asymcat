@@ -46,7 +46,7 @@ jobs:
           pytest --cov=asymcat \
                  --cov-report=term-missing \
                  --cov-report=xml \
-                 --cov-fail-under=78
+                 --cov-fail-under=80
 
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.12'

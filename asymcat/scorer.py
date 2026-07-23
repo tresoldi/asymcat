@@ -7,18 +7,19 @@ Defines the various scorers for categorical co-occurrence analysis.
 """
 
 # TODO: have a function for checking if we have enough data for a chi2, combined with smoothing
-# TODO: improve the speed of theil's u computation
 # TODO: extend scipy options in chi2_contingency
 # TODO: investigate if it is worth reusing chi2 statistics for cramer
 # TODO: include a logarithmic scaler (instead of percentile one)
 # TODO: allow to combine scalers? log within range?
 
 import math
+import warnings
 
 # Import Python standard libraries
 from collections import Counter
+from collections.abc import Callable, Iterator
 from itertools import chain, product
-from typing import Any
+from typing import Any, NamedTuple
 
 # Import 3rd party libraries
 import numpy as np
@@ -400,6 +401,37 @@ def compute_log_likelihood_ratio(cont_table: list[list[float]]) -> float:
     return 2.0 * g2
 
 
+def compute_log_likelihood_ratio_pvalue(cont_table: list[list[float]]) -> float:
+    """
+    Compute the p-value of the Log-Likelihood Ratio (G²) statistic.
+
+    Under the null hypothesis of independence, G² is asymptotically
+    chi-square distributed with ``(rows - 1) * (cols - 1)`` degrees of freedom.
+
+    Parameters
+    ----------
+    cont_table : List[List[float]]
+        The contingency table for computation.
+
+    Returns
+    -------
+    float
+        The p-value for the Log-Likelihood Ratio statistic, in range [0, 1].
+    """
+    g2 = compute_log_likelihood_ratio(cont_table)
+
+    rows = len(cont_table)
+    cols = len(cont_table[0]) if rows else 0
+    dof = (rows - 1) * (cols - 1)
+
+    # A degenerate table with no degrees of freedom carries no evidence
+    # against independence.
+    if dof <= 0:
+        return 1.0
+
+    return float(ss.chi2.sf(g2, dof))
+
+
 # TODO: allow independent scaling over `x` and independent over `y` (currently doing all)
 # TODO: allow scaling withing percentile borders
 # TODO: see if we can vectorize numpy operations (now on dicts)
@@ -530,6 +562,30 @@ def scorer2matrices(
     return xy, yx, alphabet_x, alphabet_y
 
 
+class _SubsetEntropies(NamedTuple):
+    """
+    Per-pair subset entropies shared by :meth:`CatScorer.theil_u` and
+    :meth:`CatScorer.cond_entropy`.
+
+    Each field is an ``|alphabet_x| x |alphabet_y|`` array indexed by ``[i, j]``,
+    holding a quantity computed over the subset of co-occurrences selected for
+    the pair ``(alphabet_x[i], alphabet_y[j])`` -- namely those whose first
+    element is ``alphabet_x[i]`` or whose second element is ``alphabet_y[j]``.
+
+    The ``*_zero`` fields are boolean masks flagging the pairs whose marginal
+    entropy is exactly zero (a degenerate, single-symbol subset), derived from
+    the integer counts so they match the scalar special cases exactly.
+    """
+
+    h_x: np.ndarray  # H(X) over the subset
+    h_y: np.ndarray  # H(Y) over the subset
+    h_xy: np.ndarray  # joint entropy H(X, Y) over the subset
+    h_x_given_y: np.ndarray  # H(X | Y) over the subset
+    h_y_given_x: np.ndarray  # H(Y | X) over the subset
+    h_x_zero: np.ndarray  # True where H(X) == 0
+    h_y_zero: np.ndarray  # True where H(Y) == 0
+
+
 class CatScorer:
     """
     Class for computing categorical co-occurrence scores.
@@ -600,6 +656,13 @@ class CatScorer:
         self._goodman_kruskal_lambda: dict[tuple[Any, Any], tuple[float, float]] | None = None
         self._log_likelihood_ratio: dict[tuple[Any, Any], tuple[float, float]] | None = None
         self._log_likelihood_ratio_nonsquare: dict[tuple[Any, Any], tuple[float, float]] | None = None
+
+        # p-value scorers for the statistical tests, lazily computed
+        self._chi2_pvalue: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._chi2_pvalue_nonsquare: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._fisher_pvalue: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._log_likelihood_ratio_pvalue: dict[tuple[Any, Any], tuple[float, float]] | None = None
+        self._log_likelihood_ratio_pvalue_nonsquare: dict[tuple[Any, Any], tuple[float, float]] | None = None
 
     def _compute_contingency_table_scorer(
         self, square: bool, computation_func, square_cache_attr: str, nonsquare_cache_attr: str
@@ -917,6 +980,30 @@ class CatScorer:
             square_ct, lambda ct: ss.chi2_contingency(ct)[0], "_chi2", "_chi2_nonsquare"
         )
 
+    def chi2_pvalue(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
+        """
+        Return the p-values of the chi-square test of independence.
+
+        This is the significance counterpart to :meth:`chi2`: for each pair it
+        returns the p-value from ``scipy.stats.chi2_contingency`` (a small value
+        indicates a statistically significant association). As with the other
+        symmetric statistical tests, both tuple entries hold the same value.
+
+        Parameters
+        ----------
+        square_ct : bool
+            Whether to compute the p-value over a squared (2x2) or non-squared
+            (3x2) contingency table (default: True).
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to (p-value, p-value) tuples.
+        """
+        return self._compute_contingency_table_scorer(
+            square_ct, lambda ct: ss.chi2_contingency(ct)[1], "_chi2_pvalue", "_chi2_pvalue_nonsquare"
+        )
+
     def cramers_v(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Cramér's V scorer.
@@ -955,59 +1042,179 @@ class CatScorer:
 
         return self._fisher
 
+    def fisher_pvalue(self) -> dict[tuple[Any, Any], tuple[float, float]]:
+        """
+        Return the p-values of Fisher's exact test.
+
+        This is the significance counterpart to :meth:`fisher`: for each pair it
+        returns the (two-sided) p-value from ``scipy.stats.fisher_exact`` over
+        the 2x2 contingency table. As with the other symmetric statistical
+        tests, both tuple entries hold the same value.
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to (p-value, p-value) tuples.
+        """
+
+        # Compute the square contingency table, if necessary
+        self._compute_contingency_table(True)
+
+        if not self._fisher_pvalue:
+            assert self._square_ct is not None, "Square contingency table should have been computed"  # nosec
+            self._fisher_pvalue = {}
+            for pair in self.obs:
+                pvalue = ss.fisher_exact(self._square_ct[pair])[1]
+                self._fisher_pvalue[pair] = (pvalue, pvalue)
+
+        return self._fisher_pvalue
+
+    def _joint_counts(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Build the global joint-count matrix and its marginals.
+
+        Returns ``(joint, row_sum, col_sum)`` where ``joint[i, j]`` is the
+        number of times co-occurrence ``(alphabet_x[i], alphabet_y[j])`` is
+        observed, ``row_sum[i]`` is the global count of x symbol ``i`` and
+        ``col_sum[j]`` is the global count of y symbol ``j``. Shared by the
+        vectorized entropy- and mode-based scorers.
+        """
+        x_index = {x: i for i, x in enumerate(self.alphabet_x)}
+        y_index = {y: j for j, y in enumerate(self.alphabet_y)}
+
+        joint = np.zeros((len(self.alphabet_x), len(self.alphabet_y)))
+        for (a, b), count in Counter(self.cooccs).items():
+            joint[x_index[a], y_index[b]] += count
+
+        return joint, joint.sum(axis=1), joint.sum(axis=0)
+
+    def _subset_entropy_components(self) -> _SubsetEntropies:
+        """
+        Vectorized per-pair subset entropies backing :meth:`theil_u`,
+        :meth:`cond_entropy`, :meth:`mutual_information` and
+        :meth:`normalized_mutual_information`.
+
+        These scorers operate on the subset selected for a pair ``(x, y)`` --
+        co-occurrences whose first element is ``x`` or whose second element is
+        ``y``. That subset's joint distribution is shaped like a "cross": the
+        whole row ``x`` and the whole column ``y`` of the global joint-count
+        matrix ``J``, with every other cell empty. This structure lets each of
+        the subset entropies be written in closed form from ``J``'s row/column
+        sums and a handful of precomputed per-row / per-column vectors, so all
+        pairs are evaluated together with array broadcasting.
+
+        This reduces the cost from ``O(|X| * |Y| * n)`` (re-scanning the ``n``
+        co-occurrences for every pair) to ``O(|X| * |Y|)``, while reproducing
+        the original per-pair results to floating-point precision.
+        """
+
+        # Joint-count matrix J[i, j] and its row (R) and column (C) marginals.
+        joint, row_sum, col_sum = self._joint_counts()
+
+        # `J log J` (with the standard 0 * log 0 == 0 convention), plus its row
+        # and column sums; every logarithm below guards zeros explicitly.
+        with np.errstate(divide="ignore", invalid="ignore"):
+            joint_log = joint * np.where(joint > 0, np.log(joint), 0.0)
+        row_log_sum = joint_log.sum(axis=1)
+        col_log_sum = joint_log.sum(axis=0)
+
+        # rowTerm[i] = sum_j J[i,j] log(R[i] / J[i,j]); colTerm[j] analogous.
+        # These are the (unnormalized) conditional-entropy contributions of a
+        # full row / column and, divided by the subset size, give H(Y|X) and
+        # H(X|Y) respectively.
+        row_term = row_sum * np.log(row_sum) - row_log_sum
+        col_term = col_sum * np.log(col_sum) - col_log_sum
+
+        # Broadcast the marginals over the |X| x |Y| grid. Ntot[i,j] is the size
+        # of the subset for pair (i, j): |{first == x}| + |{second == y}| minus
+        # the doubly-counted (x, y) cell. It is always positive because every
+        # alphabet symbol occurs at least once.
+        row_col = row_sum[:, None]
+        col_row = col_sum[None, :]
+        n_total = row_col + col_row - joint
+        log_n_total = np.log(n_total)
+
+        # The subset entropies (see the derivation above). The joint entropy
+        # H(X, Y) sums J log J over the "cross" cells (row i plus column j, with
+        # the shared cell counted once).
+        h_y_given_x = row_term[:, None] / n_total
+        h_x_given_y = col_term[None, :] / n_total
+        h_x = -(row_col * np.log(row_col) + col_log_sum[None, :] - joint_log) / n_total + log_n_total
+        h_y = -(col_row * np.log(col_row) + row_log_sum[:, None] - joint_log) / n_total + log_n_total
+        h_xy = -(row_log_sum[:, None] + col_log_sum[None, :] - joint_log) / n_total + log_n_total
+
+        # H(X) is exactly zero iff the subset's x-marginal is a single symbol,
+        # i.e. column j is concentrated in row i (C[j] == J[i,j]); likewise
+        # H(Y) is zero iff R[i] == J[i,j]. Detecting this from the integer
+        # counts reproduces the scalar code's `h == 0.0` special case exactly
+        # and avoids dividing by a (floating-point) zero entropy.
+        h_y_zero = row_col == joint
+        h_x_zero = col_row == joint
+
+        return _SubsetEntropies(
+            h_x=h_x,
+            h_y=h_y,
+            h_xy=h_xy,
+            h_x_given_y=h_x_given_y,
+            h_y_given_x=h_y_given_x,
+            h_x_zero=h_x_zero,
+            h_y_zero=h_y_zero,
+        )
+
     def theil_u(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Theil's U uncertainty scorer.
+
+        For every pair ``(x, y)`` this computes Theil's U in both directions
+        over the subset of co-occurrences where ``pair[0] == x`` or
+        ``pair[1] == y``, matching ``compute_theil_u(Y, X)`` and
+        ``compute_theil_u(X, Y)`` on that subset. The underlying entropies are
+        computed with a vectorized formulation (see
+        :meth:`_subset_entropy_components`) that evaluates all pairs at once
+        rather than re-filtering the co-occurrence list for each pair.
         """
 
-        # Compute theil u, if necessary; optimize with numpy arrays when possible
         if not self._theil_u:
-            self._theil_u = {}
+            comp = self._subset_entropy_components()
 
-            # Convert to numpy arrays for potentially faster filtering
-            import numpy as np
+            # Theil's U is the fractional reduction in uncertainty, with the
+            # scalar code's `h == 0.0 -> 1.0` convention on a degenerate subset.
+            with np.errstate(divide="ignore", invalid="ignore"):
+                u_y_given_x = np.where(comp.h_y_zero, 1.0, (comp.h_y - comp.h_y_given_x) / comp.h_y)
+                u_x_given_y = np.where(comp.h_x_zero, 1.0, (comp.h_x - comp.h_x_given_y) / comp.h_x)
 
-            cooccs_array = np.array(self.cooccs)
-
-            for x in self.alphabet_x:
-                for y in self.alphabet_y:
-                    # Use numpy boolean indexing for faster filtering on large datasets
-                    if len(self.cooccs) > 1000:  # Only use numpy for larger datasets
-                        mask = (cooccs_array[:, 0] == x) | (cooccs_array[:, 1] == y)
-                        subset = cooccs_array[mask].tolist()
-                    else:
-                        subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
-
-                    X = [pair[0] for pair in subset]
-                    Y = [pair[1] for pair in subset]
-
-                    # run theil's
-                    self._theil_u[(x, y)] = (
-                        compute_theil_u(Y, X),
-                        compute_theil_u(X, Y),
-                    )
+            # Preserve the (compute_theil_u(Y, X), compute_theil_u(X, Y))
+            # ordering of the original implementation.
+            self._theil_u = {
+                (x, y): (float(u_y_given_x[i, j]), float(u_x_given_y[i, j]))
+                for i, x in enumerate(self.alphabet_x)
+                for j, y in enumerate(self.alphabet_y)
+            }
 
         return self._theil_u
 
     def cond_entropy(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a corrected conditional entropy scorer.
+
+        For every pair ``(x, y)`` this computes the conditional entropy in both
+        directions over the subset of co-occurrences where ``pair[0] == x`` or
+        ``pair[1] == y``, matching ``conditional_entropy(Y, X)`` and
+        ``conditional_entropy(X, Y)`` on that subset. The entropies come from
+        the same vectorized computation as :meth:`theil_u` (see
+        :meth:`_subset_entropy_components`).
         """
 
         if not self._cond_entropy:
-            self._cond_entropy = {}
+            comp = self._subset_entropy_components()
 
-            for x in self.alphabet_x:
-                for y in self.alphabet_y:
-                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
-                    X = [pair[0] for pair in subset]
-                    Y = [pair[1] for pair in subset]
-
-                    # run conditional entropy
-                    self._cond_entropy[(x, y)] = (
-                        conditional_entropy(Y, X),
-                        conditional_entropy(X, Y),
-                    )
+            # Preserve the (conditional_entropy(Y, X), conditional_entropy(X, Y))
+            # ordering of the original implementation.
+            self._cond_entropy = {
+                (x, y): (float(comp.h_y_given_x[i, j]), float(comp.h_x_given_y[i, j]))
+                for i, x in enumerate(self.alphabet_x)
+                for j, y in enumerate(self.alphabet_y)
+            }
 
         return self._cond_entropy
 
@@ -1053,25 +1260,18 @@ class CatScorer:
             Dictionary mapping symbol pairs to (MI(X;Y), MI(Y;X)) tuples.
         """
         if not self._mutual_information:
-            self._mutual_information = {}
+            comp = self._subset_entropy_components()
 
-            for x in self.alphabet_x:
-                for y in self.alphabet_y:
-                    # Get all co-occurrences that contain either x or y
-                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
+            # Mutual information is symmetric: MI(X;Y) = H(Y) - H(Y|X) = MI(Y;X).
+            # Both tuple entries therefore hold the same value, matching the
+            # original per-pair implementation to floating-point precision.
+            mi = comp.h_y - comp.h_y_given_x
 
-                    if subset:  # Only compute if there are relevant pairs
-                        X = [pair[0] for pair in subset]
-                        Y = [pair[1] for pair in subset]
-
-                        # Compute mutual information for both directions
-                        mi_xy = compute_mutual_information(X, Y)
-                        mi_yx = compute_mutual_information(Y, X)
-
-                        self._mutual_information[(x, y)] = (mi_xy, mi_yx)
-                    else:
-                        # If no relevant pairs, MI is 0
-                        self._mutual_information[(x, y)] = (0.0, 0.0)
+            self._mutual_information = {
+                (x, y): (float(mi[i, j]), float(mi[i, j]))
+                for i, x in enumerate(self.alphabet_x)
+                for j, y in enumerate(self.alphabet_y)
+            }
 
         return self._mutual_information
 
@@ -1088,25 +1288,22 @@ class CatScorer:
             Dictionary mapping symbol pairs to (NMI(X;Y), NMI(Y;X)) tuples.
         """
         if not self._normalized_mutual_information:
-            self._normalized_mutual_information = {}
+            comp = self._subset_entropy_components()
 
-            for x in self.alphabet_x:
-                for y in self.alphabet_y:
-                    # Get all co-occurrences that contain either x or y
-                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
+            # NMI = MI / H(X, Y), also symmetric. When the subset collapses to a
+            # single (x, y) cell the joint entropy is zero and MI is zero too;
+            # that degenerate case is flagged exactly by the integer-count masks
+            # and yields 0.0, matching the scalar implementation.
+            mi = comp.h_y - comp.h_y_given_x
+            single_cell = comp.h_x_zero & comp.h_y_zero
+            with np.errstate(divide="ignore", invalid="ignore"):
+                nmi = np.where(single_cell, 0.0, mi / comp.h_xy)
 
-                    if subset:  # Only compute if there are relevant pairs
-                        X = [pair[0] for pair in subset]
-                        Y = [pair[1] for pair in subset]
-
-                        # Compute normalized mutual information for both directions
-                        nmi_xy = compute_normalized_mutual_information(X, Y)
-                        nmi_yx = compute_normalized_mutual_information(Y, X)
-
-                        self._normalized_mutual_information[(x, y)] = (nmi_xy, nmi_yx)
-                    else:
-                        # If no relevant pairs, NMI is 0
-                        self._normalized_mutual_information[(x, y)] = (0.0, 0.0)
+            self._normalized_mutual_information = {
+                (x, y): (float(nmi[i, j]), float(nmi[i, j]))
+                for i, x in enumerate(self.alphabet_x)
+                for j, y in enumerate(self.alphabet_y)
+            }
 
         return self._normalized_mutual_information
 
@@ -1165,27 +1362,80 @@ class CatScorer:
             Dictionary mapping symbol pairs to (λ(Y|X), λ(X|Y)) tuples.
         """
         if not self._goodman_kruskal_lambda:
-            self._goodman_kruskal_lambda = {}
+            lambda_y_given_x, lambda_x_given_y = self._goodman_kruskal_lambda_matrices()
 
-            for x in self.alphabet_x:
-                for y in self.alphabet_y:
-                    # Get all co-occurrences that contain either x or y
-                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
-
-                    if subset:  # Only compute if there are relevant pairs
-                        X = [pair[0] for pair in subset]
-                        Y = [pair[1] for pair in subset]
-
-                        # Compute lambda for both directions
-                        lambda_y_given_x = compute_goodman_kruskal_lambda(X, Y, "y_given_x")
-                        lambda_x_given_y = compute_goodman_kruskal_lambda(X, Y, "x_given_y")
-
-                        self._goodman_kruskal_lambda[(x, y)] = (lambda_y_given_x, lambda_x_given_y)
-                    else:
-                        # If no relevant pairs, lambda is 0
-                        self._goodman_kruskal_lambda[(x, y)] = (0.0, 0.0)
+            self._goodman_kruskal_lambda = {
+                (x, y): (float(lambda_y_given_x[i, j]), float(lambda_x_given_y[i, j]))
+                for i, x in enumerate(self.alphabet_x)
+                for j, y in enumerate(self.alphabet_y)
+            }
 
         return self._goodman_kruskal_lambda
+
+    def _goodman_kruskal_lambda_matrices(self) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Vectorized Goodman-Kruskal lambda backing :meth:`goodman_kruskal_lambda`.
+
+        Lambda is mode-based rather than entropy-based, so it needs the largest
+        cell count per row / column of the "cross"-shaped subset (see
+        :meth:`_subset_entropy_components` for the subset geometry) rather than
+        the entropies. For a pair ``(x=i, y=j)``:
+
+        * predicting ``Y`` from ``X`` -- knowing ``X == i`` narrows ``Y`` to row
+          ``i`` (best guess ``max_b J[i, b]``); any other ``X == i'`` only occurs
+          with ``Y == j`` (best guess ``J[i', j]``). Summing gives
+          ``rowMax[i] + (C[j] - J[i, j])``. The unconditional best guess is the
+          most frequent subset ``Y`` value, ``max(C[j], max_{b != j} J[i, b])``.
+        * predicting ``X`` from ``Y`` is the transpose.
+
+        With per-row / per-column maxima (and "max excluding this column/row",
+        which needs each line's top-two values and its argmax), every pair is
+        evaluated together with broadcasting, reproducing the scalar results
+        exactly (the computation is over integer counts, with no summation of
+        floats).
+        """
+
+        joint, row_sum, col_sum = self._joint_counts()
+        row_col = row_sum[:, None]
+        col_row = col_sum[None, :]
+        n_total = row_col + col_row - joint
+
+        col_idx = np.arange(len(self.alphabet_y))[None, :]
+        row_idx = np.arange(len(self.alphabet_x))[:, None]
+
+        def line_maxima(axis: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+            """Per-line max, argmax, and second-largest value along ``axis``."""
+            line_max = joint.max(axis=axis)
+            line_argmax = joint.argmax(axis=axis)
+            size = joint.shape[axis]
+            if size >= 2:
+                second = np.take(np.partition(joint, size - 2, axis=axis), size - 2, axis=axis)
+            else:
+                second = np.zeros_like(line_max)
+            return line_max, line_argmax, second
+
+        # Predicting Y from X (row-wise): "max excluding column j" drops back to
+        # the row's second-largest count exactly at that row's argmax column.
+        row_max, row_argmax, row_second = line_maxima(axis=1)
+        row_max_excl = np.where(col_idx == row_argmax[:, None], row_second[:, None], row_max[:, None])
+        max_marginal_y = np.maximum(col_row, row_max_excl)
+        sum_max_conditional_y = row_max[:, None] + (col_row - joint)
+        denom_y = n_total - max_marginal_y
+        with np.errstate(divide="ignore", invalid="ignore"):
+            lambda_y_given_x = np.where(denom_y == 0, 0.0, (sum_max_conditional_y - max_marginal_y) / denom_y)
+        lambda_y_given_x = np.maximum(0.0, lambda_y_given_x)
+
+        # Predicting X from Y (column-wise): the transpose of the above.
+        col_max, col_argmax, col_second = line_maxima(axis=0)
+        col_max_excl = np.where(row_idx == col_argmax[None, :], col_second[None, :], col_max[None, :])
+        max_marginal_x = np.maximum(row_col, col_max_excl)
+        sum_max_conditional_x = col_max[None, :] + (row_col - joint)
+        denom_x = n_total - max_marginal_x
+        with np.errstate(divide="ignore", invalid="ignore"):
+            lambda_x_given_y = np.where(denom_x == 0, 0.0, (sum_max_conditional_x - max_marginal_x) / denom_x)
+        lambda_x_given_y = np.maximum(0.0, lambda_x_given_y)
+
+        return lambda_y_given_x, lambda_x_given_y
 
     def log_likelihood_ratio(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
@@ -1208,3 +1458,296 @@ class CatScorer:
         return self._compute_contingency_table_scorer(
             square_ct, compute_log_likelihood_ratio, "_log_likelihood_ratio", "_log_likelihood_ratio_nonsquare"
         )
+
+    def log_likelihood_ratio_pvalue(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
+        """
+        Return the p-values of the Log-Likelihood Ratio (G²) test.
+
+        This is the significance counterpart to :meth:`log_likelihood_ratio`:
+        under the null hypothesis of independence, G² is asymptotically
+        chi-square distributed, and this returns the corresponding p-value for
+        each pair. As with the other symmetric statistical tests, both tuple
+        entries hold the same value.
+
+        Parameters
+        ----------
+        square_ct : bool
+            Whether to compute the p-value over a squared (2x2) or non-squared
+            (3x2) contingency table (default: True).
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to (p-value, p-value) tuples.
+        """
+        return self._compute_contingency_table_scorer(
+            square_ct,
+            compute_log_likelihood_ratio_pvalue,
+            "_log_likelihood_ratio_pvalue",
+            "_log_likelihood_ratio_pvalue_nonsquare",
+        )
+
+    #: Association measures supported by the resampling-based methods
+    #: (:meth:`permutation_pvalue` and :meth:`bootstrap_ci`). Each is a method
+    #: returning ``{(x, y): (xy, yx)}`` computed with its default parameters.
+    RESAMPLABLE_MEASURES = frozenset(
+        {
+            "mle",
+            "pmi",
+            "pmi_smoothed",
+            "chi2",
+            "cramers_v",
+            "fisher",
+            "theil_u",
+            "cond_entropy",
+            "tresoldi",
+            "mutual_information",
+            "normalized_mutual_information",
+            "jaccard_index",
+            "goodman_kruskal_lambda",
+            "log_likelihood_ratio",
+        }
+    )
+
+    def _resampled_scores(
+        self,
+        measure: str,
+        n_resamples: int,
+        resampler: Callable[[np.random.Generator, list[Any], list[Any]], list[tuple[Any, Any]]],
+        seed: int | None,
+    ) -> Iterator[dict[tuple[Any, Any], tuple[float, float]]]:
+        """
+        Yield ``measure`` recomputed on ``n_resamples`` resampled co-occurrence sets.
+
+        ``resampler(rng, x_values, y_values)`` returns the co-occurrence pairs for
+        a single replicate -- e.g. a marginal-preserving shuffle (permutation
+        test) or a with-replacement draw (bootstrap). Each replicate is scored
+        with the same smoothing configuration as this scorer, so the permutation
+        and bootstrap methods share this resampling loop.
+        """
+        x_values = [pair[0] for pair in self.cooccs]
+        y_values = [pair[1] for pair in self.cooccs]
+        rng = np.random.default_rng(seed)
+
+        for _ in range(n_resamples):
+            resampled_cooccs = resampler(rng, x_values, y_values)
+            resampled_scorer = CatScorer(resampled_cooccs, self.smoothing_method, self.smoothing_alpha)
+            yield getattr(resampled_scorer, measure)()
+
+    def permutation_pvalue(
+        self,
+        measure: str,
+        n_permutations: int = 1000,
+        alternative: str = "greater",
+        seed: int | None = None,
+    ) -> dict[tuple[Any, Any], tuple[float, float]]:
+        """
+        Estimate permutation-based p-values for an association measure.
+
+        Unlike the parametric tests (:meth:`chi2_pvalue`, :meth:`fisher_pvalue`,
+        :meth:`log_likelihood_ratio_pvalue`), this works for any per-pair
+        association measure -- including the information-theoretic ones (PMI,
+        mutual information, Theil's U, ...) that have no closed-form null
+        distribution.
+
+        The null hypothesis is that the two variables are independent. A null
+        distribution is built by repeatedly shuffling the pairing between the
+        ``x`` and ``y`` elements of the co-occurrences (which preserves both
+        marginal frequency distributions and the total count while destroying
+        the joint association) and recomputing the measure. For each pair and
+        direction, the p-value is the fraction of permutations whose score is at
+        least as extreme as the observed one, using the ``(count + 1) /
+        (n_permutations + 1)`` correction so the estimate is never exactly zero.
+
+        Because the co-occurrences are treated as exchangeable, sequences that
+        expand into many correlated co-occurrences (e.g. n-gram collection) make
+        this test slightly anti-conservative; interpret accordingly.
+
+        Parameters
+        ----------
+        measure : str
+            Name of the association measure to test; must be one of
+            :attr:`RESAMPLABLE_MEASURES`. It is computed with its default
+            parameters.
+        n_permutations : int
+            Number of random permutations forming the null distribution
+            (default: 1000). Larger values give finer-grained p-values (the
+            smallest reportable p-value is ``1 / (n_permutations + 1)``).
+        alternative : str
+            Which tail to test, matching SciPy's convention:
+
+            * ``"greater"`` (default): significant when the observed score is
+              unusually high -- appropriate for measures where a larger value
+              means stronger association (PMI, mutual information, Theil's U,
+              chi-square, ...).
+            * ``"less"``: significant when the observed score is unusually low
+              -- appropriate for measures where a smaller value means stronger
+              association (e.g. ``cond_entropy``).
+            * ``"two-sided"``: significant in either tail.
+        seed : Optional[int]
+            Seed for the random number generator, for reproducible results
+            (default: None, i.e. non-deterministic).
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to ``(p_xy, p_yx)`` p-values, one
+            per direction, aligned with the measure's own output.
+
+        Raises
+        ------
+        ValueError
+            If ``measure`` is not supported, ``alternative`` is invalid, or
+            ``n_permutations`` is not a positive integer.
+        """
+        if measure not in self.RESAMPLABLE_MEASURES:
+            raise ValueError(f"Unsupported measure {measure!r}. Choose one of: {sorted(self.RESAMPLABLE_MEASURES)}")
+
+        if alternative not in ("greater", "less", "two-sided"):
+            raise ValueError(f"Invalid alternative {alternative!r}. Use 'greater', 'less', or 'two-sided'.")
+
+        if not isinstance(n_permutations, int) or n_permutations < 1:
+            raise ValueError(f"n_permutations must be a positive integer, got {n_permutations!r}")
+
+        # Observed scores, and fixed key ordering so all comparisons vectorize.
+        observed = getattr(self, measure)()
+        keys = list(observed)
+        obs_xy = np.array([observed[k][0] for k in keys], dtype=float)
+        obs_yx = np.array([observed[k][1] for k in keys], dtype=float)
+
+        # Count, per pair and direction, how many permutations reach or exceed
+        # (>=) and how many fall at or below (<=) the observed score. Ties are
+        # counted on both sides, matching the standard conservative convention.
+        count_ge_xy = np.zeros(len(keys))
+        count_ge_yx = np.zeros(len(keys))
+        count_le_xy = np.zeros(len(keys))
+        count_le_yx = np.zeros(len(keys))
+
+        # A permutation preserves the marginals, so every symbol (and therefore
+        # every pair key) is still present in each replicate.
+        def _permute(rng: np.random.Generator, x_values: list[Any], y_values: list[Any]) -> list[tuple[Any, Any]]:
+            permuted_y = [y_values[i] for i in rng.permutation(len(y_values))]
+            return list(zip(x_values, permuted_y, strict=True))
+
+        for permuted in self._resampled_scores(measure, n_permutations, _permute, seed):
+            perm_xy = np.array([permuted[k][0] for k in keys], dtype=float)
+            perm_yx = np.array([permuted[k][1] for k in keys], dtype=float)
+
+            count_ge_xy += perm_xy >= obs_xy
+            count_ge_yx += perm_yx >= obs_yx
+            count_le_xy += perm_xy <= obs_xy
+            count_le_yx += perm_yx <= obs_yx
+
+        denom = n_permutations + 1.0
+
+        def _pvalues(count_ge: np.ndarray, count_le: np.ndarray) -> np.ndarray:
+            p_greater = (count_ge + 1.0) / denom
+            p_less = (count_le + 1.0) / denom
+            if alternative == "greater":
+                return p_greater
+            if alternative == "less":
+                return p_less
+            return np.minimum(1.0, 2.0 * np.minimum(p_greater, p_less))
+
+        p_xy = _pvalues(count_ge_xy, count_le_xy)
+        p_yx = _pvalues(count_ge_yx, count_le_yx)
+
+        return {key: (float(p_xy[i]), float(p_yx[i])) for i, key in enumerate(keys)}
+
+    def bootstrap_ci(
+        self,
+        measure: str,
+        n_bootstrap: int = 1000,
+        confidence_level: float = 0.95,
+        seed: int | None = None,
+    ) -> dict[tuple[Any, Any], tuple[tuple[float, float], tuple[float, float]]]:
+        """
+        Estimate bootstrap confidence intervals for an association measure.
+
+        Whereas :meth:`permutation_pvalue` tests whether an association differs
+        from independence, this quantifies the sampling uncertainty *around* the
+        observed score. A bootstrap distribution is built by resampling the
+        co-occurrences with replacement (``n`` draws from the ``n`` observed
+        pairs, preserving each pair's ``x``/``y`` link) and recomputing the
+        measure; the confidence interval is taken as the percentile interval of
+        that distribution, per pair and direction.
+
+        The point estimate itself is not returned -- obtain it from the measure
+        method directly (e.g. ``scorer.theil_u()``).
+
+        Because resampling can drop a rarely-seen symbol from a replicate, a pair
+        may be absent from some replicates; such replicates simply do not
+        contribute to that pair's interval. As with :meth:`permutation_pvalue`,
+        co-occurrences are treated as exchangeable, so sequence data that expands
+        into many correlated co-occurrences yields intervals that are somewhat
+        too narrow.
+
+        Parameters
+        ----------
+        measure : str
+            Name of the association measure; must be one of
+            :attr:`RESAMPLABLE_MEASURES`. It is computed with its default
+            parameters.
+        n_bootstrap : int
+            Number of bootstrap replicates (default: 1000).
+        confidence_level : float
+            Confidence level in the open interval ``(0, 1)`` (default: 0.95 for a
+            95% interval, i.e. the 2.5th and 97.5th percentiles).
+        seed : Optional[int]
+            Seed for the random number generator, for reproducible results
+            (default: None, i.e. non-deterministic).
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[Tuple[float, float], Tuple[float, float]]]
+            Dictionary mapping symbol pairs to ``((xy_low, xy_high), (yx_low,
+            yx_high))`` -- a lower/upper bound for each direction, aligned with
+            the measure's own output.
+
+        Raises
+        ------
+        ValueError
+            If ``measure`` is not supported, ``confidence_level`` is not in
+            ``(0, 1)``, or ``n_bootstrap`` is not a positive integer.
+        """
+        if measure not in self.RESAMPLABLE_MEASURES:
+            raise ValueError(f"Unsupported measure {measure!r}. Choose one of: {sorted(self.RESAMPLABLE_MEASURES)}")
+
+        if not 0.0 < confidence_level < 1.0:
+            raise ValueError(f"confidence_level must be in the open interval (0, 1), got {confidence_level!r}")
+
+        if not isinstance(n_bootstrap, int) or n_bootstrap < 1:
+            raise ValueError(f"n_bootstrap must be a positive integer, got {n_bootstrap!r}")
+
+        # Fixed key ordering; each replicate fills one row. Missing pairs stay
+        # NaN and are ignored by the percentile computation.
+        keys = list(getattr(self, measure)())
+        boot_xy = np.full((n_bootstrap, len(keys)), np.nan)
+        boot_yx = np.full((n_bootstrap, len(keys)), np.nan)
+
+        # Resample the observed co-occurrence pairs with replacement, keeping
+        # each pair's x/y link intact.
+        def _bootstrap(rng: np.random.Generator, x_values: list[Any], y_values: list[Any]) -> list[tuple[Any, Any]]:
+            indices = rng.integers(0, len(x_values), size=len(x_values))
+            return [(x_values[i], y_values[i]) for i in indices]
+
+        for row, resampled in enumerate(self._resampled_scores(measure, n_bootstrap, _bootstrap, seed)):
+            boot_xy[row] = [resampled.get(key, (np.nan, np.nan))[0] for key in keys]
+            boot_yx[row] = [resampled.get(key, (np.nan, np.nan))[1] for key in keys]
+
+        lower_q = 100.0 * (1.0 - confidence_level) / 2.0
+        upper_q = 100.0 * (1.0 + confidence_level) / 2.0
+
+        # A pair absent from every replicate yields an all-NaN column; suppress
+        # the resulting warning and let its interval be (NaN, NaN).
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            xy_low = np.nanpercentile(boot_xy, lower_q, axis=0)
+            xy_high = np.nanpercentile(boot_xy, upper_q, axis=0)
+            yx_low = np.nanpercentile(boot_yx, lower_q, axis=0)
+            yx_high = np.nanpercentile(boot_yx, upper_q, axis=0)
+
+        return {
+            key: ((float(xy_low[i]), float(xy_high[i])), (float(yx_low[i]), float(yx_high[i])))
+            for i, key in enumerate(keys)
+        }
