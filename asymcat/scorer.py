@@ -17,7 +17,7 @@ import math
 # Import Python standard libraries
 from collections import Counter
 from itertools import chain, product
-from typing import Any
+from typing import Any, NamedTuple
 
 # Import 3rd party libraries
 import numpy as np
@@ -529,6 +529,29 @@ def scorer2matrices(
     return xy, yx, alphabet_x, alphabet_y
 
 
+class _SubsetEntropies(NamedTuple):
+    """
+    Per-pair subset entropies shared by :meth:`CatScorer.theil_u` and
+    :meth:`CatScorer.cond_entropy`.
+
+    Each field is an ``|alphabet_x| x |alphabet_y|`` array indexed by ``[i, j]``,
+    holding a quantity computed over the subset of co-occurrences selected for
+    the pair ``(alphabet_x[i], alphabet_y[j])`` -- namely those whose first
+    element is ``alphabet_x[i]`` or whose second element is ``alphabet_y[j]``.
+
+    The ``*_zero`` fields are boolean masks flagging the pairs whose marginal
+    entropy is exactly zero (a degenerate, single-symbol subset), derived from
+    the integer counts so they match the scalar special cases exactly.
+    """
+
+    h_x: np.ndarray  # H(X) over the subset
+    h_y: np.ndarray  # H(Y) over the subset
+    h_x_given_y: np.ndarray  # H(X | Y) over the subset
+    h_y_given_x: np.ndarray  # H(Y | X) over the subset
+    h_x_zero: np.ndarray  # True where H(X) == 0
+    h_y_zero: np.ndarray  # True where H(Y) == 0
+
+
 class CatScorer:
     """
     Class for computing categorical co-occurrence scores.
@@ -954,38 +977,19 @@ class CatScorer:
 
         return self._fisher
 
-    def theil_u(self) -> dict[tuple[Any, Any], tuple[float, float]]:
+    def _subset_entropy_components(self) -> _SubsetEntropies:
         """
-        Return a Theil's U uncertainty scorer.
+        Vectorized per-pair subset entropies backing :meth:`theil_u` and
+        :meth:`cond_entropy`.
 
-        For every pair ``(x, y)`` this computes Theil's U in both directions
-        over the subset of co-occurrences where ``pair[0] == x`` or
-        ``pair[1] == y``, matching ``compute_theil_u(Y, X)`` and
-        ``compute_theil_u(X, Y)`` on that subset.
-
-        The result is computed with a vectorized formulation (see
-        :meth:`_compute_theil_u_matrix`) that evaluates all pairs at once from
-        the global joint-count matrix, rather than re-filtering the full
-        co-occurrence list for each of the ``|X| * |Y|`` pairs.
-        """
-
-        if not self._theil_u:
-            self._theil_u = self._compute_theil_u_matrix()
-
-        return self._theil_u
-
-    def _compute_theil_u_matrix(self) -> dict[tuple[Any, Any], tuple[float, float]]:
-        """
-        Vectorized computation backing :meth:`theil_u`.
-
-        The subset selected for a pair ``(x, y)`` -- co-occurrences whose first
-        element is ``x`` or whose second element is ``y`` -- has a joint
-        distribution shaped like a "cross": the whole row ``x`` and the whole
-        column ``y`` of the global joint-count matrix ``J``, with every other
-        cell empty. That structure lets each of the four entropies needed by
-        Theil's U be written in closed form from ``J``'s row/column sums and a
-        handful of precomputed per-row / per-column vectors, so all pairs are
-        evaluated together with array broadcasting.
+        Both scorers operate on the subset selected for a pair ``(x, y)`` --
+        co-occurrences whose first element is ``x`` or whose second element is
+        ``y``. That subset's joint distribution is shaped like a "cross": the
+        whole row ``x`` and the whole column ``y`` of the global joint-count
+        matrix ``J``, with every other cell empty. This structure lets each of
+        the four subset entropies be written in closed form from ``J``'s
+        row/column sums and a handful of precomputed per-row / per-column
+        vectors, so all pairs are evaluated together with array broadcasting.
 
         This reduces the cost from ``O(|X| * |Y| * n)`` (re-scanning the ``n``
         co-occurrences for every pair) to ``O(|X| * |Y|)``, while reproducing
@@ -1030,7 +1034,7 @@ class CatScorer:
         n_total = row_col + col_row - joint
         log_n_total = np.log(n_total)
 
-        # The four entropies over each subset (see the derivation above).
+        # The four subset entropies (see the derivation above).
         h_y_given_x = row_term[:, None] / n_total
         h_x_given_y = col_term[None, :] / n_total
         h_x = -(row_col * np.log(row_col) + col_log_sum[None, :] - joint_log) / n_total + log_n_total
@@ -1039,42 +1043,74 @@ class CatScorer:
         # H(X) is exactly zero iff the subset's x-marginal is a single symbol,
         # i.e. column j is concentrated in row i (C[j] == J[i,j]); likewise
         # H(Y) is zero iff R[i] == J[i,j]. Detecting this from the integer
-        # counts reproduces the scalar code's `h_x == 0.0 -> 1.0` branch exactly
+        # counts reproduces the scalar code's `h == 0.0` special case exactly
         # and avoids dividing by a (floating-point) zero entropy.
         h_y_zero = row_col == joint
         h_x_zero = col_row == joint
 
-        with np.errstate(divide="ignore", invalid="ignore"):
-            u_y_given_x = np.where(h_y_zero, 1.0, (h_y - h_y_given_x) / h_y)
-            u_x_given_y = np.where(h_x_zero, 1.0, (h_x - h_x_given_y) / h_x)
+        return _SubsetEntropies(
+            h_x=h_x,
+            h_y=h_y,
+            h_x_given_y=h_x_given_y,
+            h_y_given_x=h_y_given_x,
+            h_x_zero=h_x_zero,
+            h_y_zero=h_y_zero,
+        )
 
-        # Assemble the result dict, preserving the (compute_theil_u(Y, X),
-        # compute_theil_u(X, Y)) ordering of the original implementation.
-        return {
-            (x, y): (float(u_y_given_x[i, j]), float(u_x_given_y[i, j]))
-            for i, x in enumerate(self.alphabet_x)
-            for j, y in enumerate(self.alphabet_y)
-        }
+    def theil_u(self) -> dict[tuple[Any, Any], tuple[float, float]]:
+        """
+        Return a Theil's U uncertainty scorer.
+
+        For every pair ``(x, y)`` this computes Theil's U in both directions
+        over the subset of co-occurrences where ``pair[0] == x`` or
+        ``pair[1] == y``, matching ``compute_theil_u(Y, X)`` and
+        ``compute_theil_u(X, Y)`` on that subset. The underlying entropies are
+        computed with a vectorized formulation (see
+        :meth:`_subset_entropy_components`) that evaluates all pairs at once
+        rather than re-filtering the co-occurrence list for each pair.
+        """
+
+        if not self._theil_u:
+            comp = self._subset_entropy_components()
+
+            # Theil's U is the fractional reduction in uncertainty, with the
+            # scalar code's `h == 0.0 -> 1.0` convention on a degenerate subset.
+            with np.errstate(divide="ignore", invalid="ignore"):
+                u_y_given_x = np.where(comp.h_y_zero, 1.0, (comp.h_y - comp.h_y_given_x) / comp.h_y)
+                u_x_given_y = np.where(comp.h_x_zero, 1.0, (comp.h_x - comp.h_x_given_y) / comp.h_x)
+
+            # Preserve the (compute_theil_u(Y, X), compute_theil_u(X, Y))
+            # ordering of the original implementation.
+            self._theil_u = {
+                (x, y): (float(u_y_given_x[i, j]), float(u_x_given_y[i, j]))
+                for i, x in enumerate(self.alphabet_x)
+                for j, y in enumerate(self.alphabet_y)
+            }
+
+        return self._theil_u
 
     def cond_entropy(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a corrected conditional entropy scorer.
+
+        For every pair ``(x, y)`` this computes the conditional entropy in both
+        directions over the subset of co-occurrences where ``pair[0] == x`` or
+        ``pair[1] == y``, matching ``conditional_entropy(Y, X)`` and
+        ``conditional_entropy(X, Y)`` on that subset. The entropies come from
+        the same vectorized computation as :meth:`theil_u` (see
+        :meth:`_subset_entropy_components`).
         """
 
         if not self._cond_entropy:
-            self._cond_entropy = {}
+            comp = self._subset_entropy_components()
 
-            for x in self.alphabet_x:
-                for y in self.alphabet_y:
-                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
-                    X = [pair[0] for pair in subset]
-                    Y = [pair[1] for pair in subset]
-
-                    # run conditional entropy
-                    self._cond_entropy[(x, y)] = (
-                        conditional_entropy(Y, X),
-                        conditional_entropy(X, Y),
-                    )
+            # Preserve the (conditional_entropy(Y, X), conditional_entropy(X, Y))
+            # ordering of the original implementation.
+            self._cond_entropy = {
+                (x, y): (float(comp.h_y_given_x[i, j]), float(comp.h_x_given_y[i, j]))
+                for i, x in enumerate(self.alphabet_x)
+                for j, y in enumerate(self.alphabet_y)
+            }
 
         return self._cond_entropy
 

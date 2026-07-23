@@ -23,20 +23,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `theil_u`, and `cramers_v` wrappers), bringing the module to full coverage.
 - Validation/error-path tests for `asymcat.common` data-loading helpers,
   raising overall coverage above 80%.
-- Regression tests pinning the vectorized `CatScorer.theil_u()` to the original
-  per-pair algorithm, including the degenerate zero-entropy cases.
+- Regression tests pinning the vectorized `CatScorer.theil_u()` and
+  `CatScorer.cond_entropy()` to the original per-pair algorithms, including the
+  degenerate zero-entropy cases.
 - Performance benchmark suite (`tests/performance/`) built on `pytest-benchmark`
   measuring the main scoring measures. Benchmarks are opt-in (skipped by
   default) and run with `pytest tests/performance --run-slow --no-cov
   --benchmark-only`.
 
 ### Changed
-- Vectorized `CatScorer.theil_u()`. The per-pair algorithm re-scanned the full
-  co-occurrence list for each of the `|X| * |Y|` symbol pairs (`O(|X|*|Y|*n)`);
-  it now derives all pairs at once from the global joint-count matrix
-  (`O(|X|*|Y|)`), reproducing the previous results to floating-point precision.
-  Measured speed-up is ~650x on a 5k-co-occurrence dataset and ~780x on a 50k
-  one, and the gap widens with dataset size.
+- Vectorized `CatScorer.theil_u()` and `CatScorer.cond_entropy()`. The per-pair
+  algorithm re-scanned the full co-occurrence list for each of the `|X| * |Y|`
+  symbol pairs (`O(|X|*|Y|*n)`); both now derive all pairs at once from the
+  global joint-count matrix via a shared helper (`O(|X|*|Y|)`), reproducing the
+  previous results to floating-point precision. Measured `theil_u` speed-up is
+  ~650x on a 5k-co-occurrence dataset and ~780x on a 50k one (the gap widens
+  with dataset size); `cond_entropy` improves by a similar factor.
 - Corrected the `asymcat.correlation` module docstring and added per-function
   docstrings clarifying which measures are symmetric vs. directional.
 - Raised the enforced test-coverage threshold from 78% to 80% in
