@@ -546,6 +546,7 @@ class _SubsetEntropies(NamedTuple):
 
     h_x: np.ndarray  # H(X) over the subset
     h_y: np.ndarray  # H(Y) over the subset
+    h_xy: np.ndarray  # joint entropy H(X, Y) over the subset
     h_x_given_y: np.ndarray  # H(X | Y) over the subset
     h_y_given_x: np.ndarray  # H(Y | X) over the subset
     h_x_zero: np.ndarray  # True where H(X) == 0
@@ -977,39 +978,47 @@ class CatScorer:
 
         return self._fisher
 
+    def _joint_counts(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Build the global joint-count matrix and its marginals.
+
+        Returns ``(joint, row_sum, col_sum)`` where ``joint[i, j]`` is the
+        number of times co-occurrence ``(alphabet_x[i], alphabet_y[j])`` is
+        observed, ``row_sum[i]`` is the global count of x symbol ``i`` and
+        ``col_sum[j]`` is the global count of y symbol ``j``. Shared by the
+        vectorized entropy- and mode-based scorers.
+        """
+        x_index = {x: i for i, x in enumerate(self.alphabet_x)}
+        y_index = {y: j for j, y in enumerate(self.alphabet_y)}
+
+        joint = np.zeros((len(self.alphabet_x), len(self.alphabet_y)))
+        for (a, b), count in Counter(self.cooccs).items():
+            joint[x_index[a], y_index[b]] += count
+
+        return joint, joint.sum(axis=1), joint.sum(axis=0)
+
     def _subset_entropy_components(self) -> _SubsetEntropies:
         """
-        Vectorized per-pair subset entropies backing :meth:`theil_u` and
-        :meth:`cond_entropy`.
+        Vectorized per-pair subset entropies backing :meth:`theil_u`,
+        :meth:`cond_entropy`, :meth:`mutual_information` and
+        :meth:`normalized_mutual_information`.
 
-        Both scorers operate on the subset selected for a pair ``(x, y)`` --
+        These scorers operate on the subset selected for a pair ``(x, y)`` --
         co-occurrences whose first element is ``x`` or whose second element is
         ``y``. That subset's joint distribution is shaped like a "cross": the
         whole row ``x`` and the whole column ``y`` of the global joint-count
         matrix ``J``, with every other cell empty. This structure lets each of
-        the four subset entropies be written in closed form from ``J``'s
-        row/column sums and a handful of precomputed per-row / per-column
-        vectors, so all pairs are evaluated together with array broadcasting.
+        the subset entropies be written in closed form from ``J``'s row/column
+        sums and a handful of precomputed per-row / per-column vectors, so all
+        pairs are evaluated together with array broadcasting.
 
         This reduces the cost from ``O(|X| * |Y| * n)`` (re-scanning the ``n``
         co-occurrences for every pair) to ``O(|X| * |Y|)``, while reproducing
         the original per-pair results to floating-point precision.
         """
 
-        # Index the alphabets and accumulate the joint-count matrix J[i, j],
-        # the number of times co-occurrence (alphabet_x[i], alphabet_y[j]) is
-        # observed. R and C are the row and column marginals (i.e. the global
-        # counts of each x and each y symbol).
-        x_index = {x: i for i, x in enumerate(self.alphabet_x)}
-        y_index = {y: j for j, y in enumerate(self.alphabet_y)}
-        n_x, n_y = len(self.alphabet_x), len(self.alphabet_y)
-
-        joint = np.zeros((n_x, n_y))
-        for (a, b), count in Counter(self.cooccs).items():
-            joint[x_index[a], y_index[b]] += count
-
-        row_sum = joint.sum(axis=1)  # R[i]: global count of x symbol i
-        col_sum = joint.sum(axis=0)  # C[j]: global count of y symbol j
+        # Joint-count matrix J[i, j] and its row (R) and column (C) marginals.
+        joint, row_sum, col_sum = self._joint_counts()
 
         # `J log J` (with the standard 0 * log 0 == 0 convention), plus its row
         # and column sums; every logarithm below guards zeros explicitly.
@@ -1034,11 +1043,14 @@ class CatScorer:
         n_total = row_col + col_row - joint
         log_n_total = np.log(n_total)
 
-        # The four subset entropies (see the derivation above).
+        # The subset entropies (see the derivation above). The joint entropy
+        # H(X, Y) sums J log J over the "cross" cells (row i plus column j, with
+        # the shared cell counted once).
         h_y_given_x = row_term[:, None] / n_total
         h_x_given_y = col_term[None, :] / n_total
         h_x = -(row_col * np.log(row_col) + col_log_sum[None, :] - joint_log) / n_total + log_n_total
         h_y = -(col_row * np.log(col_row) + row_log_sum[:, None] - joint_log) / n_total + log_n_total
+        h_xy = -(row_log_sum[:, None] + col_log_sum[None, :] - joint_log) / n_total + log_n_total
 
         # H(X) is exactly zero iff the subset's x-marginal is a single symbol,
         # i.e. column j is concentrated in row i (C[j] == J[i,j]); likewise
@@ -1051,6 +1063,7 @@ class CatScorer:
         return _SubsetEntropies(
             h_x=h_x,
             h_y=h_y,
+            h_xy=h_xy,
             h_x_given_y=h_x_given_y,
             h_y_given_x=h_y_given_x,
             h_x_zero=h_x_zero,
@@ -1156,25 +1169,18 @@ class CatScorer:
             Dictionary mapping symbol pairs to (MI(X;Y), MI(Y;X)) tuples.
         """
         if not self._mutual_information:
-            self._mutual_information = {}
+            comp = self._subset_entropy_components()
 
-            for x in self.alphabet_x:
-                for y in self.alphabet_y:
-                    # Get all co-occurrences that contain either x or y
-                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
+            # Mutual information is symmetric: MI(X;Y) = H(Y) - H(Y|X) = MI(Y;X).
+            # Both tuple entries therefore hold the same value, matching the
+            # original per-pair implementation to floating-point precision.
+            mi = comp.h_y - comp.h_y_given_x
 
-                    if subset:  # Only compute if there are relevant pairs
-                        X = [pair[0] for pair in subset]
-                        Y = [pair[1] for pair in subset]
-
-                        # Compute mutual information for both directions
-                        mi_xy = compute_mutual_information(X, Y)
-                        mi_yx = compute_mutual_information(Y, X)
-
-                        self._mutual_information[(x, y)] = (mi_xy, mi_yx)
-                    else:
-                        # If no relevant pairs, MI is 0
-                        self._mutual_information[(x, y)] = (0.0, 0.0)
+            self._mutual_information = {
+                (x, y): (float(mi[i, j]), float(mi[i, j]))
+                for i, x in enumerate(self.alphabet_x)
+                for j, y in enumerate(self.alphabet_y)
+            }
 
         return self._mutual_information
 
@@ -1191,25 +1197,22 @@ class CatScorer:
             Dictionary mapping symbol pairs to (NMI(X;Y), NMI(Y;X)) tuples.
         """
         if not self._normalized_mutual_information:
-            self._normalized_mutual_information = {}
+            comp = self._subset_entropy_components()
 
-            for x in self.alphabet_x:
-                for y in self.alphabet_y:
-                    # Get all co-occurrences that contain either x or y
-                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
+            # NMI = MI / H(X, Y), also symmetric. When the subset collapses to a
+            # single (x, y) cell the joint entropy is zero and MI is zero too;
+            # that degenerate case is flagged exactly by the integer-count masks
+            # and yields 0.0, matching the scalar implementation.
+            mi = comp.h_y - comp.h_y_given_x
+            single_cell = comp.h_x_zero & comp.h_y_zero
+            with np.errstate(divide="ignore", invalid="ignore"):
+                nmi = np.where(single_cell, 0.0, mi / comp.h_xy)
 
-                    if subset:  # Only compute if there are relevant pairs
-                        X = [pair[0] for pair in subset]
-                        Y = [pair[1] for pair in subset]
-
-                        # Compute normalized mutual information for both directions
-                        nmi_xy = compute_normalized_mutual_information(X, Y)
-                        nmi_yx = compute_normalized_mutual_information(Y, X)
-
-                        self._normalized_mutual_information[(x, y)] = (nmi_xy, nmi_yx)
-                    else:
-                        # If no relevant pairs, NMI is 0
-                        self._normalized_mutual_information[(x, y)] = (0.0, 0.0)
+            self._normalized_mutual_information = {
+                (x, y): (float(nmi[i, j]), float(nmi[i, j]))
+                for i, x in enumerate(self.alphabet_x)
+                for j, y in enumerate(self.alphabet_y)
+            }
 
         return self._normalized_mutual_information
 
@@ -1268,27 +1271,80 @@ class CatScorer:
             Dictionary mapping symbol pairs to (λ(Y|X), λ(X|Y)) tuples.
         """
         if not self._goodman_kruskal_lambda:
-            self._goodman_kruskal_lambda = {}
+            lambda_y_given_x, lambda_x_given_y = self._goodman_kruskal_lambda_matrices()
 
-            for x in self.alphabet_x:
-                for y in self.alphabet_y:
-                    # Get all co-occurrences that contain either x or y
-                    subset = [pair for pair in self.cooccs if pair[0] == x or pair[1] == y]
-
-                    if subset:  # Only compute if there are relevant pairs
-                        X = [pair[0] for pair in subset]
-                        Y = [pair[1] for pair in subset]
-
-                        # Compute lambda for both directions
-                        lambda_y_given_x = compute_goodman_kruskal_lambda(X, Y, "y_given_x")
-                        lambda_x_given_y = compute_goodman_kruskal_lambda(X, Y, "x_given_y")
-
-                        self._goodman_kruskal_lambda[(x, y)] = (lambda_y_given_x, lambda_x_given_y)
-                    else:
-                        # If no relevant pairs, lambda is 0
-                        self._goodman_kruskal_lambda[(x, y)] = (0.0, 0.0)
+            self._goodman_kruskal_lambda = {
+                (x, y): (float(lambda_y_given_x[i, j]), float(lambda_x_given_y[i, j]))
+                for i, x in enumerate(self.alphabet_x)
+                for j, y in enumerate(self.alphabet_y)
+            }
 
         return self._goodman_kruskal_lambda
+
+    def _goodman_kruskal_lambda_matrices(self) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Vectorized Goodman-Kruskal lambda backing :meth:`goodman_kruskal_lambda`.
+
+        Lambda is mode-based rather than entropy-based, so it needs the largest
+        cell count per row / column of the "cross"-shaped subset (see
+        :meth:`_subset_entropy_components` for the subset geometry) rather than
+        the entropies. For a pair ``(x=i, y=j)``:
+
+        * predicting ``Y`` from ``X`` -- knowing ``X == i`` narrows ``Y`` to row
+          ``i`` (best guess ``max_b J[i, b]``); any other ``X == i'`` only occurs
+          with ``Y == j`` (best guess ``J[i', j]``). Summing gives
+          ``rowMax[i] + (C[j] - J[i, j])``. The unconditional best guess is the
+          most frequent subset ``Y`` value, ``max(C[j], max_{b != j} J[i, b])``.
+        * predicting ``X`` from ``Y`` is the transpose.
+
+        With per-row / per-column maxima (and "max excluding this column/row",
+        which needs each line's top-two values and its argmax), every pair is
+        evaluated together with broadcasting, reproducing the scalar results
+        exactly (the computation is over integer counts, with no summation of
+        floats).
+        """
+
+        joint, row_sum, col_sum = self._joint_counts()
+        row_col = row_sum[:, None]
+        col_row = col_sum[None, :]
+        n_total = row_col + col_row - joint
+
+        col_idx = np.arange(len(self.alphabet_y))[None, :]
+        row_idx = np.arange(len(self.alphabet_x))[:, None]
+
+        def line_maxima(axis: int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+            """Per-line max, argmax, and second-largest value along ``axis``."""
+            line_max = joint.max(axis=axis)
+            line_argmax = joint.argmax(axis=axis)
+            size = joint.shape[axis]
+            if size >= 2:
+                second = np.take(np.partition(joint, size - 2, axis=axis), size - 2, axis=axis)
+            else:
+                second = np.zeros_like(line_max)
+            return line_max, line_argmax, second
+
+        # Predicting Y from X (row-wise): "max excluding column j" drops back to
+        # the row's second-largest count exactly at that row's argmax column.
+        row_max, row_argmax, row_second = line_maxima(axis=1)
+        row_max_excl = np.where(col_idx == row_argmax[:, None], row_second[:, None], row_max[:, None])
+        max_marginal_y = np.maximum(col_row, row_max_excl)
+        sum_max_conditional_y = row_max[:, None] + (col_row - joint)
+        denom_y = n_total - max_marginal_y
+        with np.errstate(divide="ignore", invalid="ignore"):
+            lambda_y_given_x = np.where(denom_y == 0, 0.0, (sum_max_conditional_y - max_marginal_y) / denom_y)
+        lambda_y_given_x = np.maximum(0.0, lambda_y_given_x)
+
+        # Predicting X from Y (column-wise): the transpose of the above.
+        col_max, col_argmax, col_second = line_maxima(axis=0)
+        col_max_excl = np.where(row_idx == col_argmax[None, :], col_second[None, :], col_max[None, :])
+        max_marginal_x = np.maximum(row_col, col_max_excl)
+        sum_max_conditional_x = col_max[None, :] + (row_col - joint)
+        denom_x = n_total - max_marginal_x
+        with np.errstate(divide="ignore", invalid="ignore"):
+            lambda_x_given_y = np.where(denom_x == 0, 0.0, (sum_max_conditional_x - max_marginal_x) / denom_x)
+        lambda_x_given_y = np.maximum(0.0, lambda_x_given_y)
+
+        return lambda_y_given_x, lambda_x_given_y
 
     def log_likelihood_ratio(self, square_ct: bool = True) -> dict[tuple[Any, Any], tuple[float, float]]:
         """

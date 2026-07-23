@@ -81,6 +81,12 @@ def test_mutual_information_performance(benchmark, benchmark_cooccs):
     _benchmark_measure(benchmark, benchmark_cooccs, "mutual_information", "_mutual_information")
 
 
+@pytest.mark.benchmark(group="information-theoretic")
+def test_normalized_mutual_information_performance(benchmark, benchmark_cooccs):
+    """Benchmark normalized mutual information scoring."""
+    _benchmark_measure(benchmark, benchmark_cooccs, "normalized_mutual_information", "_normalized_mutual_information")
+
+
 @pytest.mark.benchmark(group="entropy")
 def test_theil_u_performance(benchmark, benchmark_cooccs):
     """Benchmark Theil's U (quadratic in alphabet size; flagged as a hot path)."""
@@ -97,3 +103,9 @@ def test_cond_entropy_performance(benchmark, benchmark_cooccs):
 def test_tresoldi_performance(benchmark, benchmark_cooccs):
     """Benchmark the custom Tresoldi measure."""
     _benchmark_measure(benchmark, benchmark_cooccs, "tresoldi", "_tresoldi")
+
+
+@pytest.mark.benchmark(group="specialized")
+def test_goodman_kruskal_lambda_performance(benchmark, benchmark_cooccs):
+    """Benchmark Goodman-Kruskal lambda (mode-based, vectorized)."""
+    _benchmark_measure(benchmark, benchmark_cooccs, "goodman_kruskal_lambda", "_goodman_kruskal_lambda")

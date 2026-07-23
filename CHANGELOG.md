@@ -17,28 +17,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (e.g. "Column not found", "Missing required 'ID' column", "Invalid
   presence-absence value") as a generic `OSError`, contradicting the documented
   behavior; these now propagate as `ValueError` as intended.
+- Corrected the stale `version = {0.3.0}` in the README citation to `0.4.0`.
 
 ### Added
 - Regression tests for the `asymcat.correlation` module (`conditional_entropy`,
   `theil_u`, and `cramers_v` wrappers), bringing the module to full coverage.
 - Validation/error-path tests for `asymcat.common` data-loading helpers,
   raising overall coverage above 80%.
-- Regression tests pinning the vectorized `CatScorer.theil_u()` and
-  `CatScorer.cond_entropy()` to the original per-pair algorithms, including the
-  degenerate zero-entropy cases.
+- Regression tests pinning the vectorized `theil_u`, `cond_entropy`,
+  `mutual_information`, `normalized_mutual_information` and
+  `goodman_kruskal_lambda` scorers to their original per-pair algorithms across
+  several datasets and degenerate cases.
 - Performance benchmark suite (`tests/performance/`) built on `pytest-benchmark`
   measuring the main scoring measures. Benchmarks are opt-in (skipped by
   default) and run with `pytest tests/performance --run-slow --no-cov
   --benchmark-only`.
 
 ### Changed
-- Vectorized `CatScorer.theil_u()` and `CatScorer.cond_entropy()`. The per-pair
-  algorithm re-scanned the full co-occurrence list for each of the `|X| * |Y|`
-  symbol pairs (`O(|X|*|Y|*n)`); both now derive all pairs at once from the
-  global joint-count matrix via a shared helper (`O(|X|*|Y|)`), reproducing the
-  previous results to floating-point precision. Measured `theil_u` speed-up is
-  ~650x on a 5k-co-occurrence dataset and ~780x on a 50k one (the gap widens
-  with dataset size); `cond_entropy` improves by a similar factor.
+- Vectorized the per-pair scorers `CatScorer.theil_u()`, `cond_entropy()`,
+  `mutual_information()`, `normalized_mutual_information()` and
+  `goodman_kruskal_lambda()`. Each previously re-scanned the full co-occurrence
+  list for every one of the `|X| * |Y|` symbol pairs (`O(|X|*|Y|*n)`); they now
+  derive all pairs at once from the global joint-count matrix (`O(|X|*|Y|)`) --
+  the entropy-based measures via a shared helper, lambda via an analogous
+  mode-based one. Results match the previous implementations to floating-point
+  precision (Goodman-Kruskal lambda matches exactly, being integer-count based).
+  Measured speed-ups on the benchmark dataset are ~650x for `theil_u` and ~330x
+  for `mutual_information`; every measure is now sub-millisecond, with the gap
+  widening as the dataset grows.
 - Corrected the `asymcat.correlation` module docstring and added per-function
   docstrings clarifying which measures are symmetric vs. directional.
 - Raised the enforced test-coverage threshold from 78% to 80% in

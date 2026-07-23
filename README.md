@@ -390,7 +390,7 @@ If you use ASymCat in your research, please cite:
   author = {Tresoldi, Tiago},
   year = {2024},
   url = {https://github.com/tresoldi/asymcat},
-  version = {0.3.0}
+  version = {0.4.0}
 }
 ```
 
