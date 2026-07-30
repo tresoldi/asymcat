@@ -48,7 +48,7 @@ dependencies = [
 viz = [
     "plotly>=5.15.0",
     "bokeh>=3.2.0",
-    "altair>=5.0.0",
+    "altair>=6.2.2",
 ]
 # Testing dependencies (lightweight; used by the CI test matrix)
 test = [
