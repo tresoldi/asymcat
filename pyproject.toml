@@ -78,6 +78,15 @@ dev = [
     "types-setuptools>=68.0.0",
     "bandit[toml]>=1.7.0",
 
+    # Bound the stub-bearing scientific deps for the type-check (quality) job,
+    # which installs `.[dev]`. A new numpy/scipy release can otherwise change
+    # mypy's view of third-party stubs and break the type check with no code
+    # change (as numpy 2.5's PEP 695 stubs did). The runtime dependencies stay
+    # unpinned so the test matrix surfaces real regressions; bump these
+    # deliberately.
+    "numpy<2.6",
+    "scipy<1.19",
+
     # Build and release
     "build>=0.10.0",
     "twine>=4.0.0",
