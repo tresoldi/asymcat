@@ -61,7 +61,7 @@ test = [
 ]
 # Documentation site (MkDocs + mkdocstrings)
 docs = [
-    "mkdocs-material>=9.5",
+    "mkdocs-material>=9.7.7",
     "mkdocstrings[python]>=0.24",
 ]
 # Development dependencies (everything the Makefile and tests/ need)
