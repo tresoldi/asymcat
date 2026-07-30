@@ -714,7 +714,7 @@ With padding: `[('#', 'a'), ('a', 'b'), ('b', 'c'), ('c', 'd'), ('d', '#')]`
 
 ```python
 # Bigrams with padding
-cooccs = asymcat.collect_cooccs(data, order=2, pad='#')
+cooccs = asymcat.collect_cooccs(data, order=2, pad="#")
 
 # Trigrams without padding
 cooccs = asymcat.collect_cooccs(data, order=3)
@@ -784,7 +784,7 @@ $$P(Y|X) = \frac{c(X,Y)}{c(X)}$$
 **Example:**
 
 ```python
-scorer = asymcat.CatScorer(cooccs, smoothing_method='mle')
+scorer = asymcat.CatScorer(cooccs, smoothing_method="mle")
 ```
 
 ### Laplace Smoothing (Add-One)
@@ -806,7 +806,7 @@ Where V = vocabulary size (number of possible Y values).
 **Example:**
 
 ```python
-scorer = asymcat.CatScorer(cooccs, smoothing_method='laplace')
+scorer = asymcat.CatScorer(cooccs, smoothing_method="laplace")
 ```
 
 **Effects:**
@@ -831,7 +831,7 @@ $$P(Y|X) = \frac{c(X,Y) + \gamma}{c(X) + \gamma \cdot V}$$
 **Example:**
 
 ```python
-scorer = asymcat.CatScorer(cooccs, smoothing_method='lidstone', smoothing_alpha=0.5)
+scorer = asymcat.CatScorer(cooccs, smoothing_method="lidstone", smoothing_alpha=0.5)
 ```
 
 **Choosing γ:**
@@ -882,10 +882,8 @@ xy_matrix, yx_matrix, x_labels, y_labels = asymcat.scorer.scorer2matrices(scores
 
 # Plot
 plt.figure(figsize=(10, 8))
-sns.heatmap(xy_matrix, annot=True, fmt='.2f',
-            xticklabels=y_labels, yticklabels=x_labels,
-            cmap='RdYlGn', center=0)
-plt.title('X → Y Associations')
+sns.heatmap(xy_matrix, annot=True, fmt=".2f", xticklabels=y_labels, yticklabels=x_labels, cmap="RdYlGn", center=0)
+plt.title("X → Y Associations")
 plt.show()
 ```
 
@@ -903,11 +901,11 @@ plt.show()
 ```python
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 7))
 
-sns.heatmap(xy_matrix, ax=ax1, annot=True, cmap='YlOrRd')
-ax1.set_title('X → Y')
+sns.heatmap(xy_matrix, ax=ax1, annot=True, cmap="YlOrRd")
+ax1.set_title("X → Y")
 
-sns.heatmap(yx_matrix, ax=ax2, annot=True, cmap='YlOrRd')
-ax2.set_title('Y → X')
+sns.heatmap(yx_matrix, ax=ax2, annot=True, cmap="YlOrRd")
+ax2.set_title("Y → X")
 
 plt.tight_layout()
 plt.show()
@@ -920,10 +918,10 @@ plt.show()
 ```python
 all_scores = [s for pair in scores.values() for s in pair]
 
-plt.hist(all_scores, bins=30, alpha=0.7, edgecolor='black')
-plt.xlabel('Score')
-plt.ylabel('Frequency')
-plt.title('Distribution of Association Scores')
+plt.hist(all_scores, bins=30, alpha=0.7, edgecolor="black")
+plt.xlabel("Score")
+plt.ylabel("Frequency")
+plt.title("Distribution of Association Scores")
 plt.show()
 ```
 
@@ -935,10 +933,10 @@ import seaborn as sns
 xy_scores = [scores[pair][0] for pair in scores]
 yx_scores = [scores[pair][1] for pair in scores]
 
-sns.kdeplot(xy_scores, label='X → Y', shade=True)
-sns.kdeplot(yx_scores, label='Y → X', shade=True)
-plt.xlabel('Score')
-plt.ylabel('Density')
+sns.kdeplot(xy_scores, label="X → Y", shade=True)
+sns.kdeplot(yx_scores, label="Y → X", shade=True)
+plt.xlabel("Score")
+plt.ylabel("Density")
 plt.legend()
 plt.show()
 ```
@@ -948,14 +946,11 @@ plt.show()
 ```python
 import pandas as pd
 
-df = pd.DataFrame({
-    'X→Y': xy_scores,
-    'Y→X': yx_scores
-})
+df = pd.DataFrame({"X→Y": xy_scores, "Y→X": yx_scores})
 
 df.boxplot()
-plt.ylabel('Score')
-plt.title('Score Distribution Comparison')
+plt.ylabel("Score")
+plt.title("Score Distribution Comparison")
 plt.show()
 ```
 
@@ -966,17 +961,17 @@ plt.show()
 ```python
 import matplotlib.pyplot as plt
 
-plt.style.use('seaborn-v0_8-paper')  # Clean style for papers
-plt.rcParams['figure.dpi'] = 300     # High resolution
-plt.rcParams['font.size'] = 10       # Readable text
-plt.rcParams['font.family'] = 'serif'  # Professional font
+plt.style.use("seaborn-v0_8-paper")  # Clean style for papers
+plt.rcParams["figure.dpi"] = 300  # High resolution
+plt.rcParams["font.size"] = 10  # Readable text
+plt.rcParams["font.family"] = "serif"  # Professional font
 ```
 
 **Export:**
 
 ```python
-plt.savefig('figure1.pdf', bbox_inches='tight', dpi=300)
-plt.savefig('figure1.png', bbox_inches='tight', dpi=300)
+plt.savefig("figure1.pdf", bbox_inches="tight", dpi=300)
+plt.savefig("figure1.png", bbox_inches="tight", dpi=300)
 ```
 
 **Multi-panel Layout:**
@@ -986,22 +981,22 @@ fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
 # Plot 1
 axes[0, 0].bar(...)
-axes[0, 0].set_title('(A) MLE Scores')
+axes[0, 0].set_title("(A) MLE Scores")
 
 # Plot 2
 axes[0, 1].bar(...)
-axes[0, 1].set_title('(B) PMI Scores')
+axes[0, 1].set_title("(B) PMI Scores")
 
 # Plot 3
 axes[1, 0].scatter(...)
-axes[1, 0].set_title('(C) MLE vs PMI')
+axes[1, 0].set_title("(C) MLE vs PMI")
 
 # Plot 4
 axes[1, 1].hist(...)
-axes[1, 1].set_title('(D) Score Distribution')
+axes[1, 1].set_title("(D) Score Distribution")
 
 plt.tight_layout()
-plt.savefig('figure_composite.pdf', dpi=300)
+plt.savefig("figure_composite.pdf", dpi=300)
 ```
 
 ## Best Practices
@@ -1043,13 +1038,13 @@ plt.savefig('figure_composite.pdf', dpi=300)
 
 1. **Use smoothing:**
    ```python
-   scorer = CatScorer(cooccs, smoothing_method='laplace')
+   scorer = CatScorer(cooccs, smoothing_method="laplace")
    ```
 
 2. **Filter rare events:**
    ```python
    # Remove pairs with count < threshold
-   filtered_cooccs = [(x,y) for (x,y) in cooccs if cooccs.count((x,y)) >= 5]
+   filtered_cooccs = [(x, y) for (x, y) in cooccs if cooccs.count((x, y)) >= 5]
    ```
 
 3. **Aggregate categories:**
@@ -1073,6 +1068,7 @@ plt.savefig('figure_composite.pdf', dpi=300)
 ```python
 import numpy as np
 
+
 def bootstrap_scores(data, n_iterations=1000):
     results = []
     for _ in range(n_iterations):
@@ -1087,6 +1083,7 @@ def bootstrap_scores(data, n_iterations=1000):
         results.append(score)
 
     return results
+
 
 # Get 95% confidence interval
 bootstrap_results = bootstrap_scores(data, n_iterations=1000)
@@ -1137,7 +1134,7 @@ significant = false_discovery_control(p_values, alpha=0.05)
 1. **Precompute co-occurrences once:**
    ```python
    cooccs = asymcat.collect_cooccs(data)  # Do once
-   scorer = asymcat.CatScorer(cooccs)     # Reuse scorer
+   scorer = asymcat.CatScorer(cooccs)  # Reuse scorer
    ```
 
 2. **Compute multiple measures at once:**
@@ -1204,7 +1201,7 @@ data = asymcat.read_sequences("resources/cmudict.sample1000.tsv")
 cooccs = asymcat.collect_cooccs(data)
 
 # Create scorer with smoothing (many rare correspondences)
-scorer = asymcat.CatScorer(cooccs, smoothing_method='lidstone', smoothing_alpha=0.1)
+scorer = asymcat.CatScorer(cooccs, smoothing_method="lidstone", smoothing_alpha=0.1)
 
 # Compute directional measures
 mle = scorer.mle()
@@ -1235,7 +1232,7 @@ data = asymcat.read_pa_matrix("resources/galapagos.tsv")
 cooccs = asymcat.collect_cooccs(data)
 
 # Create scorer
-scorer = asymcat.CatScorer(cooccs, smoothing_method='mle')
+scorer = asymcat.CatScorer(cooccs, smoothing_method="mle")
 
 # Use Jaccard and Fisher (appropriate for binary data)
 jaccard = scorer.jaccard_index()
@@ -1267,7 +1264,7 @@ transactions = asymcat.read_sequences("transactions.tsv")
 cooccs = asymcat.collect_cooccs(transactions)
 
 # Create scorer
-scorer = asymcat.CatScorer(cooccs, smoothing_method='laplace')
+scorer = asymcat.CatScorer(cooccs, smoothing_method="laplace")
 
 # Use MLE for direct prediction strength
 mle = scorer.mle()
@@ -1304,9 +1301,9 @@ data = asymcat.read_sequences("resources/mushrooms.tsv")
 # For each feature, compute association with target
 feature_importance = {}
 
-for feature in ['cap_shape', 'cap_color', 'odor', 'gill_size']:
+for feature in ["cap_shape", "cap_color", "odor", "gill_size"]:
     # Extract feature-target pairs
-    pairs = [(row[feature], row['edibility']) for row in data]
+    pairs = [(row[feature], row["edibility"]) for row in data]
 
     # Compute Theil U (normalized information)
     cooccs = asymcat.collect_cooccs(pairs)
@@ -1502,9 +1499,7 @@ Only report associations strong in multiple measures:
 ```python
 strong_in_all = []
 for pair in pairs:
-    if (mle[pair][0] > 0.5 and
-        theil[pair][0] > 0.5 and
-        pmi[pair][0] > 3.0):
+    if mle[pair][0] > 0.5 and theil[pair][0] > 0.5 and pmi[pair][0] > 3.0:
         strong_in_all.append(pair)
 ```
 

@@ -194,14 +194,10 @@ cooccs = asymcat.collect_cooccs(data)
 scorer = asymcat.scorer.CatScorer(cooccs)
 
 # Compute multiple measures
-measures = {
-    'mle': scorer.mle(),
-    'tresoldi': scorer.tresoldi(),
-    'mutual_info': scorer.mutual_information()
-}
+measures = {"mle": scorer.mle(), "tresoldi": scorer.tresoldi(), "mutual_info": scorer.mutual_information()}
 
 # Apply transformations
-scaled = asymcat.scorer.scale_scorer(measures['tresoldi'], method="minmax")
+scaled = asymcat.scorer.scale_scorer(measures["tresoldi"], method="minmax")
 
 # Generate visualization matrices
 xy_matrix, yx_matrix, x_labels, y_labels = asymcat.scorer.scorer2matrices(scaled)
@@ -267,10 +263,13 @@ When adding new tests:
 class TestNewScoringMethod:
     """Test a new scoring method."""
 
-    @pytest.mark.parametrize("dataset,expected_properties", [
-        ("toy.tsv", {"min_pairs": 10, "max_time": 1.0}),
-        ("mushroom-small.tsv", {"min_pairs": 50, "max_time": 5.0}),
-    ])
+    @pytest.mark.parametrize(
+        "dataset,expected_properties",
+        [
+            ("toy.tsv", {"min_pairs": 10, "max_time": 1.0}),
+            ("mushroom-small.tsv", {"min_pairs": 50, "max_time": 5.0}),
+        ],
+    )
     def test_new_method(self, dataset: str, expected_properties: dict):
         """
         Test new scoring method with multiple datasets.

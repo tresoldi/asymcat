@@ -139,7 +139,7 @@ scorer = asymcat.CatScorer(cooccs)
 
 # 3. Call a measure -> {(x, y): (score_xy, score_yx)}
 mle = scorer.mle()
-theil = scorer.theil_u()   # asymmetric: the two directions differ
+theil = scorer.theil_u()  # asymmetric: the two directions differ
 
 # 4. (optional) scale and assess significance
 scaled = asymcat.scorer.scale_scorer(theil, method="minmax")

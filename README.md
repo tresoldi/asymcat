@@ -18,11 +18,11 @@ measures, behind one consistent interface.
 ```python
 import asymcat
 
-data   = asymcat.read_sequences("data.tsv")
-coocs  = asymcat.collect_cooccs(data)
+data = asymcat.read_sequences("data.tsv")
+coocs = asymcat.collect_cooccs(data)
 scorer = asymcat.CatScorer(coocs)
 
-scorer.mle()[("a", "x")]   # (0.83, 0.20)  — P(x|a) vs P(a|x)
+scorer.mle()[("a", "x")]  # (0.83, 0.20)  — P(x|a) vs P(a|x)
 ```
 
 That tuple is the whole point: a symmetric summary would collapse the two numbers
@@ -45,14 +45,14 @@ call a measure. Every measure returns a mapping from category pairs to a
 ```python
 import asymcat
 
-data   = asymcat.read_sequences("data.tsv")     # or asymcat.read_pa_matrix(...)
-coocs  = asymcat.collect_cooccs(data)           # order=2, pad="#" for n-grams
+data = asymcat.read_sequences("data.tsv")  # or asymcat.read_pa_matrix(...)
+coocs = asymcat.collect_cooccs(data)  # order=2, pad="#" for n-grams
 scorer = asymcat.CatScorer(coocs, smoothing_method="laplace", smoothing_alpha=1.0)
 
-scorer.mle()          # P(y|x), P(x|y)
-scorer.theil_u()      # uncertainty coefficient in each direction
-scorer.pmi()          # pointwise mutual information
-scorer.fisher()       # exact odds ratios
+scorer.mle()  # P(y|x), P(x|y)
+scorer.theil_u()  # uncertainty coefficient in each direction
+scorer.pmi()  # pointwise mutual information
+scorer.fisher()  # exact odds ratios
 
 # Turn any scored measure into matrices for plotting
 xy, yx, x_labels, y_labels = asymcat.scorer.scorer2matrices(scorer.pmi())
@@ -81,7 +81,7 @@ pairing, and `bootstrap_ci(measure, ...)` returns percentile confidence interval
 by resampling the co-occurrences.
 
 ```python
-scorer.chi2_pvalue()                                  # closed-form p-values
+scorer.chi2_pvalue()  # closed-form p-values
 scorer.permutation_pvalue("theil_u", n_permutations=1000, seed=0)
 scorer.bootstrap_ci("theil_u", n_bootstrap=1000, confidence_level=0.95, seed=0)
 ```

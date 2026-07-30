@@ -372,7 +372,7 @@ data = asymcat.read_sequences("alignment_data.tsv")
 cooccs = asymcat.collect_cooccs(data)
 
 # Create scorer
-scorer = CatScorer(cooccs, smoothing_method='laplace')
+scorer = CatScorer(cooccs, smoothing_method="laplace")
 
 # Compute Tresoldi scores
 tresoldi_scores = scorer.tresoldi()
@@ -400,10 +400,10 @@ Because the Tresoldi measure depends on both PMI and MLE:
 **Recommended practice**:
 ```python
 # For sparse data (typical in linguistic alignments)
-scorer = CatScorer(cooccs, smoothing_method='laplace')
+scorer = CatScorer(cooccs, smoothing_method="laplace")
 
 # For denser data
-scorer = CatScorer(cooccs, smoothing_method='lidstone', smoothing_alpha=0.1)
+scorer = CatScorer(cooccs, smoothing_method="lidstone", smoothing_alpha=0.1)
 
 # Avoid for Tresoldi (PMI requires smoothing)
 # scorer = CatScorer(cooccs, smoothing_method='mle')  # Not recommended
