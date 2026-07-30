@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>asymcat — asymmetric categorical association analysis</title>
+<meta name="description" content="A Python library that measures directional (asymmetric) association between categorical variables: which category predicts which, and how strongly, in each direction.">
+<link rel="canonical" href="{{ config.site_url }}">
+<style>
+  :root {
+    --paper: #ffffff;
+    --ink: #1a1a1a;
+    --ink-2: #474747;
+    --ink-3: #737373;
+    --rule: #d8d8d8;
+    --rule-2: #ececec;
+    --link: #0f6f6a;
+    --code-bg: #f6f6f6;
+    --fig-ink: #1a1a1a;
+    --fig-grey: #8f8f8f;
+    --fig-light: #c9c9c9;
+    --fig-accent: #0f6f6a;
+    --serif: "Times New Roman", Times, Georgia, "Nimbus Roman", serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    --measure: 42rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #121212; --ink: #e6e6e6; --ink-2: #b2b2b2; --ink-3: #8a8a8a;
+      --rule: #2d2d2d; --rule-2: #242424; --link: #57c4bd;
+      --code-bg: #1a1a1a; --fig-ink: #e6e6e6; --fig-grey: #969696; --fig-light: #575757;
+      --fig-accent: #57c4bd;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--serif); font-size: 18px; line-height: 1.55;
+    text-rendering: optimizeLegibility;
+  }
+  .page { max-width: var(--measure); margin: 0 auto; padding: 0 26px 80px; }
+  a { color: var(--link); text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+  header.mast { padding: 60px 0 22px; border-bottom: 1px solid var(--ink); }
+  .title { font-size: 1.9rem; font-weight: 700; margin: 0 0 8px; }
+  .title .mono { font-family: var(--mono); font-weight: 600; letter-spacing: -0.02em; }
+  .dek { font-size: 1.05rem; color: var(--ink-2); margin: 0 0 18px; max-width: 34em; }
+  .meta { font-size: 0.9rem; color: var(--ink-3); }
+  .meta a { color: var(--ink-2); }
+  .meta .sep { padding: 0 6px; color: var(--rule); }
+
+  main > section { padding: 26px 0; border-bottom: 1px solid var(--rule-2); }
+  main > section:last-of-type { border-bottom: 0; }
+  h2 { font-size: 1.15rem; font-weight: 700; color: var(--ink); margin: 0 0 12px; }
+  p { margin: 0 0 14px; } p:last-child { margin-bottom: 0; }
+  .lead { font-size: 1.08rem; } .lead b { font-weight: 700; }
+
+  code { font-family: var(--mono); font-size: 0.84em; }
+  pre {
+    margin: 4px 0 0; background: var(--code-bg); border: 1px solid var(--rule);
+    padding: 14px 16px; overflow-x: auto; font-family: var(--mono);
+    font-size: 13.5px; line-height: 1.65; color: var(--ink);
+  }
+  pre.install { padding: 10px 14px; }
+  .c-com { color: var(--ink-3); }
+  .after-code { font-size: 0.96rem; color: var(--ink-2); margin-top: 12px; }
+
+  figure { margin: 4px 0 0; }
+  .fig-frame { border: 1px solid var(--rule); background: var(--paper); padding: 12px 14px 6px; }
+  canvas { width: 100%; height: 210px; display: block; }
+  .fig-legend { font-size: 0.8rem; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 14px; margin-top: 4px; padding-top: 8px; border-top: 1px solid var(--rule-2); }
+  .fig-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .fig-legend i { width: 14px; height: 10px; display: inline-block; border: 1px solid var(--fig-ink); }
+  .fig-legend i.solid { background: var(--fig-accent); border-color: var(--fig-accent); }
+  .fig-legend i.open { background: var(--paper); border-color: var(--fig-grey); }
+  figcaption { font-size: 0.9rem; color: var(--ink-2); line-height: 1.5; margin-top: 10px; }
+  figcaption b { font-weight: 700; color: var(--ink); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  thead th { font-size: 0.82rem; color: var(--ink-2); font-weight: 700; text-align: left; padding: 0 14px 7px 0; border-bottom: 1px solid var(--ink); }
+  tbody td { padding: 8px 14px 8px 0; border-bottom: 1px solid var(--rule-2); vertical-align: baseline; }
+  tbody tr:last-child td { border-bottom: 1px solid var(--ink); }
+  td.m { font-family: var(--mono); font-size: 0.82rem; color: var(--ink); white-space: nowrap; }
+  td.k { font-family: var(--mono); font-size: 0.8rem; color: var(--ink-3); white-space: nowrap; }
+  .tbl-scroll { overflow-x: auto; }
+
+  ul.plain { margin: 0; padding: 0; list-style: none; }
+  ul.plain li { padding: 6px 0; border-bottom: 1px solid var(--rule-2); }
+  ul.plain li:last-child { border-bottom: 0; }
+  ul.plain b { font-weight: 700; } ul.plain .d { color: var(--ink-2); }
+
+  .links-row { display: flex; flex-wrap: wrap; gap: 4px 20px; font-size: 0.98rem; }
+
+  footer { padding-top: 24px; margin-top: 6px; border-top: 1px solid var(--ink); font-size: 0.85rem; color: var(--ink-3); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="mast">
+    <h1 class="title"><span class="mono">asymcat</span></h1>
+    <p class="dek">Asymmetric measures of association between categorical
+      variables — a well-tested Python library for data exploration.</p>
+    <div class="meta">
+      MIT<span class="sep">·</span>Python 3.10–3.12<span class="sep">·</span><a href="https://github.com/tresoldi/asymcat">GitHub</a><span class="sep">·</span><a href="https://pypi.org/project/asymcat/">PyPI</a><span class="sep">·</span><a href="{{ base_url }}/USER_GUIDE/">Documentation</a>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <p class="lead">Most measures of association are <b>symmetric</b>: they report a
+        single number for a pair of variables, as if the relationship between
+        <code>X</code> and <code>Y</code> were the same as between <code>Y</code> and
+        <code>X</code>. Many real relationships are not. Knowing a country often tells
+        you its capital, yet a capital tells you its country far more decisively;
+        one symptom may predict a disease while the disease barely predicts that
+        symptom. ASymCat quantifies association <b>separately in each direction</b>,
+        across a dozen probabilistic, information-theoretic, and statistical
+        measures, behind one consistent interface.</p>
+    </section>
+
+    <section>
+      <h2>Installation</h2>
+      <pre class="install">pip install asymcat</pre>
+    </section>
+
+    <section>
+      <h2>Example</h2>
+<pre>import asymcat
+
+data   = asymcat.read_sequences("data.tsv")
+coocs  = asymcat.collect_cooccs(data)
+scorer = asymcat.scorer.CatScorer(coocs)
+
+scores = scorer.mle()
+scores[("a", "x")]   <span class="c-com"># (0.83, 0.20)  — P(x|a) vs P(a|x): the association is directional</span></pre>
+      <p class="after-code">Every measure returns a mapping from category pairs to a
+        <code>(x&#8594;y, y&#8594;x)</code> tuple. A symmetric summary would collapse those
+        two numbers into one and hide exactly the structure ASymCat is built to
+        reveal: which variable predicts which, and how strongly, in each direction.</p>
+    </section>
+
+    <section>
+      <h2>The asymmetry</h2>
+      <figure>
+        <div class="fig-frame">
+          <canvas id="viz" width="720" height="210"></canvas>
+          <div class="fig-legend">
+            <span><i class="solid"></i>x&#8594;y  (predicting y from x)</span>
+            <span><i class="open"></i>y&#8594;x  (predicting x from y)</span>
+          </div>
+        </div>
+        <figcaption><b>Figure 1.</b> For each category pair, association is scored in
+          both directions. When the two bars differ, the relationship is asymmetric —
+          one category predicts the other better than the reverse. A single symmetric
+          score would report only the average and lose this.</figcaption>
+      </figure>
+    </section>
+
+    <section>
+      <h2>Measures</h2>
+      <div class="tbl-scroll">
+        <table>
+          <thead>
+            <tr><th>Measure</th><th>Family</th><th>Reports</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="m">mle</td><td>probabilistic</td><td class="k">P(y|x), P(x|y)</td></tr>
+            <tr><td class="m">pmi, pmi_smoothed</td><td>information-theoretic</td><td class="k">pointwise mutual information</td></tr>
+            <tr><td class="m">theil_u</td><td>information-theoretic</td><td class="k">uncertainty coefficient</td></tr>
+            <tr><td class="m">cond_entropy</td><td>information-theoretic</td><td class="k">conditional entropy</td></tr>
+            <tr><td class="m">mutual_information</td><td>information-theoretic</td><td class="k">(normalized) MI</td></tr>
+            <tr><td class="m">chi2, cramers_v</td><td>statistical</td><td class="k">χ² association</td></tr>
+            <tr><td class="m">fisher</td><td>statistical</td><td class="k">exact odds ratio</td></tr>
+            <tr><td class="m">log_likelihood_ratio</td><td>statistical</td><td class="k">G² statistic</td></tr>
+            <tr><td class="m">goodman_kruskal_lambda</td><td>statistical</td><td class="k">proportional error reduction</td></tr>
+            <tr><td class="m">jaccard_index</td><td>set-based</td><td class="k">directional overlap</td></tr>
+            <tr><td class="m">tresoldi</td><td>specialized</td><td class="k">smoothed measure for sequences</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="after-code">Statistical tests expose matching p-value scorers
+        (<code>chi2_pvalue</code>, <code>fisher_pvalue</code>,
+        <code>log_likelihood_ratio_pvalue</code>); a generic
+        <code>permutation_pvalue</code> and <code>bootstrap_ci</code> provide
+        significance and confidence intervals for any measure.</p>
+    </section>
+
+    <section>
+      <h2>Across domains</h2>
+      <p>Directional association between categories recurs wherever one kind of
+        label helps predict another:</p>
+      <ul class="plain">
+        <li><b>Linguistics.</b> <span class="d">grapheme–phoneme correspondence and sound-change directionality.</span></li>
+        <li><b>Ecology.</b> <span class="d">asymmetric species co-occurrence from presence–absence data.</span></li>
+        <li><b>Machine learning.</b> <span class="d">feature screening by directional predictive strength.</span></li>
+        <li><b>Categorical analytics.</b> <span class="d">dependency and information flow between discrete variables.</span></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Documentation</h2>
+      <div class="links-row">
+        <a href="{{ base_url }}/USER_GUIDE/">User Guide →</a>
+        <a href="{{ base_url }}/reference/">API Reference →</a>
+        <a href="{{ base_url }}/TRESOLDI_MEASURE/">The Tresoldi Measure →</a>
+        <a href="https://github.com/tresoldi/asymcat/blob/master/CHANGELOG.md">Changelog →</a>
+        <a href="https://github.com/tresoldi/asymcat">Source (GitHub) →</a>
+        <a href="https://pypi.org/project/asymcat/">Package (PyPI) →</a>
+      </div>
+    </section>
+
+    <section>
+      <h2>Citation</h2>
+<pre>@software{tresoldi_asymcat,
+  author  = {Tresoldi, Tiago},
+  title   = {ASymCat: Asymmetric measures of association between
+             categorical variables},
+  url     = {https://github.com/tresoldi/asymcat}
+}</pre>
+    </section>
+  </main>
+
+  <footer>
+    <span>MIT License</span>
+    <span>© Tiago Tresoldi</span>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var canvas = document.getElementById("viz");
+    if (!canvas) return;
+    var ctx = canvas.getContext("2d");
+    function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+    // Illustrative pairs with deliberately asymmetric directional scores.
+    var pairs = [
+      { label: "a · x", xy: 0.83, yx: 0.20 },
+      { label: "b · y", xy: 0.55, yx: 0.58 },
+      { label: "c · z", xy: 0.72, yx: 0.34 },
+      { label: "d · w", xy: 0.28, yx: 0.66 },
+      { label: "e · v", xy: 0.91, yx: 0.44 }
+    ];
+
+    function dims() {
+      var ratio = window.devicePixelRatio || 1;
+      var w = canvas.clientWidth, h = canvas.clientHeight;
+      canvas.width = w * ratio; canvas.height = h * ratio;
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      return { w: w, h: h };
+    }
+    function draw() {
+      var d = dims(), w = d.w, h = d.h;
+      ctx.clearRect(0, 0, w, h);
+      var accent = css("--fig-accent"), grey = css("--fig-grey"),
+          paper = css("--paper"), rule = css("--rule"), ink3 = css("--ink-3");
+      var padL = 4, padR = 4, padB = 26, padT = 14;
+      var plotH = h - padT - padB, plotW = w - padL - padR;
+      var n = pairs.length, group = plotW / n, barW = group * 0.28, gap = group * 0.06;
+      var base = padT + plotH;
+
+      ctx.strokeStyle = rule; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(padL, base + 0.5); ctx.lineTo(w - padR, base + 0.5); ctx.stroke();
+
+      ctx.font = "11px " + css("--mono"); ctx.textAlign = "center";
+      for (var i = 0; i < n; i++) {
+        var cx = padL + group * (i + 0.5);
+        var xyH = pairs[i].xy * plotH * 0.9;
+        var yxH = pairs[i].yx * plotH * 0.9;
+
+        // x->y  solid accent bar (left)
+        var x1 = cx - barW - gap / 2;
+        ctx.fillStyle = accent;
+        ctx.fillRect(x1, base - xyH, barW, xyH);
+
+        // y->x  open bar (right)
+        var x2 = cx + gap / 2;
+        ctx.fillStyle = paper;
+        ctx.fillRect(x2, base - yxH, barW, yxH);
+        ctx.strokeStyle = grey; ctx.lineWidth = 1;
+        ctx.strokeRect(x2 + 0.5, base - yxH + 0.5, barW - 1, Math.max(yxH - 1, 0));
+
+        ctx.fillStyle = ink3;
+        ctx.fillText(pairs[i].label, cx, base + 17);
+      }
+    }
+    draw();
+    window.addEventListener("resize", draw);
+  })();
+</script>
+</body>
+</html>

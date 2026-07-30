@@ -1,30 +1,40 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "asymcat"
-version = "0.5.0"
-description = "A Python library for obtaining asymmetric measures of association between categorical variables in data exploration and description"
+dynamic = ["version"]
+description = "A Python library for asymmetric measures of association between categorical variables in data exploration and description."
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
+keywords = ["statistics", "categorical", "association", "asymmetry", "information-theory", "linguistics"]
 authors = [
-    {name = "Tiago Tresoldi"}
+    {name = "Tiago Tresoldi", email = "tiago.tresoldi@lingfil.uu.se"},
+]
+maintainers = [
+    {name = "Tiago Tresoldi", email = "tiago.tresoldi@lingfil.uu.se"},
 ]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
+    "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Scientific/Engineering :: Mathematics",
-    "Topic :: Software Development :: Libraries",
+    "Topic :: Text Processing :: Linguistic",
+    "Typing :: Typed",
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "freqprob>=0.4.0",
+    "freqprob>=0.6.2",
     "matplotlib",
     "numpy",
     "pandas",
@@ -34,211 +44,156 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Runtime optional features
+# Interactive/optional visualization backends
 viz = [
-    "plotly >= 5.15.0",
-    "bokeh >= 3.2.0",
-    "altair >= 5.0.0",
+    "plotly>=5.15.0",
+    "bokeh>=3.2.0",
+    "altair>=5.0.0",
 ]
-
-# All development dependencies in one group
-dev = [
-    # Testing
-    "pytest >= 7.0.0",
-    "pytest-cov >= 4.0.0",
-    "pytest-xdist >= 3.0.0",
-    "pytest-mock >= 3.10.0",
-    "pytest-benchmark >= 4.0.0",
-
-    # Code quality (using ruff instead of black/isort/flake8)
-    "ruff >= 0.1.0",
-
-    # Type checking
-    "mypy >= 1.5.0",
-    "types-tabulate >= 0.9.0",
-    "types-setuptools >= 68.0.0",
-
-    # Security
-    "bandit[toml] >= 1.7.0",
-    "safety >= 2.3.0",
-
-    # Build and release
-    "build >= 0.10.0",
-    "twine >= 4.0.0",
-
-    # Documentation
-    "sphinx >= 7.0.0",
-    "sphinx-rtd-theme >= 1.3.0",
-    "myst-parser >= 2.0.0",
-    "sphinx-autodoc-typehints >= 1.24.0",
-    "sphinx-copybutton >= 0.5.0",
-    "sphinx-design >= 0.5.0",
-    "nhandu >= 0.1.0",
-
-    # Jupyter notebooks
-    "jupyter >= 1.0.0",
-    "jupyterlab >= 4.0.0",
-    "ipywidgets >= 8.0.0",
-    "notebook >= 7.0.0",
-    "nbconvert >= 7.0.0",
-
-    # Performance profiling
-    "memory-profiler >= 0.61.0",
-    "line-profiler >= 4.0.0",
-
-    # Machine learning (for tutorials)
-    "scikit-learn >= 1.0.0",
-]
-
-# All features combined
-all = [
-    "asymcat[viz,dev]",
-]
-
-[project.urls]
-Homepage = "http://github.com/tresoldi/asymcat"
-Repository = "http://github.com/tresoldi/asymcat"
-
-[tool.hatch.build.targets.wheel]
-packages = ["asymcat"]
-
-[tool.hatch.build.targets.sdist]
-include = [
-    "asymcat/",
-    "docs/",
-    "resources/",
-    "scripts/",
-    "tests/",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md",
-    "pyproject.toml",
-    "requirements.txt",
-    "Makefile",
-]
-
-[tool.hatch.build.targets.wheel.shared-data]
-"docs" = "docs"
-"resources" = "resources"
-"scripts" = "scripts"
-
-[tool.hatch.version]
-path = "asymcat/__init__.py"
-
-[tool.hatch.envs.default]
-dependencies = [
+# Testing dependencies (lightweight; used by the CI test matrix)
+test = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "pytest-xdist>=3.0.0",
     "pytest-mock>=3.10.0",
-    "ruff>=0.1.0",
-    "mypy>=1.5.0",
+    "pytest-benchmark>=4.0.0",
+    "scikit-learn>=1.0.0",
+]
+# Documentation site (MkDocs + mkdocstrings)
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.24",
+]
+# Development dependencies (everything the Makefile and tests/ need)
+dev = [
+    # Testing
+    "asymcat[test]",
+
+    # Code quality. ruff/mypy pinned exactly so local, CI, and pre-commit run
+    # identical linter versions (unpinned ruff/mypy drift silently changes
+    # check results).
+    "ruff==0.16.0",
+    "mypy==1.19.1",
+    "types-tabulate>=0.9.0",
+    "types-setuptools>=68.0.0",
     "bandit[toml]>=1.7.0",
-    "safety>=2.3.0",
+
+    # Build and release
+    "build>=0.10.0",
+    "twine>=4.0.0",
+]
+# All optional dependencies (runtime + development)
+all = [
+    "asymcat[viz,dev,docs]",
 ]
 
-[tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
-test-cov = "pytest --cov=asymcat --cov-branch --cov-report=html --cov-report=term {args:tests}"
-format = "ruff format {args:.}"
-format-check = "ruff format --check {args:.}"
-lint = "ruff check {args:asymcat tests}"
-typecheck = "mypy {args:asymcat}"
-security = ["bandit -r asymcat/", "safety check"]
-ruff-check = ["ruff check {args:asymcat tests}", "ruff format --check {args:.}"]
-all-checks = ["ruff-check", "typecheck", "security", "test-cov"]
+[project.urls]
+Homepage = "https://github.com/tresoldi/asymcat"
+Documentation = "https://asymcat.tresoldi.org/"
+Repository = "https://github.com/tresoldi/asymcat.git"
+Issues = "https://github.com/tresoldi/asymcat/issues"
+Changelog = "https://github.com/tresoldi/asymcat/blob/master/CHANGELOG.md"
 
-[tool.hatch.envs.docs]
-dependencies = [
-    "sphinx>=7.0.0",
-    "sphinx-rtd-theme>=1.3.0",
-    "myst-parser>=2.0.0",
-    "sphinx-autodoc-typehints>=1.24.0",
-    "sphinx-copybutton>=0.5.0",
-    "sphinx-design>=0.5.0",
-]
+[tool.setuptools.dynamic]
+version = {attr = "asymcat.__version__"}
 
-[tool.hatch.envs.docs.scripts]
-build = "sphinx-build -b html docs/source docs/build"
-clean = "rm -rf docs/build"
-serve = "python -m http.server 8000 -d docs/build"
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["asymcat*"]
 
-[tool.hatch.envs.notebooks]
-dependencies = [
-    "jupyter>=1.0.0",
-    "jupyterlab>=4.0.0",
-    "ipywidgets>=8.0.0",
-    "notebook>=7.0.0",
-    "nbconvert>=7.0.0",
-]
+[tool.setuptools.package-data]
+asymcat = ["py.typed"]
 
-[tool.hatch.envs.notebooks.scripts]
-execute-all = """
-for notebook in docs/*.ipynb; do
-    echo "Executing: $notebook"
-    jupyter nbconvert --to notebook --execute --inplace "$notebook"
-done
-"""
-check-outputs = """
-for notebook in docs/*.ipynb; do
-    size=$(stat --format="%s" "$notebook" 2>/dev/null || stat -f%z "$notebook")
-    if [ "$size" -lt 30000 ]; then
-        echo "❌ $notebook: $size bytes (missing outputs)"
-        exit 1
-    else
-        echo "✅ $notebook: $size bytes (has outputs)"
-    fi
-done
-"""
 
+# Ruff linting (replaces flake8, pycodestyle, pyflakes, black, isort)
 [tool.ruff]
 line-length = 120
 target-version = "py310"
+extend-exclude = [
+    "__pycache__",
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+]
 
 [tool.ruff.lint]
-# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
-# Plus: isort (I), pyupgrade (UP), and other useful rules
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings  
-    "F",  # pyflakes
-    "I",  # isort
-    "UP", # pyupgrade
-    "B",  # flake8-bugbear
-    "C4", # flake8-comprehensions
-    "PIE", # flake8-pie
-    "SIM", # flake8-simplify
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "UP",    # pyupgrade
+    "SIM",   # flake8-simplify
+    "PIE",   # flake8-pie
 ]
 ignore = [
-    "E203", # whitespace before ':'
-    "B904", # Exception chaining (stylistic - raise from err)
-    "SIM102", # Nested if statements (stylistic preference)
+    "E203",   # whitespace before ':'
+    "E501",   # line too long (ruff format handles this)
+    "B904",   # exception chaining (stylistic - raise from err)
+    "SIM102", # nested if statements (stylistic preference)
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "ARG001",  # unused function arguments in tests
+    "ARG002",  # unused method arguments in tests
+    "S101",    # use of assert detected (pytest uses assert)
+]
+"docs/tutorial_*.py" = [
+    "E402",    # module level import not at top (pedagogical placement)
+    "T201",    # allow print statements in tutorials
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["asymcat"]
 
 [tool.ruff.format]
-# Like Black, use double quotes for strings.
 quote-style = "double"
-# Like Black, indent with spaces, rather than tabs.
 indent-style = "space"
-# Like Black, respect magic trailing commas.
 skip-magic-trailing-comma = false
-# Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
 
-[tool.bandit]
-exclude_dirs = ["tests", "test"]
-skips = ["B101"]  # Skip assert_used test since assertions are acceptable in tests
+# MyPy type checking
+[tool.mypy]
+python_version = "3.12"
+files = ["src/asymcat", "tests"]
+warn_return_any = true
+warn_unused_configs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+show_error_codes = true
 
-[tool.coverage.report]
-exclude_lines = [
-    "if __name__ == '__main__':",
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if TYPE_CHECKING:",
+[[tool.mypy.overrides]]
+module = [
+    "numpy.*",
+    "scipy.*",
+    "pandas.*",
+    "matplotlib.*",
+    "seaborn.*",
+    "freqprob.*",
+    "pytest.*",
+    "sklearn.*",
 ]
+ignore_missing_imports = true
 
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disable_error_code = ["misc", "no-untyped-def", "method-assign"]
+
+# Bandit security configuration
+[tool.bandit]
+exclude_dirs = ["tests", "docs"]
+skips = ["B101"]  # Skip assert_used (assertions are acceptable outside tests)
+
+# Pytest configuration
 [tool.pytest.ini_options]
 minversion = "7.0"
 testpaths = ["tests"]
@@ -247,7 +202,6 @@ python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--verbose",
     "--cov=asymcat",
     "--cov-report=term-missing",
     "--cov-report=html",
@@ -266,3 +220,28 @@ filterwarnings = [
     "ignore::FutureWarning:pandas.*",
     "ignore::DeprecationWarning",
 ]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["asymcat"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+show_missing = true
+precision = 2
+
+[tool.coverage.xml]
+output = "coverage.xml"

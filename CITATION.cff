@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+title: "ASymCat: Asymmetric measures of association between categorical variables"
+abstract: >-
+  ASymCat is a Python library for obtaining symmetric and asymmetric measures of
+  association between categorical variables in data exploration and description.
+  It provides directional (X->Y and Y->X) probabilistic, information-theoretic,
+  and statistical measures behind a single consistent interface, with robust
+  smoothing, significance testing, and confidence intervals.
+type: software
+authors:
+  - family-names: Tresoldi
+    given-names: Tiago
+    email: tiago.tresoldi@lingfil.uu.se
+    affiliation: Uppsala University
+version: 0.5.0
+license: MIT
+repository-code: "https://github.com/tresoldi/asymcat"
+url: "https://asymcat.tresoldi.org/"
+keywords:
+  - statistics
+  - categorical
+  - association
+  - asymmetry
+  - information-theory
+  - linguistics

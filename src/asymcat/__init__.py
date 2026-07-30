@@ -23,8 +23,10 @@ from asymcat.common import (
     read_pa_matrix,
     read_sequences,
 )
+from asymcat.scorer import CatScorer
 
 __all__ = [
+    "CatScorer",
     "correlation",
     "scorer",
     "collect_alphabets",
