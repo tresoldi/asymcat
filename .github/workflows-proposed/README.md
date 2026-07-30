@@ -21,15 +21,14 @@ git commit -am "Align CI workflows with the freqprob structure"
   Actions).
 - **quality.yml** *(replaces the existing one)* — splits into a `quality` job
   (ruff format check, ruff lint, mypy, bandit on `src/`) and a `test` job with an
-  OS matrix (Ubuntu/macOS/Windows × Python 3.10–3.12) uploading coverage to
-  Codecov. Fixes the stale `mypy asymcat/ tests/` path from before the `src/`
+  OS matrix (Ubuntu/macOS/Windows × Python 3.10–3.12) enforcing the coverage
+  gate. Fixes the stale `mypy asymcat/ tests/` path from before the `src/`
   migration.
 - **release.yml** *(replaces the existing one)* — minimal `build → publish`
   pipeline using PyPI trusted publishing (OIDC), triggered on `v*` tags.
 
 ## Repository settings these assume
 
-- **Codecov:** set the `CODECOV_TOKEN` repository secret (quality.yml).
 - **PyPI trusted publishing:** register this repo/workflow as a trusted
   publisher on PyPI, and add a `pypi` environment (release.yml). No API token
   needed.

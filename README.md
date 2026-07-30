@@ -1,7 +1,6 @@
 # ASymCat
 
 [![CI](https://github.com/tresoldi/asymcat/actions/workflows/quality.yml/badge.svg)](https://github.com/tresoldi/asymcat/actions/workflows/quality.yml)
-[![codecov](https://codecov.io/gh/tresoldi/asymcat/branch/master/graph/badge.svg)](https://codecov.io/gh/tresoldi/asymcat)
 [![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://asymcat.tresoldi.org/)
 [![PyPI version](https://badge.fury.io/py/asymcat.svg)](https://badge.fury.io/py/asymcat)
 [![Python versions](https://img.shields.io/pypi/pyversions/asymcat.svg)](https://pypi.org/project/asymcat/)

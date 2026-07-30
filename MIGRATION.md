@@ -81,6 +81,6 @@ no longer needs hand-maintained `.rst` files.
 
 ### New project files
 
-`ARCHITECTURE.md`, `SECURITY.md`, `CITATION.cff`, `codecov.yml`,
+`ARCHITECTURE.md`, `SECURITY.md`, `CITATION.cff`,
 `.pre-commit-config.yaml`, and `.github/dependabot.yml` were added to match the
 freqprob project structure.
