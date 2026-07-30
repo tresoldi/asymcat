@@ -150,6 +150,7 @@ The CLI has been removed. Use the library API directly:
 ```python
 # Instead of: asymcat input.tsv --scorers mle pmi
 import asymcat
+
 data = asymcat.read_sequences("input.tsv")
 cooccs = asymcat.collect_cooccs(data)
 scorer = asymcat.scorer.CatScorer(cooccs)

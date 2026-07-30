@@ -14,9 +14,6 @@ directional (``x`` given ``y``) and are therefore, in general, asymmetric.
 # Import Python standard libraries
 from collections import Counter
 
-# Import 3rd party libraries
-import numpy as np
-
 # Import local modules
 from . import common, scorer
 
@@ -46,14 +43,14 @@ def cramers_v(series_x, series_y):
     # Build a contingency table
     # TODO: use another library? pandas?
     alphabet_x, alphabet_y = common.collect_alphabets(cooccs)
-    ct = []
+    ct: list[list[float]] = []
     for x_val in alphabet_x:
         counter = Counter([y for x, y in cooccs if x == x_val])
-        obs = [counter.get(y, 0) for y in alphabet_y]
+        obs = [float(counter.get(y, 0)) for y in alphabet_y]
         ct.append(obs)
 
-    # Compute Cramers'V and return
-    return scorer.compute_cramers_v(np.array(ct))
+    # Compute Cramér's V and return
+    return scorer.compute_cramers_v(ct)
 
 
 def conditional_entropy(series_x, series_y):

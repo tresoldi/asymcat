@@ -94,7 +94,7 @@ def compute_cramers_v(cont_table: list[list[float]]) -> float:
     kcorr = cols - ((cols - 1) ** 2) / (population - 1)
 
     # Compute Cramér's from the correlations
-    return np.sqrt(phi2corr / min((kcorr - 1), (rcorr - 1)))
+    return float(np.sqrt(phi2corr / min((kcorr - 1), (rcorr - 1))))
 
 
 def compute_pmi(p_x: float, p_y: float, p_xy: float, normalized: bool, limit: float = 1e-6) -> float:
@@ -706,7 +706,8 @@ class CatScorer:
 
             setattr(self, cache_attr, scorer)
 
-        return getattr(self, cache_attr)
+        result: dict[tuple[Any, Any], tuple[float, float]] = getattr(self, cache_attr)
+        return result
 
     def _compute_probabilities(self, pair: tuple[Any, Any]) -> tuple[float, float, float]:
         """

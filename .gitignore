@@ -61,6 +61,7 @@ venv.bak/
 # Documentation
 docs/_build/
 docs/*.out.*
+site/
 
 # Benchmark results
 benchmark_results*/
@@ -72,3 +73,6 @@ Thumbs.db
 # Project-specific
 pre-migration-*.txt
 coverage.lcov
+
+# Benchmark artifacts
+.benchmarks/

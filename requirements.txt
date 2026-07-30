@@ -1,4 +1,4 @@
-freqprob>=0.4.0
+freqprob>=0.6.2
 matplotlib
 numpy
 pandas
