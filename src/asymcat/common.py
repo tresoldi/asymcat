@@ -357,7 +357,8 @@ def build_ct(observ, square: bool = True) -> list:
             ]
         )
 
-    return cont_table.tolist()
+    table: list[Any] = cont_table.tolist()
+    return table
 
 
 def read_sequences(

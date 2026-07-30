@@ -119,6 +119,7 @@ extend-exclude = [
     "venv",
     "build",
     "dist",
+    "docs/archive",
 ]
 
 [tool.ruff.lint]
@@ -186,7 +187,10 @@ ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
 module = ["tests.*"]
-disable_error_code = ["misc", "no-untyped-def", "method-assign"]
+# Tests pass concrete literals (e.g. list[list[str]]) into functions annotated
+# with broader unions; invariance makes mypy flag these, so relax the check
+# noise in tests without loosening the type checking of the package itself.
+disable_error_code = ["misc", "no-untyped-def", "method-assign", "arg-type", "list-item", "operator"]
 
 # Bandit security configuration
 [tool.bandit]
