@@ -57,7 +57,7 @@ test = [
     "pytest-xdist>=3.0.0",
     "pytest-mock>=3.10.0",
     "pytest-benchmark>=4.0.0",
-    "scikit-learn>=1.0.0",
+    "scikit-learn>=1.7.2",
 ]
 # Documentation site (MkDocs + mkdocstrings)
 docs = [
