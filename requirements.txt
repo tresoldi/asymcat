@@ -1,7 +1,0 @@
-freqprob>=0.6.2
-matplotlib
-numpy
-pandas
-scipy
-seaborn
-tabulate
