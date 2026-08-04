@@ -46,7 +46,7 @@ dependencies = [
 [project.optional-dependencies]
 # Interactive/optional visualization backends
 viz = [
-    "plotly>=5.15.0",
+    "plotly>=6.9.0",
     "bokeh>=3.9.2",
     "altair>=5.0.0",
 ]
