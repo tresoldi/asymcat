@@ -6,15 +6,16 @@ abstract: >-
   association between categorical variables in data exploration and description.
   It provides directional (X->Y and Y->X) probabilistic, information-theoretic,
   and statistical measures behind a single consistent interface, with robust
-  smoothing, significance testing, and confidence intervals.
+  smoothing, bias-corrected entropy estimation, significance testing, and
+  confidence intervals.
 type: software
 authors:
   - family-names: Tresoldi
     given-names: Tiago
     email: tiago.tresoldi@lingfil.uu.se
     affiliation: Uppsala University
-version: 0.6.0
-date-released: 2026-07-30
+version: 0.7.0
+date-released: 2026-11-02
 license: MIT
 repository-code: "https://github.com/tresoldi/asymcat"
 url: "https://asymcat.tresoldi.org/"
