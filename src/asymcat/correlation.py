@@ -53,7 +53,7 @@ def cramers_v(series_x, series_y):
     return scorer.compute_cramers_v(ct)
 
 
-def conditional_entropy(series_x, series_y):
+def conditional_entropy(series_x, series_y, estimator="plugin"):
     """
     Compute the conditional entropy of ``series_x`` given ``series_y``.
 
@@ -65,16 +65,19 @@ def conditional_entropy(series_x, series_y):
         The series whose entropy (conditioned on ``series_y``) is computed.
     series_y : list
         The conditioning series, aligned with ``series_x``.
+    estimator : str, optional
+        Entropy estimator: ``"plugin"`` (default), ``"chao_shen"`` or
+        ``"nsb"``; see :func:`asymcat.scorer.conditional_entropy`.
 
     Returns
     -------
     float
         The conditional entropy ``H(x|y)``.
     """
-    return scorer.conditional_entropy(series_x, series_y)
+    return scorer.conditional_entropy(series_x, series_y, estimator)
 
 
-def theil_u(series_x, series_y):
+def theil_u(series_x, series_y, estimator="plugin"):
     """
     Compute Theil's U (uncertainty coefficient) of ``series_x`` given ``series_y``.
 
@@ -89,10 +92,15 @@ def theil_u(series_x, series_y):
         The series whose uncertainty is being reduced.
     series_y : list
         The conditioning series, aligned with ``series_x``.
+    estimator : str, optional
+        Entropy estimator: ``"plugin"`` (default), ``"chao_shen"`` or
+        ``"nsb"``; see :func:`asymcat.scorer.compute_theil_u`. Bias-corrected
+        estimates are not confined to ``[0, 1]``.
 
     Returns
     -------
     float
-        Theil's U for ``series_x`` given ``series_y``, in ``[0, 1]``.
+        Theil's U for ``series_x`` given ``series_y``, in ``[0, 1]`` for the
+        plug-in estimator.
     """
-    return scorer.compute_theil_u(series_x, series_y)
+    return scorer.compute_theil_u(series_x, series_y, estimator)

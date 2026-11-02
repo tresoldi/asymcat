@@ -12,25 +12,83 @@ Defines the various scorers for categorical co-occurrence analysis.
 # TODO: include a logarithmic scaler (instead of percentile one)
 # TODO: allow to combine scalers? log within range?
 
+import functools
 import math
 import warnings
 
 # Import Python standard libraries
 from collections import Counter
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Mapping
 from itertools import chain, product
 from typing import Any, NamedTuple
 
 # Import 3rd party libraries
 import numpy as np
 import scipy.stats as ss  # type: ignore
-from freqprob import MLE, Laplace, Lidstone
+from freqprob import MLE, Laplace, Lidstone, chao_shen_entropy, nsb_entropy
 
 # import local modules
 from . import common
 
+# Entropy estimators accepted by the information-theoretic measures: "plugin"
+# is the maximum-likelihood estimate; "chao_shen" and "nsb" are freqprob's
+# bias-corrected estimators for undersampled data.
+_ENTROPY_ESTIMATORS = ("plugin", "chao_shen", "nsb")
 
-def conditional_entropy(x_symbols: list[Any], y_symbols: list[Any]) -> float:
+
+def _check_entropy_estimator(estimator: str) -> str:
+    """Return the normalized estimator name, raising ``ValueError`` if unknown."""
+    name = estimator.lower()
+    if name not in _ENTROPY_ESTIMATORS:
+        raise ValueError(f"Unsupported entropy estimator: {estimator!r}. Use 'plugin', 'chao_shen', or 'nsb'.")
+    return name
+
+
+@functools.lru_cache(maxsize=65536)
+def _profile_entropy(profile: tuple[int, ...], estimator: str, bins: int | None) -> float:
+    """
+    Entropy, in nats, of a sorted tuple of positive counts.
+
+    All three estimators are invariant to relabeling the types, so a
+    distribution's entropy depends only on its multiset of counts. Keying the
+    cache on that profile lets the many subsets that share one (common in
+    sparse data, and across resampling replicates) reuse a single evaluation,
+    which matters for the comparatively expensive NSB estimator.
+    """
+    if estimator == "chao_shen":
+        return float(chao_shen_entropy(dict(enumerate(profile))))
+    if estimator == "nsb":
+        return float(nsb_entropy(dict(enumerate(profile)), bins=bins))
+
+    total = sum(profile)
+    return -sum((count / total) * math.log(count / total) for count in profile) if total else 0.0
+
+
+def _entropy(counts: Mapping[Any, int], estimator: str = "plugin", bins: int | None = None) -> float:
+    """
+    Estimate the Shannon entropy, in nats, of a frequency distribution.
+
+    Parameters
+    ----------
+    counts : Mapping[Any, int]
+        Observed count of each type; non-positive counts are ignored.
+    estimator : str, optional
+        ``"plugin"`` (default), ``"chao_shen"`` or ``"nsb"``.
+    bins : int, optional
+        For ``"nsb"`` only: the number of possible types, which reserves
+        entropy for types that could occur but were not observed. Defaults to
+        the number of observed types.
+
+    Returns
+    -------
+    float
+        The estimated entropy in nats.
+    """
+    profile = tuple(sorted(count for count in counts.values() if count > 0))
+    return _profile_entropy(profile, _check_entropy_estimator(estimator), bins)
+
+
+def conditional_entropy(x_symbols: list[Any], y_symbols: list[Any], estimator: str = "plugin") -> float:
     """
     Computes the entropy of `x` given `y`.
 
@@ -40,18 +98,28 @@ def conditional_entropy(x_symbols: list[Any], y_symbols: list[Any]) -> float:
         A list of all observed `x` symbols.
     y_symbols : List[Any]
         A list of all observed `y` symbols.
+    estimator : str, optional
+        Entropy estimator: ``"plugin"`` (default, the maximum-likelihood
+        estimate), ``"chao_shen"`` or ``"nsb"``. The bias-corrected estimators
+        compute ``H(X | Y) = H(X, Y) - H(Y)`` from separately corrected
+        entropies, taking the observed symbols as the alphabet.
 
     Returns
     -------
     float
         The conditional entropy of `x` given `y`.
     """
+    estimator = _check_entropy_estimator(estimator)
 
     # Cache counters; while the xy_counter is already computed in other
     # parts, particularly in the scorers, it is worth repeating the code
     # here to have a more general function.
     y_counter = Counter(y_symbols)
     xy_counter = Counter(list(zip(x_symbols, y_symbols, strict=False)))
+
+    if estimator != "plugin":
+        return _entropy(xy_counter, estimator) - _entropy(y_counter, estimator)
+
     population = sum(y_counter.values())
 
     # Compute the entropy and return
@@ -134,7 +202,7 @@ def compute_pmi(p_x: float, p_y: float, p_xy: float, normalized: bool, limit: fl
     return pmi
 
 
-def compute_theil_u(x_symbols: list[Any], y_symbols: list[Any]) -> float:
+def compute_theil_u(x_symbols: list[Any], y_symbols: list[Any], estimator: str = "plugin") -> float:
     """
     Compute the uncertainty coefficient Theil's U.
 
@@ -144,21 +212,35 @@ def compute_theil_u(x_symbols: list[Any], y_symbols: list[Any]) -> float:
         The list of observed symbols in series `x`.
     y_symbols : List[Any]
         The list of observed symbols in series `y`.
+    estimator : str, optional
+        Entropy estimator: ``"plugin"`` (default), ``"chao_shen"`` or
+        ``"nsb"`` (see :func:`conditional_entropy`). Bias-corrected estimates
+        are not confined to ``[0, 1]``: on small samples a slightly negative
+        value means no detectable association.
 
     Returns
     -------
     float
         The uncertainty coefficient given `x` and `y`.
     """
+    estimator = _check_entropy_estimator(estimator)
 
     # Compute the conditional entropy of `x` given `y`
-    h_xy = conditional_entropy(x_symbols, y_symbols)
+    h_xy = conditional_entropy(x_symbols, y_symbols, estimator)
 
-    # Cache a counter for the symbols of the `x` series and its length
+    # Cache a counter for the symbols of the `x` series
     x_counter = Counter(x_symbols)
-    population = len(x_symbols)
+
+    if estimator != "plugin":
+        # A single observed `x` symbol leaves no uncertainty to reduce, so the
+        # coefficient keeps the plug-in convention of 1.0.
+        if len(x_counter) <= 1:
+            return 1.0
+        h_x = _entropy(x_counter, estimator)
+        return (h_x - h_xy) / h_x
 
     # Compute the probability for each symbol and, from there, the entropy
+    population = len(x_symbols)
     p_x = [n / population for n in x_counter.values()]
     h_x = ss.entropy(p_x)
 
@@ -170,7 +252,7 @@ def compute_theil_u(x_symbols: list[Any], y_symbols: list[Any]) -> float:
     return theil_u
 
 
-def compute_mutual_information(x_symbols: list[Any], y_symbols: list[Any]) -> float:
+def compute_mutual_information(x_symbols: list[Any], y_symbols: list[Any], estimator: str = "plugin") -> float:
     """
     Compute the mutual information between X and Y.
 
@@ -182,12 +264,19 @@ def compute_mutual_information(x_symbols: list[Any], y_symbols: list[Any]) -> fl
         A list of all observed `x` symbols.
     y_symbols : List[Any]
         A list of all observed `y` symbols.
+    estimator : str, optional
+        Entropy estimator: ``"plugin"`` (default), ``"chao_shen"`` or
+        ``"nsb"``. The bias-corrected estimators compute
+        ``MI = H(X) + H(Y) - H(X, Y)`` from separately corrected entropies,
+        which can be slightly negative on small samples.
 
     Returns
     -------
     float
         The mutual information between X and Y.
     """
+    estimator = _check_entropy_estimator(estimator)
+
     if len(x_symbols) != len(y_symbols):
         raise ValueError("x_symbols and y_symbols must have the same length")
 
@@ -198,6 +287,9 @@ def compute_mutual_information(x_symbols: list[Any], y_symbols: list[Any]) -> fl
     xy_counter = Counter(list(zip(x_symbols, y_symbols, strict=False)))
     x_counter = Counter(x_symbols)
     y_counter = Counter(y_symbols)
+
+    if estimator != "plugin":
+        return _entropy(x_counter, estimator) + _entropy(y_counter, estimator) - _entropy(xy_counter, estimator)
 
     population = len(x_symbols)
     mi = 0.0
@@ -215,7 +307,9 @@ def compute_mutual_information(x_symbols: list[Any], y_symbols: list[Any]) -> fl
     return mi
 
 
-def compute_normalized_mutual_information(x_symbols: list[Any], y_symbols: list[Any]) -> float:
+def compute_normalized_mutual_information(
+    x_symbols: list[Any], y_symbols: list[Any], estimator: str = "plugin"
+) -> float:
     """
     Compute the normalized mutual information between X and Y.
 
@@ -228,12 +322,19 @@ def compute_normalized_mutual_information(x_symbols: list[Any], y_symbols: list[
         A list of all observed `x` symbols.
     y_symbols : List[Any]
         A list of all observed `y` symbols.
+    estimator : str, optional
+        Entropy estimator: ``"plugin"`` (default), ``"chao_shen"`` or
+        ``"nsb"`` (see :func:`compute_mutual_information`). Bias-corrected
+        estimates are not confined to ``[0, 1]``.
 
     Returns
     -------
     float
-        The normalized mutual information between X and Y, in range [0, 1].
+        The normalized mutual information between X and Y, in range [0, 1]
+        for the plug-in estimator.
     """
+    estimator = _check_entropy_estimator(estimator)
+
     if len(x_symbols) != len(y_symbols):
         raise ValueError("x_symbols and y_symbols must have the same length")
 
@@ -241,10 +342,15 @@ def compute_normalized_mutual_information(x_symbols: list[Any], y_symbols: list[
         return 0.0
 
     # Compute mutual information
-    mi = compute_mutual_information(x_symbols, y_symbols)
+    mi = compute_mutual_information(x_symbols, y_symbols, estimator)
 
     # Compute joint entropy H(X,Y)
     xy_counter = Counter(list(zip(x_symbols, y_symbols, strict=False)))
+
+    if estimator != "plugin":
+        # A single joint cell has no information to share, as in the plug-in case.
+        return 0.0 if len(xy_counter) <= 1 else mi / _entropy(xy_counter, estimator)
+
     population = len(x_symbols)
 
     joint_entropy = 0.0
@@ -591,7 +697,13 @@ class CatScorer:
     Class for computing categorical co-occurrence scores.
     """
 
-    def __init__(self, cooccs: list[tuple[Any, Any]], smoothing_method: str = "mle", smoothing_alpha: float = 1.0):
+    def __init__(
+        self,
+        cooccs: list[tuple[Any, Any]],
+        smoothing_method: str = "mle",
+        smoothing_alpha: float = 1.0,
+        entropy_estimator: str = "plugin",
+    ):
         """
         Initialization function.
 
@@ -600,10 +712,17 @@ class CatScorer:
         cooccs : List[Tuple[Any, Any]]
             A list of co-occurrence tuples.
         smoothing_method : str, optional
-            Smoothing method for probability estimation. Options: 'mle', 'laplace', 'ele'.
-            Default is 'mle'.
+            Smoothing method for probability estimation. Options: 'mle', 'laplace',
+            'lidstone'. Default is 'mle'.
         smoothing_alpha : float, optional
-            Smoothing parameter (alpha for Laplace/ELE). Default is 1.0.
+            Additive constant for 'lidstone' smoothing (its ``gamma``); 'laplace'
+            always adds 1 and 'mle' adds nothing. Default is 1.0.
+        entropy_estimator : str, optional
+            Estimator for the entropies behind :meth:`theil_u`,
+            :meth:`cond_entropy`, :meth:`mutual_information` and
+            :meth:`normalized_mutual_information`. Options: 'plugin' (the
+            maximum-likelihood estimate), 'chao_shen' and 'nsb' (bias-corrected
+            estimators for undersampled data, from freqprob). Default is 'plugin'.
         """
 
         # Store cooccs, observations, symbols and alphabets
@@ -631,8 +750,14 @@ class CatScorer:
         else:
             raise ValueError(f"Unsupported smoothing method: {smoothing_method}. Use 'mle', 'laplace', or 'lidstone'.")
 
+        # Entropy estimator for the information-theoretic scorers
+        self.entropy_estimator = _check_entropy_estimator(entropy_estimator)
+
         # Cache for freqprob scorers per context
         self._freqprob_cache: dict[str, Any] = {}
+
+        # Per-pair subset entropies from a bias-corrected estimator, computed lazily
+        self._estimated_entropies: _SubsetEntropies | None = None
 
         # Initialize the square and non-square contingency table as None
         self._square_ct: dict[tuple[Any, Any], list[list[float]]] | None = None
@@ -1107,7 +1232,13 @@ class CatScorer:
         This reduces the cost from ``O(|X| * |Y| * n)`` (re-scanning the ``n``
         co-occurrences for every pair) to ``O(|X| * |Y|)``, while reproducing
         the original per-pair results to floating-point precision.
+
+        This closed form holds for the plug-in estimator only; other
+        ``entropy_estimator`` values are handled by
+        :meth:`_estimated_subset_entropy_components`.
         """
+        if self.entropy_estimator != "plugin":
+            return self._estimated_subset_entropy_components()
 
         # Joint-count matrix J[i, j] and its row (R) and column (C) marginals.
         joint, row_sum, col_sum = self._joint_counts()
@@ -1162,6 +1293,69 @@ class CatScorer:
             h_y_zero=h_y_zero,
         )
 
+    def _estimated_subset_entropy_components(self) -> _SubsetEntropies:
+        """
+        Per-pair subset entropies from a bias-corrected estimator.
+
+        The counterpart of :meth:`_subset_entropy_components` for the
+        ``"chao_shen"`` and ``"nsb"`` estimators, which have no closed form over
+        the joint-count matrix. Each pair's subset (row ``x`` plus column ``y``
+        of ``J``) is materialized as three frequency distributions -- its
+        x-marginal, its y-marginal and its joint cells -- whose entropies are
+        estimated separately; the conditional entropies then follow from the
+        chain rule, ``H(Y | X) = H(X, Y) - H(X)``.
+
+        For ``"nsb"`` the alphabet of each distribution is every symbol the
+        data could place in it: ``|X|`` and ``|Y|`` for the marginals, and the
+        ``|X| + |Y| - 1`` cells of the subset for the joint. This lets NSB
+        reserve entropy for symbols observed elsewhere in the data but not in
+        the subset, which is the information it exists to use.
+
+        The degeneracy masks are the same integer-count masks as the plug-in
+        path, so the measures keep their conventions for single-symbol subsets.
+        Results are cached, since every pair needs several entropy estimates.
+        """
+        if self._estimated_entropies is not None:
+            return self._estimated_entropies
+
+        joint, row_sum, col_sum = self._joint_counts()
+        counts = joint.astype(np.int64)
+        n_x, n_y = counts.shape
+        estimator = self.entropy_estimator
+        bins_x, bins_y, bins_xy = (n_x, n_y, n_x + n_y - 1) if estimator == "nsb" else (None, None, None)
+
+        h_x = np.empty((n_x, n_y))
+        h_y = np.empty((n_x, n_y))
+        h_xy = np.empty((n_x, n_y))
+        for i in range(n_x):
+            row = counts[i]
+            for j in range(n_y):
+                col = counts[:, j]
+                # x-marginal: all of row i for x_i, plus column j for every other x.
+                x_marginal = {m: int(col[m]) for m in range(n_x) if m != i}
+                x_marginal[i] = int(row_sum[i])
+                # y-marginal: all of column j for y_j, plus row i for every other y.
+                y_marginal = {k: int(row[k]) for k in range(n_y) if k != j}
+                y_marginal[j] = int(col_sum[j])
+                # Joint cells: row i, plus column j without the shared cell.
+                cells = {("x", k): int(row[k]) for k in range(n_y)}
+                cells.update({("y", m): int(col[m]) for m in range(n_x) if m != i})
+
+                h_x[i, j] = _entropy(x_marginal, estimator, bins_x)
+                h_y[i, j] = _entropy(y_marginal, estimator, bins_y)
+                h_xy[i, j] = _entropy(cells, estimator, bins_xy)
+
+        self._estimated_entropies = _SubsetEntropies(
+            h_x=h_x,
+            h_y=h_y,
+            h_xy=h_xy,
+            h_x_given_y=h_xy - h_y,
+            h_y_given_x=h_xy - h_x,
+            h_x_zero=col_sum[None, :] == joint,
+            h_y_zero=row_sum[:, None] == joint,
+        )
+        return self._estimated_entropies
+
     def theil_u(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a Theil's U uncertainty scorer.
@@ -1173,6 +1367,10 @@ class CatScorer:
         computed with a vectorized formulation (see
         :meth:`_subset_entropy_components`) that evaluates all pairs at once
         rather than re-filtering the co-occurrence list for each pair.
+
+        Entropies follow the scorer's ``entropy_estimator``. Bias-corrected
+        estimates are not confined to ``[0, 1]``: a slightly negative value on
+        a small subset means no detectable association.
         """
 
         if not self._theil_u:
@@ -1202,8 +1400,9 @@ class CatScorer:
         directions over the subset of co-occurrences where ``pair[0] == x`` or
         ``pair[1] == y``, matching ``conditional_entropy(Y, X)`` and
         ``conditional_entropy(X, Y)`` on that subset. The entropies come from
-        the same vectorized computation as :meth:`theil_u` (see
-        :meth:`_subset_entropy_components`).
+        the same computation as :meth:`theil_u` (see
+        :meth:`_subset_entropy_components`) and follow the scorer's
+        ``entropy_estimator``.
         """
 
         if not self._cond_entropy:
@@ -1253,7 +1452,9 @@ class CatScorer:
         Return a Mutual Information scorer.
 
         Computes MI(X;Y) and MI(Y;X) for each symbol pair, measuring the
-        overall statistical dependence between the symbols.
+        overall statistical dependence between the symbols. Entropies follow
+        the scorer's ``entropy_estimator``; bias-corrected estimates can be
+        slightly negative on small subsets.
 
         Returns
         -------
@@ -1281,7 +1482,8 @@ class CatScorer:
         Return a Normalized Mutual Information scorer.
 
         Computes NMI(X;Y) and NMI(Y;X) for each symbol pair, measuring the
-        statistical dependence normalized by joint entropy (range [0,1]).
+        statistical dependence normalized by joint entropy (range [0,1] for the
+        plug-in estimator). Entropies follow the scorer's ``entropy_estimator``.
 
         Returns
         -------
@@ -1523,8 +1725,9 @@ class CatScorer:
         ``resampler(rng, x_values, y_values)`` returns the co-occurrence pairs for
         a single replicate -- e.g. a marginal-preserving shuffle (permutation
         test) or a with-replacement draw (bootstrap). Each replicate is scored
-        with the same smoothing configuration as this scorer, so the permutation
-        and bootstrap methods share this resampling loop.
+        with the same smoothing and entropy-estimator configuration as this
+        scorer, so the permutation and bootstrap methods share this resampling
+        loop.
         """
         x_values = [pair[0] for pair in self.cooccs]
         y_values = [pair[1] for pair in self.cooccs]
@@ -1532,7 +1735,12 @@ class CatScorer:
 
         for _ in range(n_resamples):
             resampled_cooccs = resampler(rng, x_values, y_values)
-            resampled_scorer = CatScorer(resampled_cooccs, self.smoothing_method, self.smoothing_alpha)
+            resampled_scorer = CatScorer(
+                resampled_cooccs,
+                self.smoothing_method,
+                self.smoothing_alpha,
+                entropy_estimator=self.entropy_estimator,
+            )
             yield getattr(resampled_scorer, measure)()
 
     def permutation_pvalue(
