@@ -51,11 +51,13 @@ analytics user never trips over linguistic terminology.
    and each measure caches its result. Significance methods
    (`*_pvalue`, `bootstrap_ci`, `permutation_pvalue`) are *layers over* the same
    contract, not a parallel hierarchy.
-3. **Robust probabilities via freqprob.** Smoothing (MLE, Laplace, Lidstone) is
-   delegated to [`freqprob`](https://github.com/tresoldi/freqprob) rather than
-   hand-rolled, so zero-count handling is principled and shared with the wider
-   ecosystem. ASymCat treats freqprob estimators as log-probability sources and
-   converts as needed.
+3. **Robust estimation via freqprob.** Smoothing (MLE, Laplace, Lidstone) and
+   bias-corrected entropy estimation (Chao-Shen, NSB) are delegated to
+   [`freqprob`](https://github.com/tresoldi/freqprob) rather than hand-rolled,
+   so small-sample handling is principled and shared with the wider ecosystem;
+   a defect found in an estimator is fixed there, not worked around here.
+   ASymCat treats freqprob's smoothers as log-probability sources and converts
+   as needed.
 4. **Significance is separable.** Point measures never change to accommodate
    significance. Parametric tests (χ², Fisher, log-likelihood ratio) and
    non-parametric resampling (permutation p-values, bootstrap confidence
@@ -98,7 +100,7 @@ that is the right granularity until the codebase grows a genuine sub-family.
   collectors (`collect_cooccs`, `collect_ngrams`, `collect_observations`,
   `collect_alphabets`) turn raw input into the list of category pairs the scorer
   consumes, plus `build_ct` for contingency tables. Depends only on the standard
-  library, `numpy`, and `pandas`.
+  library and `numpy`.
 - **`scorer.py` — scoring.** `CatScorer` is the heart of the library. It holds
   the co-occurrences and exposes the measures — probabilistic (`mle`, `pmi`,
   `pmi_smoothed`), information-theoretic (`cond_entropy`, `theil_u`,
@@ -107,13 +109,23 @@ that is the right granularity until the codebase grows a genuine sub-family.
   predictive (`goodman_kruskal_lambda`), and the composite `tresoldi` measure —
   alongside parametric p-values (`chi2_pvalue`, `fisher_pvalue`,
   `log_likelihood_ratio_pvalue`) and resampling significance
-  (`permutation_pvalue`, `bootstrap_ci`). Standalone `compute_*` helpers and
-  `scale_scorer` support reuse and post-processing. Depends on `common`,
-  `freqprob`, `numpy`, and `scipy`.
+  (`permutation_pvalue`, `bootstrap_ci`). The information-theoretic measures
+  take their entropies from a single estimator choice (`entropy_estimator`):
+  the default plug-in path is a vectorized closed form over the joint-count
+  matrix, while the bias-corrected estimators rebuild each pair's subset as
+  frequency distributions and delegate to freqprob. Standalone `compute_*`
+  helpers and `scale_scorer` support reuse and post-processing. Depends on
+  `common`, `freqprob`, `numpy`, and `scipy`.
 - **`correlation.py` — convenience.** Thin wrappers (`conditional_entropy`,
   `theil_u`, `cramers_v`) that take two parallel/aligned series and return a
-  single summary statistic by delegating to `scorer`. This is the "I just have
-  two columns" entry point.
+  single summary statistic by delegating to `scorer`, forwarding the entropy
+  estimator where it applies. This is the "I just have two columns" entry point.
+
+### Dependencies
+
+The runtime dependencies are exactly what the package imports: `freqprob`,
+`numpy`, and `scipy`. Plotting libraries used only by documentation examples
+live in the `viz` extra, so a plain install stays light.
 
 ### Dependency rule
 
@@ -220,3 +232,9 @@ clearly flagged in the `CHANGELOG`.
    the point measures without altering them (§2).
 5. **Docs tooling:** MkDocs-Material + mkdocstrings on GitHub Pages, replacing
    Sphinx (archived under `docs/archive/`) (§6).
+6. **Entropy estimation is a scorer-level choice** (`entropy_estimator`), with
+   the plug-in estimate as the default so existing results are unchanged.
+   Corrected Theil's U and mutual information are reported unclipped, since
+   clipping would reintroduce the bias the estimators remove (§2, §3).
+7. **Runtime dependencies match the imports** (`freqprob`, `numpy`, `scipy`);
+   documentation-only plotting libraries belong to the `viz` extra (§3).

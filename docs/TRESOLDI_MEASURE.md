@@ -749,15 +749,13 @@ This geometric mean interpretation explains why:
 
 ### ASymCat Documentation
 
-- **User Guide**: `docs/USER_GUIDE.md` - Comprehensive usage examples
-- **API Reference**: `docs/API_REFERENCE.md` - Technical API documentation
-- **Tutorial 2**: `docs/tutorial_2_advanced_measures.py` - Measure comparisons
-- **Tutorial 3**: `docs/tutorial_3_visualization.py` - Visualizing Tresoldi scores
+- **[User Guide](USER_GUIDE.md)**: comprehensive usage examples, including measure comparisons and visualization
+- **[API Reference](reference.md)**: generated documentation for every public class and function
 
 ### Implementation
 
-The Tresoldi measure implementation can be found in:
-- `asymcat/scorer.py`: Line 1014-1041 (`tresoldi()` method)
+The Tresoldi measure is implemented by `CatScorer.tresoldi()` in
+`src/asymcat/scorer.py`; see its entry in the [API Reference](reference.md).
 
 ## Summary
 
