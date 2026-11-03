@@ -60,6 +60,8 @@ docs = [
     "mkdocs-material>=9.5",
     "mkdocstrings[python]>=0.24",
     "mkdocs-redirects>=1.2",
+    # Publishes one copy of the site per version (see .github/workflows/docs.yml)
+    "mike>=2.1",
     # Draws the figures of the How-to guides when the site is built
     "matplotlib",
 ]

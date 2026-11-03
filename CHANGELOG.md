@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Zenodo DOIs: 10.5281/zenodo.23917212 for version 0.8.0, and 10.5281/zenodo.23917211 for all versions. They are in
   `CITATION.cff`, the README (with a DOI badge), the home page and the How to
   cite page.
+- **Versioned documentation.** The site is published with mike, one copy per
+  release (`/0.9/`, ...) plus `/latest/` and the development version `/dev/`,
+  with a version selector and a notice on versions other than the latest
+  release. Links without a version, such as those in earlier READMEs, redirect
+  to `/latest/`. The `docs` extra adds `mike`.
 
 ### Changed
 

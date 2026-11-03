@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Redirecting…</title>
+<script>
+  // The documentation is versioned (/latest/, /dev/, /0.9/, ...). Send links
+  // made before versioning, such as /measures/mle/, to the latest release.
+  (function () {
+    var path = window.location.pathname;
+    if (!/^\/(latest|dev|\d+\.\d+)(\/|$)/.test(path)) {
+      window.location.replace("/latest" + path + window.location.search + window.location.hash);
+    }
+  })();
+</script>
+</head>
+<body>
+<p>Page not found. <a href="/latest/">Go to the documentation.</a></p>
+</body>
+</html>
