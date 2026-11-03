@@ -1,5 +1,38 @@
 # Migration Guide
 
+## Migrating to the next release (unreleased)
+
+### `pmi_smoothed()` results change with smoothing
+
+`pmi_smoothed()` and `get_smoothed_probabilities()` now smooth the joint
+distribution of the pairs once, and take the marginals as its sums. Before, the
+marginals were smoothed separately, from counts multiplied by the size of the
+other alphabet, so they did not match the joint distribution, and an unobserved
+pair could score above independence.
+
+```python
+scorer = CatScorer(pairs, smoothing_method="laplace")
+scorer.pmi_smoothed()[("q", "s")]  # a pair never observed together
+# before: (0.128, 0.128)    above independence
+# now:    (-0.288, -0.288)  below independence
+```
+
+**What to do:** recompute any `pmi_smoothed` scores you reported with
+`smoothing_method="laplace"` or `"lidstone"`. With the default `"mle"`, results
+are unchanged except for the scores of unobserved pairs, which remain very large
+and negative.
+
+### `goodman_kruskal_lambda()` on degenerate subsets
+
+When the predicted variable takes a single value in a pair's subset, λ is now
+1, as Theil's U already was, instead of 0. Only those pairs change; for them,
+both measures now say that the direction is trivially predictable.
+
+### `square_ct=False` is deprecated
+
+The statistical measures warn when called with `square_ct=False`, which will be
+removed in a future version. Use the default 2×2 table.
+
 ## Migrating to 0.8.0
 
 ### `mle()` and `tresoldi()` now follow the documented direction

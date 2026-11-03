@@ -85,10 +85,10 @@ For `c` and /k/:
 [[6, 4], [5, 0]]
 ```
 
-These measures accept `square_ct=False`, which uses the 2×3 table that
-`build_ct(..., square=False)` returns instead: the same table with the row
-totals $c(x)$ and $n - c(x)$ added as a first column. The default 2×2 table is
-the standard choice.
+These measures also accept `square_ct=False`, which is deprecated: it uses the
+2×3 table that `build_ct(..., square=False)` returns, which adds the row totals
+$c(x)$ and $n - c(x)$ as a first column and is not a contingency table of the
+pair.
 
 ### The pair subset
 

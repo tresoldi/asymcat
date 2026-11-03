@@ -47,20 +47,19 @@ G²) are unsigned in the same way.
 
 ## Degenerate subsets fall back on conventions
 
-When one variable takes a single value in the pair subset, its entropy is
-zero, and the measures that divide by it use a convention. They do not all use
-the same one:
+When one variable takes a single value in the pair subset, there is nothing
+left to predict, and the measures fall back on a convention: Theil's U and λ
+score that direction as 1.
 
 ```pycon
 >>> [round(u, 3) for u in scorer.theil_u()[("q", "k")]]
 [1.0, 0.0]
 >>> scorer.goodman_kruskal_lambda()[("q", "k")]
-(0.0, 0.0)
+(1.0, 0.0)
 ```
 
-In the subset of `q` and /k/, the sound is always /k/: there is no uncertainty
-left to remove, which Theil's U scores as 1 and λ as 0. Neither number is
-evidence about `q` in particular. Pairs whose subset is small or degenerate are
+In the subset of `q` and /k/, the sound is always /k/, so knowing the letter
+predicts it trivially. The 1 is not evidence about `q` in particular. Pairs whose subset is small or degenerate are
 best judged with the conditional probability and its count.
 
 ## Unobserved pairs are scored too

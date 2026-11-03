@@ -414,7 +414,9 @@ def compute_goodman_kruskal_lambda(x_symbols: list[Any], y_symbols: list[Any], d
     Returns
     -------
     float
-        The Goodman-Kruskal Lambda coefficient, in range [0, 1].
+        The Goodman-Kruskal Lambda coefficient, in range [0, 1]. When the
+        predicted variable takes a single value there are no errors to reduce,
+        and the coefficient is 1.0 by convention, as for `compute_theil_u`.
     """
     if len(x_symbols) != len(y_symbols):
         raise ValueError("x_symbols and y_symbols must have the same length")
@@ -454,7 +456,9 @@ def compute_goodman_kruskal_lambda(x_symbols: list[Any], y_symbols: list[Any], d
     # Compute lambda
     denominator = total_n - max_marginal
     if denominator == 0:
-        return 0.0  # Perfect prediction already exists
+        # A single predicted value leaves no errors to reduce: prediction is
+        # trivially perfect, the same convention as Theil's U.
+        return 1.0
 
     lambda_val = (sum_max_conditional - max_marginal) / denominator
     return max(0.0, lambda_val)  # Ensure non-negative
@@ -815,6 +819,13 @@ class CatScorer:
             cache_attr = square_cache_attr
             ct_attr = "_square_ct"
         else:
+            warnings.warn(
+                "square_ct=False is deprecated and will be removed in a future version: the 2x3 table it "
+                "uses adds the row totals as a column, so it is not a contingency table of the pair and its "
+                "statistics have no standard interpretation. Use the default 2x2 table (square_ct=True).",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             cache_attr = nonsquare_cache_attr
             ct_attr = "_nonsquare_ct"
 
@@ -946,16 +957,22 @@ class CatScorer:
 
         return self._mle
 
-    def get_smoothed_probabilities(self) -> dict[str, dict[tuple[Any, Any], float]]:
+    def get_smoothed_probabilities(self) -> dict[str, dict[Any, float]]:
         """
         Return smoothed probability estimates using the configured freqprob method.
 
+        The joint distribution over all pairs of observed symbols is smoothed
+        with the scorer's ``smoothing_method``, and the marginal and conditional
+        distributions are derived from it, so that they are consistent with
+        each other.
+
         Returns
         -------
-        Dict[str, Dict[Tuple[Any, Any], float]]
-            Dictionary containing 'xy_given_y', 'yx_given_x', 'joint', 'marginal_x', 'marginal_y' probabilities.
+        Dict[str, Dict[Any, float]]
+            Dictionary containing 'xy_given_y', 'yx_given_x' and 'joint', keyed by
+            symbol pair, and 'marginal_x' and 'marginal_y', keyed by symbol.
         """
-        results: dict[str, dict[tuple[Any, Any], float]] = {
+        results: dict[str, dict[Any, float]] = {
             "xy_given_y": {},  # P(X|Y)
             "yx_given_x": {},  # P(Y|X)
             "joint": {},  # P(X,Y)
@@ -963,65 +980,50 @@ class CatScorer:
             "marginal_y": {},  # P(Y)
         }
 
-        # Create global frequency distributions
-
-        # Build frequency distributions - cast keys to work with freqprob API
+        # Smooth the joint distribution over every pair of observed symbols, and
+        # derive the marginals from it by summation, so that the three
+        # distributions are consistent: P(x) = sum_y P(x, y) and P(y) = sum_x P(x, y).
+        # Smoothing the marginals separately would give them different
+        # pseudo-counts, and an unobserved pair could then score above
+        # independence.
         from typing import cast
 
         joint_freqdist = cast(dict[Any, int], {pair: obs["11"] for pair, obs in self.obs.items()})
-        x_freqdist: dict[Any, int] = {}
-        y_freqdist: dict[Any, int] = {}
 
-        for pair in product(self.alphabet_x, self.alphabet_y):
-            obs = self.obs[pair]
-            if pair[0] not in x_freqdist:
-                x_freqdist[pair[0]] = 0
-            if pair[1] not in y_freqdist:
-                y_freqdist[pair[1]] = 0
-            x_freqdist[pair[0]] += obs["10"]
-            y_freqdist[pair[1]] += obs["01"]
-
-        # Create freqprob scorers
         if self._freqprob_scorer_class is None:
             raise ValueError("Freqprob scorer class not initialized")
 
         if self.smoothing_method == "mle" or self.smoothing_method == "laplace":
             joint_scorer = self._freqprob_scorer_class(joint_freqdist)  # type: ignore[call-arg]
-            x_scorer = self._freqprob_scorer_class(x_freqdist)  # type: ignore[call-arg]
-            y_scorer = self._freqprob_scorer_class(y_freqdist)  # type: ignore[call-arg]
         else:  # Lidstone
             joint_scorer = self._freqprob_scorer_class(joint_freqdist, gamma=self.smoothing_alpha)  # type: ignore[call-arg]
-            x_scorer = self._freqprob_scorer_class(x_freqdist, gamma=self.smoothing_alpha)  # type: ignore[call-arg]
-            y_scorer = self._freqprob_scorer_class(y_freqdist, gamma=self.smoothing_alpha)  # type: ignore[call-arg]
 
-        for pair in product(self.alphabet_x, self.alphabet_y):
-            obs = self.obs[pair]
+        # freqprob returns log-probabilities by default
+        results["joint"] = {pair: math.exp(joint_scorer(pair)) for pair in product(self.alphabet_x, self.alphabet_y)}
+        results["marginal_x"] = dict.fromkeys(self.alphabet_x, 0.0)
+        results["marginal_y"] = dict.fromkeys(self.alphabet_y, 0.0)
+        for (x, y), joint_prob in results["joint"].items():
+            results["marginal_x"][x] += joint_prob
+            results["marginal_y"][y] += joint_prob
 
-            # Get smoothed probabilities (note: freqprob returns log probabilities by default)
-            joint_prob = math.exp(joint_scorer(pair)) if pair in joint_freqdist else 0.0
-            x_prob = math.exp(x_scorer(pair[0])) if pair[0] in x_freqdist else 0.0
-            y_prob = math.exp(y_scorer(pair[1])) if pair[1] in y_freqdist else 0.0
-
-            results["joint"][pair] = joint_prob
-            results["marginal_x"][pair[0]] = x_prob
-            results["marginal_y"][pair[1]] = y_prob
-
-            # Conditional probabilities using Bayes' rule
-            if obs["01"] > 0 and y_prob > 0:  # Y marginal count > 0
-                results["xy_given_y"][pair] = joint_prob / y_prob
-            else:
-                results["xy_given_y"][pair] = 0.0
-
-            if obs["10"] > 0 and x_prob > 0:  # X marginal count > 0
-                results["yx_given_x"][pair] = joint_prob / x_prob
-            else:
-                results["yx_given_x"][pair] = 0.0
+        # Conditional probabilities from the joint and the marginals
+        for pair, joint_prob in results["joint"].items():
+            x_prob = results["marginal_x"][pair[0]]
+            y_prob = results["marginal_y"][pair[1]]
+            results["xy_given_y"][pair] = joint_prob / y_prob if y_prob > 0 else 0.0
+            results["yx_given_x"][pair] = joint_prob / x_prob if x_prob > 0 else 0.0
 
         return results
 
     def pmi_smoothed(self, normalized: bool = False) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
         Return a PMI scorer using freqprob smoothing for better numerical stability.
+
+        The probabilities come from `get_smoothed_probabilities`: the joint
+        distribution smoothed with the scorer's ``smoothing_method``, and the
+        marginals derived from it. Use it with ``smoothing_method="laplace"`` or
+        ``"lidstone"``; with the default ``"mle"``, unobserved pairs get a
+        near-zero probability and a very large negative score.
 
         Parameters
         ----------
@@ -1111,8 +1113,8 @@ class CatScorer:
         Parameters
         ----------
         square_ct : bool
-            Whether to return the score over a squared or
-            non squared contingency table (default: True)
+            Whether to return the score over the 2x2 contingency table (default:
+            True). ``False``, which uses a 2x3 table, is deprecated.
         """
         return self._compute_contingency_table_scorer(
             square_ct, lambda ct: ss.chi2_contingency(ct)[0], "_chi2", "_chi2_nonsquare"
@@ -1130,8 +1132,8 @@ class CatScorer:
         Parameters
         ----------
         square_ct : bool
-            Whether to compute the p-value over a squared (2x2) or non-squared
-            (3x2) contingency table (default: True).
+            Whether to compute the p-value over the 2x2 contingency table
+            (default: True). ``False``, which uses a 2x3 table, is deprecated.
 
         Returns
         -------
@@ -1149,8 +1151,8 @@ class CatScorer:
         Parameters
         ----------
         square_ct : bool
-            Whether to return the score over a squared or
-            non squared contingency table (default: True)
+            Whether to return the score over the 2x2 contingency table (default:
+            True). ``False``, which uses a 2x3 table, is deprecated.
         """
         return self._compute_contingency_table_scorer(square_ct, compute_cramers_v, "_cramersv", "_cramersv_nonsquare")
 
@@ -1584,6 +1586,9 @@ class CatScorer:
 
         Computes λ(Y|X) and λ(X|Y) for each symbol pair, measuring the
         proportional reduction in error when predicting one variable from another.
+        Like `theil_u`, it is computed on the subset of co-occurrences where
+        ``pair[0] == x`` or ``pair[1] == y``; when the predicted variable takes a
+        single value in that subset, the score is 1.0, as for `theil_u`.
 
         Returns
         -------
@@ -1651,7 +1656,7 @@ class CatScorer:
         sum_max_conditional_y = row_max[:, None] + (col_row - joint)
         denom_y = n_total - max_marginal_y
         with np.errstate(divide="ignore", invalid="ignore"):
-            lambda_y_given_x = np.where(denom_y == 0, 0.0, (sum_max_conditional_y - max_marginal_y) / denom_y)
+            lambda_y_given_x = np.where(denom_y == 0, 1.0, (sum_max_conditional_y - max_marginal_y) / denom_y)
         lambda_y_given_x = np.maximum(0.0, lambda_y_given_x)
 
         # Predicting X from Y (column-wise): the transpose of the above.
@@ -1661,7 +1666,7 @@ class CatScorer:
         sum_max_conditional_x = col_max[None, :] + (row_col - joint)
         denom_x = n_total - max_marginal_x
         with np.errstate(divide="ignore", invalid="ignore"):
-            lambda_x_given_y = np.where(denom_x == 0, 0.0, (sum_max_conditional_x - max_marginal_x) / denom_x)
+            lambda_x_given_y = np.where(denom_x == 0, 1.0, (sum_max_conditional_x - max_marginal_x) / denom_x)
         lambda_x_given_y = np.maximum(0.0, lambda_x_given_y)
 
         return lambda_y_given_x, lambda_x_given_y
@@ -1676,8 +1681,8 @@ class CatScorer:
         Parameters
         ----------
         square_ct : bool
-            Whether to return the score over a squared or
-            non squared contingency table (default: True)
+            Whether to return the score over the 2x2 contingency table (default:
+            True). ``False``, which uses a 2x3 table, is deprecated.
 
         Returns
         -------
@@ -1701,8 +1706,8 @@ class CatScorer:
         Parameters
         ----------
         square_ct : bool
-            Whether to compute the p-value over a squared (2x2) or non-squared
-            (3x2) contingency table (default: True).
+            Whether to compute the p-value over the 2x2 contingency table
+            (default: True). ``False``, which uses a 2x3 table, is deprecated.
 
         Returns
         -------
