@@ -17,8 +17,9 @@ $$
 \lambda(Y \mid X) = \frac{\sum_x \max_y n(x, y) - \max_y n(y)}{N - \max_y n(y)},
 $$
 
-with $\lambda = 0$ by convention when the denominator is 0 (when $Y$ takes a
-single value). In ASymCat, the table is the
+with $\lambda = 1$ by convention when the denominator is 0 (when $Y$ takes a
+single value, so that there are no errors to reduce), as for
+[Theil's U](theil-u.md). In ASymCat, the table is the
 [pair subset](../concepts/notation.md#the-pair-subset) $S(x, y)$:
 
 $$
@@ -53,8 +54,8 @@ determines the other.
   modal guess. When one value dominates every row, λ is 0 whatever the
   association; Theil's U is more sensitive.
 - **A convention on degenerate subsets.** When the predicted variable takes a
-  single value in the subset, λ is 0, where Theil's U is 1. Compare
-  `("q", "k")`: λ gives 0 in both directions, and Theil's U 1 and 0.
+  single value in the subset, λ is 1, as is Theil's U: for `("q", "k")`, both
+  give 1 and 0.
 - **Unsigned**, as for the other measures on the pair subset: see
   [Pitfalls](../concepts/pitfalls.md#high-scores-can-mean-avoidance).
 

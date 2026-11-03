@@ -56,6 +56,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `docs` extra adds `mkdocs-redirects` and `matplotlib`. References add
   Bergsma (2013), the source of the bias-corrected Cramér's V.
 
+### Fixed
+
+- **`pmi_smoothed()` and `get_smoothed_probabilities()` used inconsistent
+  marginals.** Each symbol's marginal count was multiplied by the size of the
+  other alphabet, and the marginals were smoothed separately from the joint
+  distribution, so with `"laplace"` or `"lidstone"` an unobserved pair could
+  score above independence. The joint distribution is now smoothed once and the
+  marginals are its sums. **This changes `pmi_smoothed` results** with
+  smoothing; with the default `"mle"` they are unchanged up to the floor for
+  unobserved pairs. See `MIGRATION.md`.
+- **`goodman_kruskal_lambda()` used the opposite convention to `theil_u()` on
+  degenerate subsets.** When the predicted variable takes a single value in a
+  pair's subset, λ was 0 and Theil's U 1. λ is now 1 too, in `CatScorer` and in
+  `compute_goodman_kruskal_lambda`. **This changes λ for such pairs.**
+
+### Deprecated
+
+- `square_ct=False` in `chi2`, `chi2_pvalue`, `cramers_v`,
+  `log_likelihood_ratio` and `log_likelihood_ratio_pvalue` now raises a
+  `DeprecationWarning`. The 2×3 table it uses adds the row totals as a column,
+  so it is not a contingency table of the pair; use the default 2×2 table.
+
 ## [0.8.0] - 2026-11-03
 
 Corrects the direction of `mle()` and `tresoldi()` and prepares ASymCat for

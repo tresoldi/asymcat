@@ -36,12 +36,13 @@ With only two observations of `q`, Laplace smoothing pulls $P(k \mid q)$ from 1
 to 0.75; Lidstone with $\gamma = 0.5$ pulls it less. Smoothing matters most for
 rare symbols and leaves frequent ones nearly unchanged.
 
-`pmi_smoothed` uses the same setting for the joint and marginal probabilities:
+`pmi_smoothed` smooths the joint distribution of the pairs with the same
+setting, and derives the marginal probabilities from it:
 
 ```pycon
 >>> laplace = CatScorer(pairs, smoothing_method="laplace")
 >>> [round(v, 3) for v in laplace.pmi_smoothed()[("c", "s")]]
-[0.302, 0.302]
+[0.223, 0.223]
 ```
 
 ## Correct the entropies

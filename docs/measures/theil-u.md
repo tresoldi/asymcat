@@ -65,8 +65,8 @@ With the [example data](../concepts/notation.md#the-example-data):
   score, unlike $P(y \mid x)$.
 - **Unsigned.** Avoidance is as predictive as attraction.
 - **A convention on degenerate subsets.** When one variable takes a single
-  value in the subset, its score is 1 (no uncertainty left to remove).
-  [Goodman–Kruskal λ](goodman-kruskal-lambda.md) uses 0 in the same case.
+  value in the subset, its score is 1 (no uncertainty left to remove), as for
+  [Goodman–Kruskal λ](goodman-kruskal-lambda.md).
 - **Bias-corrected estimates leave $[0, 1]$.** With `"chao_shen"` or `"nsb"`,
   a slightly negative score on a small subset means no detectable association.
   The plug-in estimate can also print as `-0.0`.

@@ -29,8 +29,9 @@ PMI is symmetric, so both tuple entries are equal. In ASymCat:
   have $\mathrm{PMI} = -\infty$; it gets the floor $P(x, y) = (1/n)^2$
   instead, which gives a large negative value.
 - **`pmi(normalized=True)`** returns NPMI, with the same floor.
-- **`pmi_smoothed()`** takes $P(x, y)$, $P(x)$ and $P(y)$ from the scorer's
-  `smoothing_method`, estimated by FreqProb. It is meant for use with
+- **`pmi_smoothed()`** smooths the joint distribution $P(x, y)$ over all pairs
+  of observed symbols with the scorer's `smoothing_method`, estimated by
+  FreqProb, and takes $P(x)$ and $P(y)$ as its sums. It is meant for use with
   `"laplace"` or `"lidstone"`; see the properties below.
 
 ## Example
@@ -74,9 +75,8 @@ $P(k) = 11/15 \approx 0.73$.
 - **`pmi_smoothed` needs a smoothing method.** With the default
   `smoothing_method="mle"`, unobserved pairs get a near-zero probability from
   FreqProb and a very large negative score. With `"laplace"` or `"lidstone"`,
-  the joint and the marginal distributions are smoothed separately, so an
-  unobserved pair can score slightly above zero. Compare `pmi_smoothed` scores
-  among observed pairs.
+  every pair receives the same pseudo-count, so unobserved pairs score below
+  independence but by a finite amount.
 
 ## API
 
