@@ -200,9 +200,9 @@ the shift is in the core API and prose, which stay domain-neutral.
 - **Tooling:** MkDocs-Material + mkdocstrings, published to GitHub Pages from CI
   (see `mkdocs.yml`; build with `make site` / `mkdocs serve`).
 
-The earlier Sphinx site and rendered tutorial artifacts are retained under
-`docs/archive/` and excluded from the built site. Generated artifacts (tutorial
-HTML, figures, coverage reports) are kept out of version control.
+The earlier Sphinx site and tutorials were removed after 0.7.0; they remain in
+the git history and in the `v0.7.0` tag. Generated artifacts (figures, coverage
+reports) are kept out of version control.
 
 ---
 
@@ -231,7 +231,7 @@ clearly flagged in the `CHANGELOG`.
 4. **Significance layered, not baked in**: parametric and resampling tests wrap
    the point measures without altering them (§2).
 5. **Docs tooling:** MkDocs-Material + mkdocstrings on GitHub Pages, replacing
-   Sphinx (archived under `docs/archive/`) (§6).
+   Sphinx (§6).
 6. **Entropy estimation is a scorer-level choice** (`entropy_estimator`), with
    the plug-in estimate as the default so existing results are unchanged.
    Corrected Theil's U and mutual information are reported unclipped, since

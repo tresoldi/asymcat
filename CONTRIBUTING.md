@@ -66,7 +66,7 @@ automatically on every commit.
 - `tests/` — `unit/`, `integration/`, and `performance/` suites with shared
   fixtures.
 - `docs/` — the MkDocs site (`USER_GUIDE.md`, `TRESOLDI_MEASURE.md`,
-  `reference.md`); `docs/archive/` holds the retired Sphinx docs and tutorials.
+  `reference.md`, `references.md` with `references.bib`, and `citing.md`).
 - `resources/` — sample datasets used by the docs, tests, and examples.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for a fuller tour of the codebase.

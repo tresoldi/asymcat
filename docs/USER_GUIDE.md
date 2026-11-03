@@ -1624,7 +1624,6 @@ triplets = [(x, y, z) for x, y, z in data]
 
 For every public class and function, see the [API Reference](reference.md);
 for the motivation and definition of the specialized measure, see
-[The Tresoldi Measure](TRESOLDI_MEASURE.md). The earlier tutorial scripts are
-kept, unmaintained, in the repository's
-[`docs/archive/`](https://github.com/tresoldi/asymcat/tree/master/docs/archive)
-directory.
+[The Tresoldi Measure](TRESOLDI_MEASURE.md); for the published source of each
+measure, see [References](references.md); and to cite ASymCat, see
+[How to cite](citing.md).

@@ -1,5 +1,7 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it using the metadata from this file."
+message: >-
+  If you use this software, please cite it using the metadata from this file,
+  and state the version you used.
 title: "ASymCat: Asymmetric measures of association between categorical variables"
 abstract: >-
   ASymCat is a Python library for obtaining symmetric and asymmetric measures of
@@ -14,10 +16,12 @@ authors:
     given-names: Tiago
     email: tiago.tresoldi@lingfil.uu.se
     affiliation: Uppsala University
+    orcid: "https://orcid.org/0000-0002-2863-1467"
 version: 0.7.0
 date-released: 2026-11-03
 license: MIT
 repository-code: "https://github.com/tresoldi/asymcat"
+repository-artifact: "https://pypi.org/project/asymcat/"
 url: "https://asymcat.tresoldi.org/"
 keywords:
   - statistics

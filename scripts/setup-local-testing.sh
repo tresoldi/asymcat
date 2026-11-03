@@ -33,17 +33,17 @@ if ! command -v act &> /dev/null; then
     echo -e "${YELLOW}📦 Installing act...${NC}"
     mkdir -p ~/.local/bin
     curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | bash -s -- -b ~/.local/bin
-    
+
     # Add to PATH for current session
     export PATH="$PATH:$HOME/.local/bin"
-    
+
     # Add to shell profile
     if [[ "$SHELL" == *"bash"* ]]; then
         echo 'export PATH="$PATH:$HOME/.local/bin"' >> ~/.bashrc
     elif [[ "$SHELL" == *"zsh"* ]]; then
         echo 'export PATH="$PATH:$HOME/.local/bin"' >> ~/.zshrc
     fi
-    
+
     echo -e "${GREEN}✅ act installed successfully${NC}"
 else
     echo -e "${GREEN}✅ act is already installed${NC}"

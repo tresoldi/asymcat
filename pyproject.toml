@@ -91,7 +91,7 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/tresoldi/asymcat"
+Homepage = "https://asymcat.tresoldi.org/"
 Documentation = "https://asymcat.tresoldi.org/"
 Repository = "https://github.com/tresoldi/asymcat.git"
 Issues = "https://github.com/tresoldi/asymcat/issues"
@@ -122,7 +122,6 @@ extend-exclude = [
     "venv",
     "build",
     "dist",
-    "docs/archive",
 ]
 
 [tool.ruff.lint]

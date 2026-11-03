@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **References** page on the documentation site, with the published source of
+  every measure and a `references.bib` file.
+- **How to cite** page with APA and BibTeX (`@software` and `@misc`) entries.
+- `resources/README.md` now gives a full citation, source URL and licence for
+  every sample dataset, and `resources/LICENSE-cmudict.txt` carries the notice
+  CMUdict's licence requires.
+
+### Changed
+
+- `CITATION.cff` adds an ORCID iD and the PyPI artifact; README and home-page
+  BibTeX entries now include the year and version and point to the
+  documentation site. PyPI's Homepage link now points to the site too.
+
+### Removed
+
+- `docs/archive/` (the pre-0.6 Sphinx site, tutorials and LLM documentation).
+  It was excluded from the site and partly outdated; it remains in the git
+  history and in the `v0.7.0` tag.
+
 ## [0.7.0] - 2026-11-03
 
 Adopts freqprob's bias-corrected entropy estimators and trims the dependencies
