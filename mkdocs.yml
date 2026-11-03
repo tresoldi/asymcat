@@ -32,6 +32,14 @@ theme:
     - search.suggest
     - toc.follow
 
+# Versioned documentation, published with mike: the selector lists every
+# deployed version, and pages of non-default versions show an "outdated" notice.
+extra:
+  version:
+    provider: mike
+    default: latest
+    alias: true
+
 nav:
   - Home: index.md
   - Getting started:
