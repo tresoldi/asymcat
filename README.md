@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/tresoldi/asymcat/actions/workflows/quality.yml/badge.svg)](https://github.com/tresoldi/asymcat/actions/workflows/quality.yml)
 [![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://asymcat.tresoldi.org/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23917211.svg)](https://doi.org/10.5281/zenodo.23917211)
 [![PyPI version](https://badge.fury.io/py/asymcat.svg)](https://badge.fury.io/py/asymcat)
 [![Python versions](https://img.shields.io/pypi/pyversions/asymcat.svg)](https://pypi.org/project/asymcat/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -146,10 +147,13 @@ If you use ASymCat in published work, please cite the version you used:
              categorical variables},
   year    = {2026},
   version = {0.8.0},
+  doi     = {10.5281/zenodo.23917212},
   url     = {https://asymcat.tresoldi.org/}
 }
 ```
 
+The DOI [10.5281/zenodo.23917212](https://doi.org/10.5281/zenodo.23917212) identifies version 0.8.0;
+[10.5281/zenodo.23917211](https://doi.org/10.5281/zenodo.23917211) always resolves to the latest version.
 See [How to cite](https://asymcat.tresoldi.org/citing/) for APA and classic
 BibTeX forms, and [References](https://asymcat.tresoldi.org/references/) for
 the papers behind each measure. Citation metadata is also in

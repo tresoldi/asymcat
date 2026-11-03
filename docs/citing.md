@@ -11,13 +11,26 @@ import asymcat
 print(asymcat.__version__)
 ```
 
+## DOIs
+
+Every release of ASymCat is archived on [Zenodo](https://doi.org/10.5281/zenodo.23917211) with its
+own DOI:
+
+- **A specific version:** cite the DOI of the release you used, so readers get
+  exactly that code. Version 0.8.0 is
+  [10.5281/zenodo.23917212](https://doi.org/10.5281/zenodo.23917212). Other versions are listed under "Versions" on the
+  Zenodo record.
+- **All versions:** [10.5281/zenodo.23917211](https://doi.org/10.5281/zenodo.23917211) always resolves to the latest
+  release. Use it when you refer to ASymCat in general rather than to results
+  from a particular version.
+
 ## Citing the software
 
 **APA**
 
 > Tresoldi, T. (2026). *ASymCat: Asymmetric measures of association between
-> categorical variables* (Version 0.8.0) [Computer software].
-> https://asymcat.tresoldi.org/
+> categorical variables* (Version 0.8.0) [Computer software]. Zenodo.
+> https://doi.org/10.5281/zenodo.23917212
 
 **BibTeX** (biblatex, or any style that supports `@software`)
 
@@ -28,6 +41,7 @@ print(asymcat.__version__)
              categorical variables},
   year    = {2026},
   version = {0.8.0},
+  doi     = {10.5281/zenodo.23917212},
   url     = {https://asymcat.tresoldi.org/}
 }
 ```
@@ -42,11 +56,12 @@ templates)
                   categorical variables},
   year         = {2026},
   note         = {Version 0.8.0},
-  howpublished = {\url{https://asymcat.tresoldi.org/}}
+  doi          = {10.5281/zenodo.23917212},
+  howpublished = {\url{https://doi.org/10.5281/zenodo.23917212}}
 }
 ```
 
-Replace the version and year with those of the release you used. The citation
+Replace the version, year and DOI with those of the release you used. The citation
 metadata also lives in
 [`CITATION.cff`](https://github.com/tresoldi/asymcat/blob/master/CITATION.cff);
 GitHub's **Cite this repository** button on the repository page builds APA and
