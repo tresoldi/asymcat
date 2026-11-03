@@ -145,7 +145,7 @@ If you use ASymCat in published work, please cite the version you used:
   title   = {{ASymCat}: Asymmetric measures of association between
              categorical variables},
   year    = {2026},
-  version = {0.7.0},
+  version = {0.8.0},
   url     = {https://asymcat.tresoldi.org/}
 }
 ```

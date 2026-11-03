@@ -17,7 +17,7 @@ authors:
     email: tiago.tresoldi@lingfil.uu.se
     affiliation: Uppsala University
     orcid: "https://orcid.org/0000-0002-2863-1467"
-version: 0.7.0
+version: 0.8.0
 date-released: 2026-11-03
 license: MIT
 repository-code: "https://github.com/tresoldi/asymcat"
