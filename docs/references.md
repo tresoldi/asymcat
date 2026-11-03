@@ -129,8 +129,11 @@ ASymCat uses FreqProb for smoothing and entropy estimation, and is built on
 NumPy and SciPy.
 
 - Tresoldi, T. (2026). *FreqProb: A Python library for probability smoothing and
-  frequency-based estimation* (Version 0.8.0) [Computer software].
-  [https://freqprob.tresoldi.org/](https://freqprob.tresoldi.org/)
+  frequency-based estimation* [Computer software]. Zenodo.
+  [doi:10.5281/zenodo.23917393](https://doi.org/10.5281/zenodo.23917393)
+  (all versions; ASymCat requires 0.8.0 or later, and FreqProb's
+  [How to cite](https://freqprob.tresoldi.org/citing/) page gives the DOI of
+  each version)
 - Harris, C. R., Millman, K. J., van der Walt, S. J., et al. (2020). Array
   programming with NumPy. *Nature*, 585(7825), 357–362.
   [doi:10.1038/s41586-020-2649-2](https://doi.org/10.1038/s41586-020-2649-2)
