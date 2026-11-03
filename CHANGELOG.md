@@ -31,6 +31,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bundled UCI Mushroom sample (`P(class | odour)` against `P(odour | class)`).
   The page also gains Related projects and links to How to cite and the
   migration guide.
+- **Documentation restructured by purpose.** The User Guide is replaced by a
+  tutorial; concept pages on directional association, notation (including the
+  2×2 table and the pair subset that the measures use), choosing a measure, and
+  pitfalls; one page per measure with its definition as ASymCat computes it, a
+  worked example on shared data, its properties, its API entry and its
+  references; how-to guides for preparing data, sparse data, significance,
+  comparing scores, plotting and whole-variable summaries; and an API reference
+  with one page per module. Old URLs redirect to their new pages.
+- **Every documentation example is tested.** Examples are `pycon` blocks with
+  their real output, run as doctests by `tests/unit/test_docs_examples.py`;
+  several examples of the old User Guide referred to missing files or undefined
+  names. The plotting guide's figure is drawn from its own example when the site
+  is built (`scripts/docs_figures.py`).
+- **API reference renders correctly.** The docstrings are NumPy-style, but the
+  site parsed them as Google-style, so parameters and return values were not
+  shown; Sphinx roles in the docstrings are replaced by plain code. The `fisher`
+  docstring no longer claims that the odds ratio is slow to compute.
+- **Statistical measures return Python floats.** `chi2`, `chi2_pvalue`,
+  `cramers_v`, `fisher`, `fisher_pvalue`, `log_likelihood_ratio`,
+  `log_likelihood_ratio_pvalue` and `correlation.theil_u` returned NumPy
+  scalars; they now return `float`, like the other measures. Values are
+  unchanged.
+- The `docs` extra adds `mkdocs-redirects` and `matplotlib`. References add
+  Bergsma (2013), the source of the bias-corrected Cramér's V.
 
 ## [0.8.0] - 2026-11-03
 

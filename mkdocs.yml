@@ -25,6 +25,8 @@ theme:
         name: Switch to light mode
   features:
     - navigation.sections
+    - navigation.indexes
+    - navigation.footer
     - navigation.top
     - content.code.copy
     - search.suggest
@@ -32,20 +34,60 @@ theme:
 
 nav:
   - Home: index.md
-  - User Guide: USER_GUIDE.md
-  - The Tresoldi Measure: TRESOLDI_MEASURE.md
-  - API Reference: reference.md
+  - Getting started:
+      - Installation: getting-started/installation.md
+      - Tutorial: getting-started/tutorial.md
+  - Concepts:
+      - Directional association: concepts/directional-association.md
+      - Notation: concepts/notation.md
+      - Choosing a measure: concepts/choosing-a-measure.md
+      - Pitfalls: concepts/pitfalls.md
+  - Measures:
+      - measures/index.md
+      - Conditional probability (mle): measures/mle.md
+      - Pointwise mutual information: measures/pmi.md
+      - Theil's U: measures/theil-u.md
+      - Conditional entropy: measures/conditional-entropy.md
+      - Mutual information: measures/mutual-information.md
+      - Chi-square and Cramér's V: measures/chi2.md
+      - Fisher's exact test: measures/fisher.md
+      - Log-likelihood ratio (G²): measures/log-likelihood-ratio.md
+      - Goodman–Kruskal λ: measures/goodman-kruskal-lambda.md
+      - Jaccard index: measures/jaccard.md
+      - The Tresoldi measure: measures/tresoldi.md
+  - How-to guides:
+      - how-to/index.md
+      - Prepare co-occurrence data: how-to/prepare-data.md
+      - Work with sparse data: how-to/sparse-data.md
+      - Test significance and uncertainty: how-to/significance.md
+      - Rank, scale and compare scores: how-to/compare-scores.md
+      - Plot score matrices: how-to/plot.md
+      - Summarise whole variables: how-to/whole-variables.md
+  - API reference:
+      - api/index.md
+      - asymcat.scorer.CatScorer: api/catscorer.md
+      - asymcat.scorer functions: api/scorer-functions.md
+      - asymcat.common: api/common.md
+      - asymcat.correlation: api/correlation.md
   - References: references.md
   - How to cite: citing.md
 
+hooks:
+  - scripts/docs_figures.py
+
 plugins:
   - search
+  - redirects:
+      redirect_maps:
+        USER_GUIDE.md: getting-started/tutorial.md
+        TRESOLDI_MEASURE.md: measures/tresoldi.md
+        reference.md: api/index.md
   - mkdocstrings:
       handlers:
         python:
           paths: [src]
           options:
-            docstring_style: google
+            docstring_style: numpy
             show_root_heading: true
             show_source: false
             members_order: source

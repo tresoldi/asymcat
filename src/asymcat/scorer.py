@@ -214,7 +214,7 @@ def compute_theil_u(x_symbols: list[Any], y_symbols: list[Any], estimator: str =
         The list of observed symbols in series `y`.
     estimator : str, optional
         Entropy estimator: ``"plugin"`` (default), ``"chao_shen"`` or
-        ``"nsb"`` (see :func:`conditional_entropy`). Bias-corrected estimates
+        ``"nsb"`` (see `conditional_entropy`). Bias-corrected estimates
         are not confined to ``[0, 1]``: on small samples a slightly negative
         value means no detectable association.
 
@@ -249,7 +249,7 @@ def compute_theil_u(x_symbols: list[Any], y_symbols: list[Any], estimator: str =
     # conditional entropy
     theil_u = 1.0 if h_x == 0.0 else (h_x - h_xy) / h_x
 
-    return theil_u
+    return float(theil_u)
 
 
 def compute_mutual_information(x_symbols: list[Any], y_symbols: list[Any], estimator: str = "plugin") -> float:
@@ -324,7 +324,7 @@ def compute_normalized_mutual_information(
         A list of all observed `y` symbols.
     estimator : str, optional
         Entropy estimator: ``"plugin"`` (default), ``"chao_shen"`` or
-        ``"nsb"`` (see :func:`compute_mutual_information`). Bias-corrected
+        ``"nsb"`` (see `compute_mutual_information`). Bias-corrected
         estimates are not confined to ``[0, 1]``.
 
     Returns
@@ -504,7 +504,7 @@ def compute_log_likelihood_ratio(cont_table: list[list[float]]) -> float:
             if o_ij > 0 and e_ij > 0:
                 g2 += o_ij * math.log(o_ij / e_ij)
 
-    return 2.0 * g2
+    return float(2.0 * g2)
 
 
 def compute_log_likelihood_ratio_pvalue(cont_table: list[list[float]]) -> float:
@@ -670,8 +670,8 @@ def scorer2matrices(
 
 class _SubsetEntropies(NamedTuple):
     """
-    Per-pair subset entropies shared by :meth:`CatScorer.theil_u` and
-    :meth:`CatScorer.cond_entropy`.
+    Per-pair subset entropies shared by `CatScorer.theil_u` and
+    `CatScorer.cond_entropy`.
 
     Each field is an ``|alphabet_x| x |alphabet_y|`` array indexed by ``[i, j]``,
     holding a quantity computed over the subset of co-occurrences selected for
@@ -718,9 +718,9 @@ class CatScorer:
             Additive constant for 'lidstone' smoothing (its ``gamma``); 'laplace'
             always adds 1 and 'mle' adds nothing. Default is 1.0.
         entropy_estimator : str, optional
-            Estimator for the entropies behind :meth:`theil_u`,
-            :meth:`cond_entropy`, :meth:`mutual_information` and
-            :meth:`normalized_mutual_information`. Options: 'plugin' (the
+            Estimator for the entropies behind `theil_u`,
+            `cond_entropy`, `mutual_information` and
+            `normalized_mutual_information`. Options: 'plugin' (the
             maximum-likelihood estimate), 'chao_shen' and 'nsb' (bias-corrected
             estimators for undersampled data, from freqprob). Default is 'plugin'.
         """
@@ -826,7 +826,7 @@ class CatScorer:
             scorer = {}
             ct_dict = getattr(self, ct_attr)
             for pair in self.obs:
-                score = computation_func(ct_dict[pair])
+                score = float(computation_func(ct_dict[pair]))
                 scorer[pair] = (score, score)
 
             setattr(self, cache_attr, scorer)
@@ -878,8 +878,8 @@ class CatScorer:
 
         For every pair ``(x, y)`` the tuple is ``(P(y|x), P(x|y))``: how well
         ``x`` predicts ``y``, then how well ``y`` predicts ``x``. This is the
-        same ``X→Y, Y→X`` order as :meth:`theil_u`, :meth:`cond_entropy` and
-        :meth:`goodman_kruskal_lambda`. With ``smoothing_method`` set to
+        same ``X→Y, Y→X`` order as `theil_u`, `cond_entropy` and
+        `goodman_kruskal_lambda`. With ``smoothing_method`` set to
         ``"laplace"`` or ``"lidstone"``, the probabilities are smoothed with
         freqprob.
 
@@ -1122,7 +1122,7 @@ class CatScorer:
         """
         Return the p-values of the chi-square test of independence.
 
-        This is the significance counterpart to :meth:`chi2`: for each pair it
+        This is the significance counterpart to `chi2`: for each pair it
         returns the p-value from ``scipy.stats.chi2_contingency`` (a small value
         indicates a statistically significant association). As with the other
         symmetric statistical tests, both tuple entries hold the same value.
@@ -1158,13 +1158,17 @@ class CatScorer:
         """
         Return a Fisher Exact Odds Ratio scorer.
 
-        Please note that in scipy's implementation the calculated odds ratio
-        is different from the one found in R. While the latter returns the
-        "conditional Maximum Likelihood Estimate", this implementation computes
-        the more common "unconditional Maximum Likelihood Estimate", which
-        is known to be very slow for contingency tables with large numbers.
-        If the computation is too slow, the similar but inexact chi-square
-        test the the chi2 contingency scorer can be used.
+        For each pair, this is the sample odds ratio ``(a * d) / (b * c)`` of the
+        2x2 contingency table, as returned by ``scipy.stats.fisher_exact``. It
+        is the unconditional maximum-likelihood estimate; R's ``fisher.test``
+        reports the conditional one, which differs slightly. A table with an
+        empty cell gives an odds ratio of 0 or ``inf``. Both tuple entries hold
+        the same value; the p-values are given by `fisher_pvalue`.
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to (odds ratio, odds ratio) tuples.
         """
 
         # Compute the square contingency table, if necessary
@@ -1175,7 +1179,7 @@ class CatScorer:
             assert self._square_ct is not None, "Square contingency table should have been computed"  # nosec
             self._fisher = {}
             for pair in self.obs:
-                fisher = ss.fisher_exact(self._square_ct[pair])[0]
+                fisher = float(ss.fisher_exact(self._square_ct[pair])[0])
                 self._fisher[pair] = (fisher, fisher)
 
         return self._fisher
@@ -1184,7 +1188,7 @@ class CatScorer:
         """
         Return the p-values of Fisher's exact test.
 
-        This is the significance counterpart to :meth:`fisher`: for each pair it
+        This is the significance counterpart to `fisher`: for each pair it
         returns the (two-sided) p-value from ``scipy.stats.fisher_exact`` over
         the 2x2 contingency table. As with the other symmetric statistical
         tests, both tuple entries hold the same value.
@@ -1202,7 +1206,7 @@ class CatScorer:
             assert self._square_ct is not None, "Square contingency table should have been computed"  # nosec
             self._fisher_pvalue = {}
             for pair in self.obs:
-                pvalue = ss.fisher_exact(self._square_ct[pair])[1]
+                pvalue = float(ss.fisher_exact(self._square_ct[pair])[1])
                 self._fisher_pvalue[pair] = (pvalue, pvalue)
 
         return self._fisher_pvalue
@@ -1228,9 +1232,9 @@ class CatScorer:
 
     def _subset_entropy_components(self) -> _SubsetEntropies:
         """
-        Vectorized per-pair subset entropies backing :meth:`theil_u`,
-        :meth:`cond_entropy`, :meth:`mutual_information` and
-        :meth:`normalized_mutual_information`.
+        Vectorized per-pair subset entropies backing `theil_u`,
+        `cond_entropy`, `mutual_information` and
+        `normalized_mutual_information`.
 
         These scorers operate on the subset selected for a pair ``(x, y)`` --
         co-occurrences whose first element is ``x`` or whose second element is
@@ -1247,7 +1251,7 @@ class CatScorer:
 
         This closed form holds for the plug-in estimator only; other
         ``entropy_estimator`` values are handled by
-        :meth:`_estimated_subset_entropy_components`.
+        `_estimated_subset_entropy_components`.
         """
         if self.entropy_estimator != "plugin":
             return self._estimated_subset_entropy_components()
@@ -1309,7 +1313,7 @@ class CatScorer:
         """
         Per-pair subset entropies from a bias-corrected estimator.
 
-        The counterpart of :meth:`_subset_entropy_components` for the
+        The counterpart of `_subset_entropy_components` for the
         ``"chao_shen"`` and ``"nsb"`` estimators, which have no closed form over
         the joint-count matrix. Each pair's subset (row ``x`` plus column ``y``
         of ``J``) is materialized as three frequency distributions -- its
@@ -1377,7 +1381,7 @@ class CatScorer:
         ``pair[1] == y``, matching ``compute_theil_u(Y, X)`` and
         ``compute_theil_u(X, Y)`` on that subset. The underlying entropies are
         computed with a vectorized formulation (see
-        :meth:`_subset_entropy_components`) that evaluates all pairs at once
+        `_subset_entropy_components`) that evaluates all pairs at once
         rather than re-filtering the co-occurrence list for each pair.
 
         Entropies follow the scorer's ``entropy_estimator``. Bias-corrected
@@ -1412,8 +1416,8 @@ class CatScorer:
         directions over the subset of co-occurrences where ``pair[0] == x`` or
         ``pair[1] == y``, matching ``conditional_entropy(Y, X)`` and
         ``conditional_entropy(X, Y)`` on that subset. The entropies come from
-        the same computation as :meth:`theil_u` (see
-        :meth:`_subset_entropy_components`) and follow the scorer's
+        the same computation as `theil_u` (see
+        `_subset_entropy_components`) and follow the scorer's
         ``entropy_estimator``.
         """
 
@@ -1437,9 +1441,9 @@ class CatScorer:
         For every pair ``(x, y)`` the tuple is ``(T(x→y), T(y→x))``, with
         ``T(x→y) = sign(PMI) * |PMI(x, y)| ** (1 - P(y|x))``: the PMI pulled
         towards ±1 as the conditional probability approaches 1. The
-        conditional probabilities come from :meth:`mle` (so smoothing applies
-        to them) and the PMI from :meth:`pmi`. See the documentation page
-        "The Tresoldi Measure" for its properties.
+        conditional probabilities come from `mle` (so smoothing applies
+        to them) and the PMI from `pmi`. See the documentation page
+        "The Tresoldi measure" for its properties.
 
         Returns
         -------
@@ -1599,11 +1603,11 @@ class CatScorer:
 
     def _goodman_kruskal_lambda_matrices(self) -> tuple[np.ndarray, np.ndarray]:
         """
-        Vectorized Goodman-Kruskal lambda backing :meth:`goodman_kruskal_lambda`.
+        Vectorized Goodman-Kruskal lambda backing `goodman_kruskal_lambda`.
 
         Lambda is mode-based rather than entropy-based, so it needs the largest
         cell count per row / column of the "cross"-shaped subset (see
-        :meth:`_subset_entropy_components` for the subset geometry) rather than
+        `_subset_entropy_components` for the subset geometry) rather than
         the entropies. For a pair ``(x=i, y=j)``:
 
         * predicting ``Y`` from ``X`` -- knowing ``X == i`` narrows ``Y`` to row
@@ -1688,7 +1692,7 @@ class CatScorer:
         """
         Return the p-values of the Log-Likelihood Ratio (G²) test.
 
-        This is the significance counterpart to :meth:`log_likelihood_ratio`:
+        This is the significance counterpart to `log_likelihood_ratio`:
         under the null hypothesis of independence, G² is asymptotically
         chi-square distributed, and this returns the corresponding p-value for
         each pair. As with the other symmetric statistical tests, both tuple
@@ -1713,7 +1717,7 @@ class CatScorer:
         )
 
     #: Association measures supported by the resampling-based methods
-    #: (:meth:`permutation_pvalue` and :meth:`bootstrap_ci`). Each is a method
+    #: (`permutation_pvalue` and `bootstrap_ci`). Each is a method
     #: returning ``{(x, y): (xy, yx)}`` computed with its default parameters.
     RESAMPLABLE_MEASURES = frozenset(
         {
@@ -1775,8 +1779,8 @@ class CatScorer:
         """
         Estimate permutation-based p-values for an association measure.
 
-        Unlike the parametric tests (:meth:`chi2_pvalue`, :meth:`fisher_pvalue`,
-        :meth:`log_likelihood_ratio_pvalue`), this works for any per-pair
+        Unlike the parametric tests (`chi2_pvalue`, `fisher_pvalue`,
+        `log_likelihood_ratio_pvalue`), this works for any per-pair
         association measure -- including the information-theoretic ones (PMI,
         mutual information, Theil's U, ...) that have no closed-form null
         distribution.
@@ -1798,7 +1802,7 @@ class CatScorer:
         ----------
         measure : str
             Name of the association measure to test; must be one of
-            :attr:`RESAMPLABLE_MEASURES`. It is computed with its default
+            `RESAMPLABLE_MEASURES`. It is computed with its default
             parameters.
         n_permutations : int
             Number of random permutations forming the null distribution
@@ -1895,7 +1899,7 @@ class CatScorer:
         """
         Estimate bootstrap confidence intervals for an association measure.
 
-        Whereas :meth:`permutation_pvalue` tests whether an association differs
+        Whereas `permutation_pvalue` tests whether an association differs
         from independence, this quantifies the sampling uncertainty *around* the
         observed score. A bootstrap distribution is built by resampling the
         co-occurrences with replacement (``n`` draws from the ``n`` observed
@@ -1908,7 +1912,7 @@ class CatScorer:
 
         Because resampling can drop a rarely-seen symbol from a replicate, a pair
         may be absent from some replicates; such replicates simply do not
-        contribute to that pair's interval. As with :meth:`permutation_pvalue`,
+        contribute to that pair's interval. As with `permutation_pvalue`,
         co-occurrences are treated as exchangeable, so sequence data that expands
         into many correlated co-occurrences yields intervals that are somewhat
         too narrow.
@@ -1917,7 +1921,7 @@ class CatScorer:
         ----------
         measure : str
             Name of the association measure; must be one of
-            :attr:`RESAMPLABLE_MEASURES`. It is computed with its default
+            `RESAMPLABLE_MEASURES`. It is computed with its default
             parameters.
         n_bootstrap : int
             Number of bootstrap replicates (default: 1000).
