@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.7.0] - 2026-11-02
+## [0.7.0] - 2026-11-03
 
 Adopts freqprob's bias-corrected entropy estimators and trims the dependencies
 to what the package imports. Existing results are unchanged; see `MIGRATION.md`
