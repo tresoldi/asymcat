@@ -16,7 +16,7 @@ None of these files is included in the packages published on PyPI.
 | `mushrooms.tsv` | 1,000 instances of the UCI Mushroom data, one `feature:value` token list and class per row | UCI Machine Learning Repository | CC BY 4.0 |
 | `mushroom-small.tsv` | 20 instances of the same data, cap shape and class only | UCI Machine Learning Repository | CC BY 4.0 |
 | `pokemon.tsv` | Attributes of 801 Pokémon (types, abilities, base statistics) | Banik (2017), Kaggle | **Not stated by the source** (see below) |
-| `wiktionary.tsv` | Spellings of the same concepts in 13 languages, one character per token | Compiled from Wiktionary by T. Tresoldi (2018) | CC BY-SA 3.0, as required by Wiktionary |
+| `wiktionary.tsv` | Translations of the same words in 13 languages, one character per token | Collected from Wiktionary by T. Tresoldi (2018) for ASymCat | CC BY-SA 3.0, as required by Wiktionary |
 | `toy.tsv` | Three invented sequence pairs | Written for ASymCat's tests | MIT, like the code |
 
 ## Sources
@@ -47,12 +47,20 @@ ASymCat's files are subsets reformatted as described in the table.
 Kaggle. <https://www.kaggle.com/datasets/rounakbanik/pokemon>. The Kaggle page
 says the data was scraped from <https://serebii.net/> and gives no licence for
 redistribution. Pokémon names are trademarks of Nintendo, Creatures Inc. and
-GAME FREAK inc. The file is kept here for examples only; check the source's
-terms before redistributing it or using it in published work.
+GAME FREAK inc. The file is kept as example data. Its source states no licence,
+so check the source's terms before redistributing it or using it in published
+work.
 
-**Wiktionary.** Compiled in 2018 by Tiago Tresoldi from
-[Wiktionary](https://www.wiktionary.org/), whose text was then licensed under
-the [Creative Commons Attribution-ShareAlike 3.0
-licence](https://creativecommons.org/licenses/by-sa/3.0/). As a derivative of
-that content, `wiktionary.tsv` is distributed under the same licence, with
-attribution to the Wiktionary contributors.
+**Wiktionary.** Collected by Tiago Tresoldi in 2018 from
+[Wiktionary](https://www.wiktionary.org/) for use with ASymCat; it has not been
+published separately. Wiktionary's text was then licensed under the [Creative
+Commons Attribution-ShareAlike 3.0
+licence](https://creativecommons.org/licenses/by-sa/3.0/), so `wiktionary.tsv`,
+as a derivative of that content, is distributed under the same licence, with
+attribution to the Wiktionary contributors. To cite it, cite ASymCat (see
+[How to cite](https://asymcat.tresoldi.org/citing/)) and credit Wiktionary as
+its source, for example:
+
+> Tresoldi, T. (2018). *Multilingual word list collected from Wiktionary*
+> [Data set]. Distributed with ASymCat. CC BY-SA 3.0. Source: Wiktionary
+> contributors, https://www.wiktionary.org/
