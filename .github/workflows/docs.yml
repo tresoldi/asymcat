@@ -1,41 +1,73 @@
 name: Docs
 
+# Versioned documentation, published with mike to the gh-pages branch:
+# - every push to master updates /dev/;
+# - every published release adds /X.Y/ and points /latest/ (the default) at it;
+# - a manual run deploys the version given, or /dev/ when it is left empty.
 on:
   push:
     branches: [master]
+  release:
+    types: [published]
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Release to deploy as X.Y and latest (for example 0.9); leave empty for dev"
+        required: false
+        default: ""
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
+  group: docs
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - run: |
           python -m pip install --upgrade pip
           pip install -e ".[docs]"
-      - run: mkdocs build --strict
-      - uses: actions/upload-pages-artifact@v5
-        with:
-          path: site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Check the build
+        run: mkdocs build --strict
+      - name: Prepare git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages:gh-pages || true
+      - name: Deploy a release
+        if: github.event_name == 'release' || inputs.version != ''
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          VERSION="${INPUT_VERSION:-${TAG#v}}"
+          VERSION="$(echo "$VERSION" | cut -d. -f1,2)"
+          mike deploy --push --update-aliases --alias-type=copy "$VERSION" latest
+          mike set-default --push latest
+      - name: Deploy the development version
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.version == '')
+        run: |
+          mike deploy --push dev
+          # Until the first release is deployed, the site root opens dev.
+          if ! mike list | grep -q 'latest'; then mike set-default --push dev; fi
+      - name: Keep the custom domain and the redirect for unversioned links
+        run: |
+          git worktree add ../gh-pages gh-pages
+          cp docs/CNAME ../gh-pages/CNAME
+          cp scripts/gh-pages-404.html ../gh-pages/404.html
+          touch ../gh-pages/.nojekyll
+          cd ../gh-pages
+          git add CNAME 404.html .nojekyll
+          if ! git diff --cached --quiet; then
+            git commit -m "Keep the custom domain and the redirect for unversioned links"
+            git push origin gh-pages
+          fi
