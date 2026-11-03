@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-03
+
+Restructured, fully tested and versioned documentation, and fixes that change
+results: `pmi_smoothed` derives its marginals from the smoothed joint
+distribution, and Goodman–Kruskal λ scores degenerate subsets as 1, like Theil's
+U. `square_ct=False` is deprecated. See `MIGRATION.md`.
+
 ### Added
 
 - Zenodo DOIs: 10.5281/zenodo.23917212 for version 0.8.0, and 10.5281/zenodo.23917211 for all versions. They are in
@@ -462,7 +469,8 @@ All APIs remain the same, only the package name changed.
 - **0.2.1** - Double series correlation
 - **0.2.0** - Initial release
 
-[Unreleased]: https://github.com/tresoldi/asymcat/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/tresoldi/asymcat/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/tresoldi/asymcat/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/tresoldi/asymcat/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/tresoldi/asymcat/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/tresoldi/asymcat/compare/1867eb9...v0.6.0

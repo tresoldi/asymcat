@@ -29,8 +29,8 @@ own DOI:
 **APA**
 
 > Tresoldi, T. (2026). *ASymCat: Asymmetric measures of association between
-> categorical variables* (Version 0.8.0) [Computer software]. Zenodo.
-> https://doi.org/10.5281/zenodo.23917212
+> categorical variables* (Version 0.9.0) [Computer software]. Zenodo.
+> https://doi.org/10.5281/zenodo.23917211
 
 **BibTeX** (biblatex, or any style that supports `@software`)
 
@@ -40,8 +40,8 @@ own DOI:
   title   = {{ASymCat}: Asymmetric measures of association between
              categorical variables},
   year    = {2026},
-  version = {0.8.0},
-  doi     = {10.5281/zenodo.23917212},
+  version = {0.9.0},
+  doi     = {10.5281/zenodo.23917211},
   url     = {https://asymcat.tresoldi.org/}
 }
 ```
@@ -55,9 +55,9 @@ templates)
   title        = {{ASymCat}: Asymmetric measures of association between
                   categorical variables},
   year         = {2026},
-  note         = {Version 0.8.0},
-  doi          = {10.5281/zenodo.23917212},
-  howpublished = {\url{https://doi.org/10.5281/zenodo.23917212}}
+  note         = {Version 0.9.0},
+  doi          = {10.5281/zenodo.23917211},
+  howpublished = {\url{https://doi.org/10.5281/zenodo.23917211}}
 }
 ```
 

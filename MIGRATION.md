@@ -1,6 +1,6 @@
 # Migration Guide
 
-## Migrating to the next release (unreleased)
+## Migrating to 0.9.0
 
 ### `pmi_smoothed()` results change with smoothing
 
