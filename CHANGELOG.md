@@ -23,6 +23,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runs them so they cannot drift from the code. All links are absolute, so they
   also work on PyPI. The badges are reduced to version, Python versions, CI,
   docs, DOI and licence.
+- **Landing page refreshed.** The masthead shows the version and DOI and a row
+  of links into the documentation; four entry cards lead to getting started, the
+  measures, the how-to guides and the API reference. The quick start is the
+  README's, and a new test (`tests/unit/test_landing_example.py`) runs it. The
+  illustrative figure is replaced by a figure computed with ASymCat on the
+  bundled UCI Mushroom sample (`P(class | odour)` against `P(odour | class)`).
+  The page also gains Related projects and links to How to cite and the
+  migration guide.
 
 ## [0.8.0] - 2026-11-03
 
