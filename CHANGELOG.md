@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-03
+
+Corrects the direction of `mle()` and `tresoldi()` and prepares ASymCat for
+citation. **Results of `mle` and `tresoldi` change**; see `MIGRATION.md`.
+
 ### Fixed
 
 - **`mle()` returned its tuple in the reverse of the documented order.** For a
@@ -381,7 +386,8 @@ All APIs remain the same, only the package name changed.
 - **0.2.1** - Double series correlation
 - **0.2.0** - Initial release
 
-[Unreleased]: https://github.com/tresoldi/asymcat/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/tresoldi/asymcat/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/tresoldi/asymcat/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/tresoldi/asymcat/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/tresoldi/asymcat/compare/1867eb9...v0.6.0
 [0.5.0]: https://github.com/tresoldi/asymcat/compare/v0.4.0...1867eb9
