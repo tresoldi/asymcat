@@ -75,7 +75,7 @@ xy, yx, x_labels, y_labels = asymcat.scorer.scorer2matrices(scorer.pmi())
 | `log_likelihood_ratio` | G² association statistic | statistical |
 | `goodman_kruskal_lambda` | proportional reduction in prediction error | statistical |
 | `jaccard_index` | directional set overlap | set-based |
-| `tresoldi` | smoothed measure tuned for sequence alignment | specialized |
+| `tresoldi` | PMI tempered by conditional probability, for alignments | specialized |
 
 **Significance and uncertainty.** The statistical tests expose matching p-value
 scorers (`chi2_pvalue`, `fisher_pvalue`, `log_likelihood_ratio_pvalue`). For any
@@ -119,10 +119,12 @@ scorer.theil_u()
   API reference.
 - **[User Guide](docs/USER_GUIDE.md)** — concepts, measure selection, data
   preparation, and worked examples.
-- **[The Tresoldi Measure](docs/TRESOLDI_MEASURE.md)** — motivation and
-  definition of the specialized `tresoldi` measure.
+- **[The Tresoldi Measure](docs/TRESOLDI_MEASURE.md)** — definition,
+  properties and caveats of the specialized `tresoldi` measure.
 - **[API Reference](https://asymcat.tresoldi.org/reference/)** — every public
   class and function, generated from the source.
+- **[References](https://asymcat.tresoldi.org/references/)** — the published
+  source of each measure, with a BibTeX file.
 
 ## Applications
 
@@ -130,19 +132,28 @@ Directional association between categories recurs across fields: grapheme–phon
 correspondence and sound-change directionality in **linguistics**; asymmetric
 species co-occurrence in **ecology**; feature screening in **machine learning**;
 and dependency analysis in **categorical analytics**. Sample datasets for several
-of these live in [`resources/`](resources/).
+of these live in [`resources/`](resources/); see
+[`resources/README.md`](resources/README.md) for their sources and licences.
 
 ## Citation
 
-If you use ASymCat in academic research, please cite:
+If you use ASymCat in published work, please cite the version you used:
 
 ```bibtex
 @software{tresoldi_asymcat,
   author  = {Tresoldi, Tiago},
-  title   = {ASymCat: Asymmetric measures of association between categorical variables},
-  url     = {https://github.com/tresoldi/asymcat}
+  title   = {{ASymCat}: Asymmetric measures of association between
+             categorical variables},
+  year    = {2026},
+  version = {0.7.0},
+  url     = {https://asymcat.tresoldi.org/}
 }
 ```
+
+See [How to cite](https://asymcat.tresoldi.org/citing/) for APA and classic
+BibTeX forms, and [References](https://asymcat.tresoldi.org/references/) for
+the papers behind each measure. Citation metadata is also in
+[`CITATION.cff`](CITATION.cff).
 
 ## License
 

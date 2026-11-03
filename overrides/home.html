@@ -177,7 +177,7 @@ scores[("a", "x")]   <span class="c-com"># (0.83, 0.20)  — P(x|a) vs P(a|x): t
             <tr><td class="m">log_likelihood_ratio</td><td>statistical</td><td class="k">G² statistic</td></tr>
             <tr><td class="m">goodman_kruskal_lambda</td><td>statistical</td><td class="k">proportional error reduction</td></tr>
             <tr><td class="m">jaccard_index</td><td>set-based</td><td class="k">directional overlap</td></tr>
-            <tr><td class="m">tresoldi</td><td>specialized</td><td class="k">smoothed measure for sequences</td></tr>
+            <tr><td class="m">tresoldi</td><td>specialized</td><td class="k">PMI tempered by conditional probability</td></tr>
           </tbody>
         </table>
       </div>
@@ -206,6 +206,7 @@ scores[("a", "x")]   <span class="c-com"># (0.83, 0.20)  — P(x|a) vs P(a|x): t
         <a href="{{ base_url }}/USER_GUIDE/">User Guide →</a>
         <a href="{{ base_url }}/reference/">API Reference →</a>
         <a href="{{ base_url }}/TRESOLDI_MEASURE/">The Tresoldi Measure →</a>
+        <a href="{{ base_url }}/references/">References →</a>
         <a href="https://github.com/tresoldi/asymcat/blob/master/CHANGELOG.md">Changelog →</a>
         <a href="https://github.com/tresoldi/asymcat">Source (GitHub) →</a>
         <a href="https://pypi.org/project/asymcat/">Package (PyPI) →</a>
@@ -214,18 +215,24 @@ scores[("a", "x")]   <span class="c-com"># (0.83, 0.20)  — P(x|a) vs P(a|x): t
 
     <section>
       <h2>Citation</h2>
-<pre>@software{tresoldi_asymcat,
+      <p>Please cite the version you used. See
+        <a href="{{ base_url }}/citing/">How to cite</a> for APA and classic
+        BibTeX forms, and <a href="{{ base_url }}/references/">References</a>
+        for the papers behind each measure.</p>
+{% raw %}<pre>@software{tresoldi_asymcat,
   author  = {Tresoldi, Tiago},
-  title   = {ASymCat: Asymmetric measures of association between
+  title   = {{ASymCat}: Asymmetric measures of association between
              categorical variables},
-  url     = {https://github.com/tresoldi/asymcat}
-}</pre>
+  year    = {2026},
+  version = {0.7.0},
+  url     = {https://asymcat.tresoldi.org/}
+}</pre>{% endraw %}
     </section>
   </main>
 
   <footer>
     <span>MIT License</span>
-    <span>© Tiago Tresoldi</span>
+    <span>© 2019–2026 Tiago Tresoldi</span>
   </footer>
 </div>
 

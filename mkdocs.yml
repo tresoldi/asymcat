@@ -35,9 +35,8 @@ nav:
   - User Guide: USER_GUIDE.md
   - The Tresoldi Measure: TRESOLDI_MEASURE.md
   - API Reference: reference.md
-
-exclude_docs: |
-  archive/
+  - References: references.md
+  - How to cite: citing.md
 
 plugins:
   - search

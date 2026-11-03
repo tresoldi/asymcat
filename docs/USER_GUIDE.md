@@ -186,11 +186,12 @@ $$U(Y|X) = \frac{H(Y) - H(Y|X)}{H(Y)} = \frac{I(X; Y)}{H(Y)}$$
 
 **Tresoldi Measure** (ASymCat-specific):
 
-$$T(X, Y) = \text{PMI}(X, Y)^{1 - P(Y|X)}$$
+$$T(X \to Y) = \operatorname{sign}(\text{PMI}) \, |\text{PMI}(X, Y)|^{1 - P(Y|X)}$$
 
 - Combines information content with conditional probability
 - Designed for sequence alignment applications
-- Penalizes low-probability predictions
+- Pulls the PMI towards ±1 as the conditional probability approaches 1; when
+  prediction is weak, the score stays close to the PMI
 
 ## Association Measures Guide
 
@@ -605,11 +606,11 @@ $$G^2 = 2\sum_{x,y} O_{xy} \log \frac{O_{xy}}{E_{xy}}$$
 
 #### Tresoldi Measure
 
-**Concept:** PMI weighted by conditional probability.
+**Concept:** PMI tempered by conditional probability.
 
 **Formula:**
 
-$$T(X, Y) = \text{PMI}(X, Y)^{1 - P(Y|X)}$$
+$$T(X \to Y) = \operatorname{sign}(\text{PMI}) \, |\text{PMI}(X, Y)|^{1 - P(Y|X)}$$
 
 **When to use:**
 - Sequence alignment
@@ -617,19 +618,20 @@ $$T(X, Y) = \text{PMI}(X, Y)^{1 - P(Y|X)}$$
 - When both information content and probability matter
 
 **Interpretation:**
-- Combines PMI (information) with MLE (probability)
-- Penalizes low-probability associations
-- **Asymmetric**: T(X,Y) ≠ T(Y,X)
+- Close to the PMI when $P(Y|X)$ is low; exactly ±1 when $P(Y|X) = 1$
+- The sign is the sign of the PMI
+- **Asymmetric**: $T(X \to Y) \neq T(Y \to X)$ whenever $P(Y|X) \neq P(X|Y)$
 
 **Strengths:**
 - Designed for linguistic alignment
-- Balances information and probability
+- Keeps the sign and scale of PMI for weak predictions
 - Asymmetric
 
 **Weaknesses:**
-- Less established theoretically
-- Domain-specific design
-- Complex interpretation
+- Not normalized, and not monotone in predictive strength: for $|\text{PMI}| > 1$
+  the score falls towards 1 as $P(Y|X)$ rises
+- Specific to ASymCat; see [The Tresoldi Measure](TRESOLDI_MEASURE.md) for its
+  properties and caveats
 
 **Example Use Case:** Grapheme-to-phoneme alignment in historical linguistics.
 
@@ -1624,7 +1626,6 @@ triplets = [(x, y, z) for x, y, z in data]
 
 For every public class and function, see the [API Reference](reference.md);
 for the motivation and definition of the specialized measure, see
-[The Tresoldi Measure](TRESOLDI_MEASURE.md). The earlier tutorial scripts are
-kept, unmaintained, in the repository's
-[`docs/archive/`](https://github.com/tresoldi/asymcat/tree/master/docs/archive)
-directory.
+[The Tresoldi Measure](TRESOLDI_MEASURE.md); for the published source of each
+measure, see [References](references.md); and to cite ASymCat, see
+[How to cite](citing.md).

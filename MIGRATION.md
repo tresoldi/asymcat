@@ -1,5 +1,38 @@
 # Migration Guide
 
+## Migrating to 0.8.0
+
+### `mle()` and `tresoldi()` now follow the documented direction
+
+Every measure returns, for a pair `(x, y)`, a tuple whose first element is the
+`x → y` direction (`x` predicting `y`) and whose second is `y → x`. `mle()` used
+to return the reverse, `(P(x|y), P(y|x))`, unlike the documentation and unlike
+`theil_u`, `cond_entropy` and `goodman_kruskal_lambda`. It now returns
+`(P(y|x), P(x|y))`.
+
+`tresoldi()` takes its exponent from `mle()`, and PMI is symmetric, so its two
+elements swap in the same way. No other measure changes.
+
+```python
+# With "q" always followed by "k", but "k" also following other symbols:
+scorer.mle()[("q", "k")]
+# before 0.8.0: (0.2, 1.0)   i.e. (P(q|k), P(k|q))
+# from 0.8.0:   (1.0, 0.2)   i.e. (P(k|q), P(q|k))
+```
+
+**What to do:**
+
+- **Results from earlier versions:** if you reported `mle` or `tresoldi` values,
+  the two directions in them were swapped relative to their labels. Swap the
+  elements to compare them with 0.8.0 results.
+- **Code that swapped the tuple:** if your code worked around the old order
+  (for example, reading `mle()[pair][1]` as `P(y|x)`), remove the workaround.
+- **Everything else:** code that already treated the first element as `x → y`
+  is now correct, with no change needed.
+
+`scorer2matrices`, `permutation_pvalue` and `bootstrap_ci` pass the tuples
+through unchanged, so their results for these two measures swap too.
+
 ## Migrating to 0.7.0
 
 The public API is unchanged and every existing result is identical:

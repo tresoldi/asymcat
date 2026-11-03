@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`mle()` returned its tuple in the reverse of the documented order.** For a
+  pair `(x, y)` it gave `(P(x|y), P(y|x))`, while the README, the User Guide,
+  and `theil_u`, `cond_entropy` and `goodman_kruskal_lambda` all use the
+  `(X→Y, Y→X)` order, i.e. `(P(y|x), P(x|y))`. It now follows that order.
+  `tresoldi()`, which takes its exponent from `mle()`, swaps with it. **This
+  changes results** for both measures, and for `permutation_pvalue`,
+  `bootstrap_ci` and `scorer2matrices` applied to them. The behaviour dated back
+  to the original implementation; the legacy expected values in the tests are
+  updated, and a new test pins the direction of every measure. See
+  `MIGRATION.md`.
+
+### Added
+
+- **References** page on the documentation site, with the published source of
+  every measure and a `references.bib` file.
+- **How to cite** page with APA and BibTeX (`@software` and `@misc`) entries.
+- `resources/README.md` now gives a full citation, source URL and licence for
+  every sample dataset, and `resources/LICENSE-cmudict.txt` carries the notice
+  CMUdict's licence requires.
+
+### Changed
+
+- **The Tresoldi Measure page is rewritten.** The previous page stated several
+  properties the formula does not have: it said high scores require a high
+  conditional probability (a conditional probability of 1 gives exactly ±1),
+  reversed the monotonicity in the conditional probability, said the PMI term
+  needs smoothing (it uses raw frequencies), and listed significance testing as
+  an open question (`permutation_pvalue` and `bootstrap_ci` already accept
+  `"tresoldi"`). The new page states the definition, the limiting cases and the
+  properties with values computed by ASymCat. The User Guide, README and home
+  page descriptions are corrected to match.
+- `CITATION.cff` adds an ORCID iD and the PyPI artifact; README and home-page
+  BibTeX entries now include the year and version and point to the
+  documentation site. PyPI's Homepage link now points to the site too.
+
+### Removed
+
+- `docs/archive/` (the pre-0.6 Sphinx site, tutorials and LLM documentation).
+  It was excluded from the site and partly outdated; it remains in the git
+  history and in the `v0.7.0` tag.
+
 ## [0.7.0] - 2026-11-03
 
 Adopts freqprob's bias-corrected entropy estimators and trims the dependencies

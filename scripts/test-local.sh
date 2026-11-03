@@ -36,9 +36,9 @@ fi
 run_job() {
     local job_name="$1"
     local workflow_file="$2"
-    
+
     echo -e "${YELLOW}🔧 Running job: $job_name${NC}"
-    
+
     # Use act with our configuration
     act -W "$workflow_file" \
         --job "$job_name" \
@@ -47,7 +47,7 @@ run_job() {
         --container-architecture linux/amd64 \
         --artifact-server-path /tmp/artifacts \
         --verbose
-    
+
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✅ Job $job_name completed successfully${NC}"
     else
@@ -60,16 +60,16 @@ run_job() {
 run_workflow() {
     local workflow_file="$1"
     local workflow_name=$(basename "$workflow_file" .yml)
-    
+
     echo -e "${BLUE}🏗️  Running workflow: $workflow_name${NC}"
-    
+
     act -W "$workflow_file" \
         --env-file .env \
         --platform ubuntu-latest=catthehacker/ubuntu:act-22.04 \
         --container-architecture linux/amd64 \
         --artifact-server-path /tmp/artifacts \
         --verbose
-    
+
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✅ Workflow $workflow_name completed successfully${NC}"
     else
