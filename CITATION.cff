@@ -23,6 +23,14 @@ license: MIT
 repository-code: "https://github.com/tresoldi/asymcat"
 repository-artifact: "https://pypi.org/project/asymcat/"
 url: "https://asymcat.tresoldi.org/"
+doi: 10.5281/zenodo.23917211
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23917211
+    description: "Concept DOI for all versions of ASymCat; resolves to the latest release."
+  - type: doi
+    value: 10.5281/zenodo.23917212
+    description: "DOI of ASymCat version 0.8.0."
 keywords:
   - statistics
   - categorical
