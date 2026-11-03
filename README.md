@@ -35,6 +35,10 @@ variable predicts which, and how strongly, in each direction.
 pip install asymcat
 ```
 
+ASymCat itself needs only FreqProb, NumPy and SciPy. For the plotting examples
+in the documentation, `pip install "asymcat[viz]"` adds matplotlib, seaborn and
+pandas.
+
 ## The interface
 
 The workflow is always the same: read data into paired sequences (or a
@@ -86,14 +90,26 @@ scorer.permutation_pvalue("theil_u", n_permutations=1000, seed=0)
 scorer.bootstrap_ci("theil_u", n_bootstrap=1000, confidence_level=0.95, seed=0)
 ```
 
+**Sparse data.** Plug-in entropy is biased low on small samples, and that bias
+carries into Theil's U, conditional entropy and mutual information. Pass
+`entropy_estimator="chao_shen"` (fast) or `"nsb"` (Bayesian, slower) to use
+FreqProb's bias-corrected estimators; permutation tests and bootstrap intervals
+then use the same estimator.
+
+```python
+scorer = asymcat.CatScorer(coocs, entropy_estimator="chao_shen")
+scorer.theil_u()
+```
+
 ## Why ASymCat
 
 - **Directional by construction** — every measure reports `x→y` and `y→x`
   separately, surfacing asymmetries symmetric measures average away.
 - **One consistent API** across a dozen measures — swap `scorer.mle()` for
   `scorer.theil_u()` without changing anything else.
-- **Robust smoothing** via [FreqProb](https://github.com/tresoldi/freqprob) for
-  numerically stable probability estimates on sparse data.
+- **Built for sparse data** via [FreqProb](https://github.com/tresoldi/freqprob):
+  smoothing for stable probability estimates, and bias-corrected entropy
+  estimators for the information-theoretic measures.
 - **Typed and tested** — full type hints (`py.typed`), strict linting and
   type-checking, and a test suite run across Python 3.10–3.12.
 

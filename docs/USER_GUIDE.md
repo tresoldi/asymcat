@@ -9,11 +9,12 @@ A comprehensive guide to asymmetric categorical association analysis.
 3. [Association Measures Guide](#association-measures-guide)
 4. [Data Preparation](#data-preparation)
 5. [Smoothing Methods](#smoothing-methods)
-6. [Visualization Techniques](#visualization-techniques)
-7. [Best Practices](#best-practices)
-8. [Common Use Cases](#common-use-cases)
-9. [Interpretation Guidelines](#interpretation-guidelines)
-10. [Advanced Topics](#advanced-topics)
+6. [Entropy Estimation](#entropy-estimation)
+7. [Visualization Techniques](#visualization-techniques)
+8. [Best Practices](#best-practices)
+9. [Common Use Cases](#common-use-cases)
+10. [Interpretation Guidelines](#interpretation-guidelines)
+11. [Advanced Topics](#advanced-topics)
 
 ## Introduction
 
@@ -72,22 +73,23 @@ ASymCat provides:
 - **17+ Association Measures**: Probabilistic, information-theoretic, statistical, and specialized
 - **Directional Analysis**: Explicit X→Y vs Y→X quantification
 - **Robust Smoothing**: Handle sparse data with FreqProb integration
+- **Bias-Corrected Entropy**: Chao-Shen and NSB estimators for the information-theoretic measures
 - **Multiple Data Formats**: Sequences, presence-absence matrices, n-grams
-- **Comprehensive Visualization**: Heatmaps, distributions, networks
+- **Plot-Ready Output**: Turn any measure into matrices for heatmaps and distributions
 - **Statistical Validation**: Bootstrap, permutation tests
 - **Scalable Architecture**: Optimized for large datasets
 
 ### Installation
 
 ```bash
-# Core installation
+# Core installation (depends only on freqprob, numpy and scipy)
 pip install asymcat
 
-# With visualization support
-pip install asymcat[viz]
+# Plus matplotlib, seaborn and pandas, for the Visualization examples
+pip install "asymcat[viz]"
 
-# All features
-pip install asymcat[all]
+# Everything, including development tooling
+pip install "asymcat[all]"
 ```
 
 ## Mathematical Background
@@ -867,7 +869,73 @@ scorer = asymcat.CatScorer(cooccs, smoothing_method="lidstone", smoothing_alpha=
 - Smoothing increases rare pair probability noticeably
 - Smoothing gives non-zero to unseen pairs
 
+## Entropy Estimation
+
+Theil's U, conditional entropy, mutual information and normalized mutual
+information are all built from entropies. By default ASymCat estimates them
+with the **plug-in** (maximum-likelihood) estimator: the entropy of the
+observed relative frequencies. On small or sparse samples the plug-in estimate
+is biased low, because a sample misses rare symbols and makes the ones it does
+contain look more predictable than they are. Each measure combines several
+entropies, so this bias reaches the scores unevenly.
+
+`CatScorer` takes an `entropy_estimator` that swaps in one of
+[FreqProb](https://github.com/tresoldi/freqprob)'s bias-corrected estimators:
+
+| Estimator | Approach | Cost |
+|-----------|----------|------|
+| `"plugin"` (default) | Entropy of the observed frequencies | Fastest (vectorized) |
+| `"chao_shen"` | Good-Turing coverage correction plus a Horvitz-Thompson adjustment for unseen symbols | Fast |
+| `"nsb"` | Nemenman-Shafee-Bialek: a Bayesian estimate averaged over Dirichlet priors, strongest when undersampled | Much slower |
+
+```python
+import asymcat
+
+coocs = asymcat.collect_cooccs(asymcat.read_sequences("data.tsv"))
+
+plugin = asymcat.CatScorer(coocs)  # entropy_estimator="plugin"
+corrected = asymcat.CatScorer(coocs, entropy_estimator="chao_shen")
+
+plugin.theil_u()[("a", "x")]
+corrected.theil_u()[("a", "x")]
+```
+
+The estimator applies to `theil_u`, `cond_entropy`, `mutual_information` and
+`normalized_mutual_information`, and to the significance methods built on
+them: `permutation_pvalue` and `bootstrap_ci` score every replicate with the
+scorer's estimator. The scalar helpers in `asymcat.scorer` (for example
+`compute_theil_u(xs, ys, estimator="nsb")`) and the `asymcat.correlation`
+wrappers accept it too. Probability-based measures are unaffected; their
+small-sample counterpart is [smoothing](#smoothing-methods).
+
+**How the corrected estimates are computed.** A measure scores a pair (x, y)
+over the co-occurrences in which x or y appears. ASymCat estimates H(X), H(Y)
+and H(X, Y) on that subset separately and derives the rest by the chain rule:
+H(Y | X) = H(X, Y) − H(X) and MI = H(X) + H(Y) − H(X, Y). For `"nsb"`, the
+alphabet of each distribution is every symbol the data could place in it (all
+of X, all of Y, and the |X| + |Y| − 1 cells of the subset), so NSB can reserve
+entropy for symbols seen elsewhere in the data but absent from the subset.
+
+**Reading the results.**
+
+- Bias-corrected Theil's U and (normalized) mutual information are not
+  confined to [0, 1]. On a small subset, a slightly negative value means no
+  detectable association rather than an error; clipping it would reintroduce
+  the bias the estimator removes.
+- Degenerate subsets keep the plug-in conventions: a subset with a single x
+  (or y) symbol gives Theil's U of 1.0, and a single joint cell gives a
+  normalized mutual information of 0.0.
+
+**Choosing an estimator.** Start with `"chao_shen"` when many symbols are rare:
+it costs little more than the plug-in estimate. Use `"nsb"` when the alphabet
+is large relative to the sample and the computation is affordable, and prefer
+fewer resampling replicates with it. On well-sampled data all three agree
+closely.
+
 ## Visualization Techniques
+
+These examples use matplotlib, seaborn and pandas, which ASymCat does not
+install by default. Install them with `pip install "asymcat[viz]"`.
 
 ### Heatmap Strategies
 
@@ -933,8 +1001,8 @@ import seaborn as sns
 xy_scores = [scores[pair][0] for pair in scores]
 yx_scores = [scores[pair][1] for pair in scores]
 
-sns.kdeplot(xy_scores, label="X → Y", shade=True)
-sns.kdeplot(yx_scores, label="Y → X", shade=True)
+sns.kdeplot(xy_scores, label="X → Y", fill=True)
+sns.kdeplot(yx_scores, label="Y → X", fill=True)
 plt.xlabel("Score")
 plt.ylabel("Density")
 plt.legend()
@@ -1041,23 +1109,29 @@ plt.savefig("figure_composite.pdf", dpi=300)
    scorer = CatScorer(cooccs, smoothing_method="laplace")
    ```
 
-2. **Filter rare events:**
+2. **Correct the entropy bias** (information-theoretic measures; see
+   [Entropy Estimation](#entropy-estimation)):
+   ```python
+   scorer = CatScorer(cooccs, entropy_estimator="chao_shen")
+   ```
+
+3. **Filter rare events:**
    ```python
    # Remove pairs with count < threshold
    filtered_cooccs = [(x, y) for (x, y) in cooccs if cooccs.count((x, y)) >= 5]
    ```
 
-3. **Aggregate categories:**
+4. **Aggregate categories:**
    - Combine similar categories
    - Use broader bins
 
-4. **Use exact tests:**
+5. **Use exact tests:**
    ```python
    # Fisher's exact test handles small samples better
    fisher_scores = scorer.fisher()
    ```
 
-5. **Bootstrap validation:**
+6. **Bootstrap validation:**
    - Estimate confidence intervals
    - Check stability of results
 
@@ -1548,11 +1622,9 @@ triplets = [(x, y, z) for x, y, z in data]
 
 **End of User Guide**
 
-For practical examples with code, see the tutorials:
-- tutorial_1_basics.py - Core workflow
-- tutorial_2_advanced_measures.py - All measures
-- tutorial_3_visualization.py - Plotting techniques
-- tutorial_4_real_world.py - Complete analyses
-
-For API reference, see API_REFERENCE.md.
-For LLM integration, see LLM_DOCUMENTATION.md.
+For every public class and function, see the [API Reference](reference.md);
+for the motivation and definition of the specialized measure, see
+[The Tresoldi Measure](TRESOLDI_MEASURE.md). The earlier tutorial scripts are
+kept, unmaintained, in the repository's
+[`docs/archive/`](https://github.com/tresoldi/asymcat/tree/master/docs/archive)
+directory.

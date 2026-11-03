@@ -1,5 +1,46 @@
 # Migration Guide
 
+## Migrating to 0.7.0
+
+The public API is unchanged and every existing result is identical:
+`entropy_estimator` is a new, opt-in argument whose default (`"plugin"`) is
+the previous behavior. What changed is what a plain `pip install asymcat`
+installs.
+
+### A plain install no longer pulls in plotting and dataframe libraries
+
+ASymCat's runtime dependencies are now exactly what the package imports:
+**freqprob, NumPy and SciPy**. It no longer installs `matplotlib`, `pandas`,
+`seaborn` or `tabulate`, none of which the package itself used.
+
+If your own code imports any of them and relied on ASymCat to install them,
+either declare them in your project or install the plotting extra:
+
+```bash
+pip install "asymcat[viz]"  # matplotlib, seaborn and pandas
+```
+
+`tabulate` is not in any extra; install it directly if you need it.
+
+### The `viz` extra changed contents
+
+`asymcat[viz]` used to install `plotly`, `bokeh` and `altair`, which nothing in
+ASymCat or its documentation used. It now installs the libraries the User
+Guide's plotting examples actually use (`matplotlib`, `seaborn`, `pandas`).
+Install `plotly`, `bokeh` or `altair` directly if you want them.
+
+### freqprob 0.8.0 or later is required
+
+The bias-corrected estimators come from freqprob. Version 0.8.0 fixes
+`chao_shen_entropy` returning zero for samples in which every symbol occurs
+once, a case that is common in sparse co-occurrence data.
+
+### For contributors
+
+`scikit-learn`, `types-tabulate` and `types-setuptools` were dropped from the
+`test` and `dev` extras (none were imported), and the linters are now pinned at
+`ruff==0.17.3` and `mypy==2.4.1`. Reinstall with `pip install -e ".[dev]"`.
+
 ## The `src/` layout restructure
 
 This restructure aligns ASymCat's packaging, documentation, and tooling with the

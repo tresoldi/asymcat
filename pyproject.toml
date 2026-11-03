@@ -34,21 +34,18 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "freqprob>=0.6.2",
-    "matplotlib",
+    "freqprob>=0.8.0",
     "numpy",
-    "pandas",
     "scipy",
-    "seaborn",
-    "tabulate",
 ]
 
 [project.optional-dependencies]
-# Interactive/optional visualization backends
+# Plotting stack used by the User Guide's visualization examples (the package
+# itself needs none of it)
 viz = [
-    "plotly>=6.9.0",
-    "bokeh>=3.9.2",
-    "altair>=5.0.0",
+    "matplotlib",
+    "pandas",
+    "seaborn",
 ]
 # Testing dependencies (lightweight; used by the CI test matrix)
 test = [
@@ -57,7 +54,6 @@ test = [
     "pytest-xdist>=3.0.0",
     "pytest-mock>=3.15.1",
     "pytest-benchmark>=5.2.3",
-    "scikit-learn>=1.0.0",
 ]
 # Documentation site (MkDocs + mkdocstrings)
 docs = [
@@ -72,10 +68,8 @@ dev = [
     # Code quality. ruff/mypy pinned exactly so local, CI, and pre-commit run
     # identical linter versions (unpinned ruff/mypy drift silently changes
     # check results).
-    "ruff==0.16.1",
-    "mypy==1.19.1",
-    "types-tabulate>=0.9.0",
-    "types-setuptools>=83.0.0.20260724",
+    "ruff==0.17.3",
+    "mypy==2.4.1",
     "bandit[toml]>=1.7.0",
 
     # Bound the stub-bearing scientific deps for the type-check (quality) job,
@@ -185,12 +179,8 @@ show_error_codes = true
 module = [
     "numpy.*",
     "scipy.*",
-    "pandas.*",
-    "matplotlib.*",
-    "seaborn.*",
     "freqprob.*",
     "pytest.*",
-    "sklearn.*",
 ]
 ignore_missing_imports = true
 

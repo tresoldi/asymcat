@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-03
+
+Adopts freqprob's bias-corrected entropy estimators and trims the dependencies
+to what the package imports. Existing results are unchanged; see `MIGRATION.md`
+for the installation changes.
+
+### Added
+- `entropy_estimator` option on `CatScorer` (`"plugin"`, the default, plus
+  `"chao_shen"` and `"nsb"`) for `theil_u`, `cond_entropy`,
+  `mutual_information` and `normalized_mutual_information`, using freqprob's
+  bias-corrected estimators for sparse data. `permutation_pvalue` and
+  `bootstrap_ci` score their replicates with the same estimator.
+- `estimator` argument on the scalar helpers (`conditional_entropy`,
+  `compute_theil_u`, `compute_mutual_information`,
+  `compute_normalized_mutual_information`) and on the
+  `correlation.conditional_entropy` and `correlation.theil_u` wrappers.
+- User Guide section on entropy estimation.
+
+### Changed
+- Runtime dependencies are now `freqprob>=0.8.0`, `numpy` and `scipy`.
+  `matplotlib`, `pandas`, `seaborn` and `tabulate` are no longer installed: the
+  package never imported them.
+- The `viz` extra installs `matplotlib`, `seaborn` and `pandas`, which the User
+  Guide's plotting examples use, instead of the unused `plotly`, `bokeh` and
+  `altair`.
+- Development tooling: `ruff` 0.17.3 and `mypy` 2.4.1. The unused
+  `scikit-learn`, `types-tabulate` and `types-setuptools` were dropped from the
+  extras.
+
+### Fixed
+- The User Guide and the Tresoldi Measure page pointed at archived files
+  (tutorial scripts, `API_REFERENCE.md`, `LLM_DOCUMENTATION.md`) and at a
+  stale source path and line range; they now link to the live API Reference.
+- `CatScorer`'s docstring listed a nonexistent `'ele'` smoothing method and
+  misdescribed `smoothing_alpha`.
+- A User Guide plotting example used seaborn's deprecated `shade=` argument.
+- The compare links for 0.5.0 and 0.6.0 referenced a `v0.5.0` tag that was
+  never created.
+
 ## [0.6.0] - 2026-07-30
 
 This release restructures the project to match the layout and tooling of the
@@ -299,9 +338,10 @@ All APIs remain the same, only the package name changed.
 - **0.2.1** - Double series correlation
 - **0.2.0** - Initial release
 
-[Unreleased]: https://github.com/tresoldi/asymcat/compare/v0.6.0...HEAD
-[0.6.0]: https://github.com/tresoldi/asymcat/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/tresoldi/asymcat/compare/v0.4.0...v0.5.0
+[Unreleased]: https://github.com/tresoldi/asymcat/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/tresoldi/asymcat/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/tresoldi/asymcat/compare/1867eb9...v0.6.0
+[0.5.0]: https://github.com/tresoldi/asymcat/compare/v0.4.0...1867eb9
 [0.4.0]: https://github.com/tresoldi/asymcat/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/tresoldi/asymcat/releases/tag/v0.3.1
 [0.3.0]: https://github.com/tresoldi/asymcat/releases/tag/v0.3.0
