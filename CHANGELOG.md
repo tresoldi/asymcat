@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `CITATION.cff`, the README (with a DOI badge), the home page and the How to
   cite page.
 
+### Changed
+
+- **README rewritten as the project's front door**, with the same structure as
+  FreqProb's: badges, a short description with the DOI, install, a runnable
+  quick start, the selection table, highlights, links into the documentation,
+  related projects, citation and licence. Every example now uses inline data
+  and shows its real output, and a new test (`tests/unit/test_readme.py`)
+  runs them so they cannot drift from the code. All links are absolute, so they
+  also work on PyPI. The badges are reduced to version, Python versions, CI,
+  docs, DOI and licence.
+
 ## [0.8.0] - 2026-11-03
 
 Corrects the direction of `mle()` and `tresoldi()` and prepares ASymCat for
