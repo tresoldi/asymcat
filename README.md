@@ -1,34 +1,23 @@
 # ASymCat
 
-[![CI](https://github.com/tresoldi/asymcat/actions/workflows/quality.yml/badge.svg)](https://github.com/tresoldi/asymcat/actions/workflows/quality.yml)
-[![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://asymcat.tresoldi.org/)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23917211.svg)](https://doi.org/10.5281/zenodo.23917211)
-[![PyPI version](https://badge.fury.io/py/asymcat.svg)](https://badge.fury.io/py/asymcat)
+[![PyPI version](https://img.shields.io/pypi/v/asymcat.svg)](https://pypi.org/project/asymcat/)
 [![Python versions](https://img.shields.io/pypi/pyversions/asymcat.svg)](https://pypi.org/project/asymcat/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![CI](https://github.com/tresoldi/asymcat/actions/workflows/quality.yml/badge.svg)](https://github.com/tresoldi/asymcat/actions/workflows/quality.yml)
+[![Docs](https://img.shields.io/badge/docs-asymcat.tresoldi.org-blue.svg)](https://asymcat.tresoldi.org/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23917211.svg)](https://doi.org/10.5281/zenodo.23917211)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](https://github.com/tresoldi/asymcat/blob/master/LICENSE)
 
 **Measure association between categorical variables — separately in each direction.**
 
 Most association measures are *symmetric*: they report one number for a pair of
 variables, as if the relationship between `X` and `Y` were the same as between
 `Y` and `X`. Many real relationships are not. ASymCat scores association in both
-directions across a dozen probabilistic, information-theoretic, and statistical
+directions across a dozen probabilistic, information-theoretic and statistical
 measures, behind one consistent interface.
 
-```python
-import asymcat
-
-data = asymcat.read_sequences("data.tsv")
-coocs = asymcat.collect_cooccs(data)
-scorer = asymcat.CatScorer(coocs)
-
-scorer.mle()[("a", "x")]  # (0.83, 0.20)  — P(x|a) vs P(a|x)
-```
-
-That tuple is the whole point: a symmetric summary would collapse the two numbers
-into one and hide exactly the structure ASymCat is built to reveal — which
-variable predicts which, and how strongly, in each direction.
+If you use ASymCat in research, please cite it:
+[doi:10.5281/zenodo.23917212](https://doi.org/10.5281/zenodo.23917212)
+(version 0.8.0; see [Citation](#citation)).
 
 ## Install
 
@@ -36,32 +25,53 @@ variable predicts which, and how strongly, in each direction.
 pip install asymcat
 ```
 
-ASymCat itself needs only FreqProb, NumPy and SciPy. For the plotting examples
-in the documentation, `pip install "asymcat[viz]"` adds matplotlib, seaborn and
-pandas.
+ASymCat needs only FreqProb, NumPy and SciPy. For the plotting examples in the
+documentation, `pip install "asymcat[viz]"` adds matplotlib, seaborn and pandas.
 
-## The interface
+## Quick start
 
-The workflow is always the same: read data into paired sequences (or a
-presence–absence matrix), collect the co-occurrences, build a `CatScorer`, then
-call a measure. Every measure returns a mapping from category pairs to a
-`(x→y, y→x)` tuple.
+How English spellings map to sounds: the letter `q` is always pronounced /k/,
+but /k/ is spelled in several ways.
 
-```python
-import asymcat
-
-data = asymcat.read_sequences("data.tsv")  # or asymcat.read_pa_matrix(...)
-coocs = asymcat.collect_cooccs(data)  # order=2, pad="#" for n-grams
-scorer = asymcat.CatScorer(coocs, smoothing_method="laplace", smoothing_alpha=1.0)
-
-scorer.mle()  # P(y|x), P(x|y)
-scorer.theil_u()  # uncertainty coefficient in each direction
-scorer.pmi()  # pointwise mutual information
-scorer.fisher()  # exact odds ratios
-
-# Turn any scored measure into matrices for plotting
-xy, yx, x_labels, y_labels = asymcat.scorer.scorer2matrices(scorer.pmi())
+```pycon
+>>> from asymcat import CatScorer
+>>> pairs = [("q", "k")] * 2 + [("c", "k")] * 6 + [("k", "k")] * 3 + [("c", "s")] * 4
+>>> scorer = CatScorer(pairs)
+>>> p_k_given_q, p_q_given_k = scorer.mle()[("q", "k")]
+>>> round(p_k_given_q, 2), round(p_q_given_k, 2)
+(1.0, 0.18)
 ```
+
+Every measure returns, for each pair `(x, y)`, a tuple `(x→y, y→x)`. Here `q`
+predicts /k/ perfectly, while /k/ points back to `q` only 18% of the time. A
+symmetric measure would collapse the two numbers into one and hide exactly that
+difference.
+
+## From sequences to scores
+
+ASymCat collects co-occurrences from paired sequences, such as aligned spellings
+and pronunciations, and from presence–absence matrices (`read_sequences` and
+`read_pa_matrix` load them from files). Any measure can then be scored, tested
+and plotted the same way:
+
+```pycon
+>>> import asymcat
+>>> words = [("cat", "kat"), ("cot", "kot"), ("city", "siti"), ("kit", "kit"), ("cent", "sent")]
+>>> cooccs = asymcat.collect_cooccs(words, order=1)  # align position by position
+>>> scorer = asymcat.CatScorer(cooccs, smoothing_method="laplace")
+>>> [round(v, 2) for v in scorer.theil_u()[("c", "k")]]  # uncertainty coefficient
+[0.18, 0.24]
+>>> pvalues = scorer.permutation_pvalue("mle", n_permutations=999, seed=0)
+>>> [round(float(p), 3) for p in pvalues[("c", "k")]]
+[0.137, 0.137]
+>>> xy, yx, x_labels, y_labels = asymcat.scorer.scorer2matrices(scorer.pmi())
+>>> xy.shape  # one row per spelling symbol, one column per sound, ready to plot
+(9, 8)
+```
+
+For sparse data, `CatScorer(..., entropy_estimator="chao_shen")` or `"nsb"`
+replaces the plug-in entropy behind the information-theoretic measures with a
+bias-corrected estimate.
 
 ## Choosing a measure
 
@@ -75,66 +85,52 @@ xy, yx, x_labels, y_labels = asymcat.scorer.scorer2matrices(scorer.pmi())
 | `fisher` | exact odds ratios for small samples | statistical |
 | `log_likelihood_ratio` | G² association statistic | statistical |
 | `goodman_kruskal_lambda` | proportional reduction in prediction error | statistical |
-| `jaccard_index` | directional set overlap | set-based |
+| `jaccard_index` | set overlap | set-based |
 | `tresoldi` | PMI tempered by conditional probability, for alignments | specialized |
 
-**Significance and uncertainty.** The statistical tests expose matching p-value
-scorers (`chi2_pvalue`, `fisher_pvalue`, `log_likelihood_ratio_pvalue`). For any
-measure — including the information-theoretic ones with no closed-form null —
-`permutation_pvalue(measure, ...)` estimates significance by shuffling the `x`↔`y`
-pairing, and `bootstrap_ci(measure, ...)` returns percentile confidence intervals
-by resampling the co-occurrences.
+The statistical tests also expose p-values (`chi2_pvalue`, `fisher_pvalue`,
+`log_likelihood_ratio_pvalue`). For any measure, `permutation_pvalue` and
+`bootstrap_ci` give resampling-based p-values and confidence intervals. The
+[User Guide](https://asymcat.tresoldi.org/USER_GUIDE/) explains each measure and
+when to use it.
 
-```python
-scorer.chi2_pvalue()  # closed-form p-values
-scorer.permutation_pvalue("theil_u", n_permutations=1000, seed=0)
-scorer.bootstrap_ci("theil_u", n_bootstrap=1000, confidence_level=0.95, seed=0)
-```
+## Highlights
 
-**Sparse data.** Plug-in entropy is biased low on small samples, and that bias
-carries into Theil's U, conditional entropy and mutual information. Pass
-`entropy_estimator="chao_shen"` (fast) or `"nsb"` (Bayesian, slower) to use
-FreqProb's bias-corrected estimators; permutation tests and bootstrap intervals
-then use the same estimator.
-
-```python
-scorer = asymcat.CatScorer(coocs, entropy_estimator="chao_shen")
-scorer.theil_u()
-```
-
-## Why ASymCat
-
-- **Directional by construction** — every measure reports `x→y` and `y→x`
-  separately, surfacing asymmetries symmetric measures average away.
-- **One consistent API** across a dozen measures — swap `scorer.mle()` for
+- **Directional by construction:** every measure reports `x→y` and `y→x`
+  separately.
+- **One interface for every measure:** swap `scorer.mle()` for
   `scorer.theil_u()` without changing anything else.
-- **Built for sparse data** via [FreqProb](https://github.com/tresoldi/freqprob):
-  smoothing for stable probability estimates, and bias-corrected entropy
-  estimators for the information-theoretic measures.
-- **Typed and tested** — full type hints (`py.typed`), strict linting and
-  type-checking, and a test suite run across Python 3.10–3.12.
+- **Built for sparse data:** smoothing and bias-corrected entropy estimation
+  from [FreqProb](https://freqprob.tresoldi.org/).
+- **Domain-neutral:** linguistics, ecology, machine learning and categorical
+  analytics; the repository ships
+  [sample datasets](https://github.com/tresoldi/asymcat/tree/master/resources)
+  with their sources and licences.
+- **Typed and tested:** full type hints (`py.typed`), with tests on Python
+  3.10–3.12 across Linux, macOS and Windows.
 
 ## Documentation
 
-- **[Documentation site](https://asymcat.tresoldi.org/)** — user guide and full
-  API reference.
-- **[User Guide](docs/USER_GUIDE.md)** — concepts, measure selection, data
-  preparation, and worked examples.
-- **[The Tresoldi Measure](docs/TRESOLDI_MEASURE.md)** — definition,
-  properties and caveats of the specialized `tresoldi` measure.
-- **[API Reference](https://asymcat.tresoldi.org/reference/)** — every public
+- **[User Guide](https://asymcat.tresoldi.org/USER_GUIDE/):** concepts, measure
+  selection, data preparation and worked examples.
+- **[The Tresoldi Measure](https://asymcat.tresoldi.org/TRESOLDI_MEASURE/):**
+  definition, properties and caveats of the `tresoldi` measure.
+- **[API Reference](https://asymcat.tresoldi.org/reference/):** every public
   class and function, generated from the source.
-- **[References](https://asymcat.tresoldi.org/references/)** — the published
+- **[References](https://asymcat.tresoldi.org/references/):** the published
   source of each measure, with a BibTeX file.
+- **[Changelog](https://github.com/tresoldi/asymcat/blob/master/CHANGELOG.md)**
+  and **[Migration guide](https://github.com/tresoldi/asymcat/blob/master/MIGRATION.md)**.
 
-## Applications
+## Related projects
 
-Directional association between categories recurs across fields: grapheme–phoneme
-correspondence and sound-change directionality in **linguistics**; asymmetric
-species co-occurrence in **ecology**; feature screening in **machine learning**;
-and dependency analysis in **categorical analytics**. Sample datasets for several
-of these live in [`resources/`](resources/); see
-[`resources/README.md`](resources/README.md) for their sources and licences.
+- **[FreqProb](https://freqprob.tresoldi.org/)** provides ASymCat's smoothed
+  probabilities and bias-corrected entropy estimators.
+- **SciPy's
+  [`scipy.stats.contingency.association`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.contingency.association.html)**
+  computes symmetric association for a whole contingency table (Cramér's V,
+  Tschuprow's T, Pearson's contingency coefficient). ASymCat adds directional
+  measures and scores every pair of categories.
 
 ## Citation
 
@@ -152,13 +148,15 @@ If you use ASymCat in published work, please cite the version you used:
 }
 ```
 
-The DOI [10.5281/zenodo.23917212](https://doi.org/10.5281/zenodo.23917212) identifies version 0.8.0;
-[10.5281/zenodo.23917211](https://doi.org/10.5281/zenodo.23917211) always resolves to the latest version.
-See [How to cite](https://asymcat.tresoldi.org/citing/) for APA and classic
-BibTeX forms, and [References](https://asymcat.tresoldi.org/references/) for
-the papers behind each measure. Citation metadata is also in
-[`CITATION.cff`](CITATION.cff).
+The DOI [10.5281/zenodo.23917212](https://doi.org/10.5281/zenodo.23917212)
+identifies version 0.8.0;
+[10.5281/zenodo.23917211](https://doi.org/10.5281/zenodo.23917211) always
+resolves to the latest version. See
+[How to cite](https://asymcat.tresoldi.org/citing/) for APA and classic BibTeX
+forms, and [References](https://asymcat.tresoldi.org/references/) for the papers
+behind each measure. Citation metadata is also in
+[`CITATION.cff`](https://github.com/tresoldi/asymcat/blob/master/CITATION.cff).
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT; see [LICENSE](https://github.com/tresoldi/asymcat/blob/master/LICENSE).
