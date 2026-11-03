@@ -1,7 +1,9 @@
-# The Tresoldi Measure
+# The Tresoldi measure
 
-The Tresoldi measure is a directional association score specific to ASymCat,
-available as `CatScorer.tresoldi()`. It was designed for scoring alignments,
+**`CatScorer.tresoldi()`** · directional · signed · range $(-\infty, \infty)$ ·
+specialized
+
+The Tresoldi measure is a directional association score specific to ASymCat. It was designed for scoring alignments,
 such as grapheme–phoneme correspondences, where the question is how strongly one
 symbol is associated with another *in a given direction*. It combines two
 quantities: the pointwise mutual information (PMI) of the pair, which says how
@@ -73,16 +75,20 @@ predicts the other, use `mle()` or `theil_u()` alongside it.
 
 These values come from ASymCat itself:
 
-```python
-import asymcat
-from asymcat.scorer import CatScorer
-
-pairs = [("x", "a")] * 3 + [("y", "a")] + [("y", "b")] * 20 + [("z", "b")] * 10 + [("z", "c")] * 10
-scorer = CatScorer(asymcat.collect_cooccs([[[x], [y]] for x, y in pairs]))
-
-scorer.mle()[("x", "a")]  # (1.0, 0.75): x always gives a; a comes from x 3 times in 4
-scorer.pmi()[("x", "a")]  # (2.398, 2.398)
-scorer.tresoldi()[("x", "a")]  # (1.0, 1.244)
+```pycon
+>>> from asymcat import CatScorer
+>>> pairs = [("x", "a")] * 3 + [("y", "a")] + [("y", "b")] * 20 + [("z", "b")] * 10 + [("z", "c")] * 10
+>>> scorer = CatScorer(pairs)
+>>> scorer.mle()[("x", "a")]  # x always gives a; a comes from x 3 times in 4
+(1.0, 0.75)
+>>> [round(v, 3) for v in scorer.pmi()[("x", "a")]]
+[2.398, 2.398]
+>>> [round(v, 3) for v in scorer.tresoldi()[("x", "a")]]
+[1.0, 1.244]
+>>> [round(v, 3) for v in scorer.tresoldi()[("y", "b")]]
+[0.949, 0.694]
+>>> [round(v, 3) for v in scorer.tresoldi()[("y", "a")]]
+[-0.66, -0.721]
 ```
 
 - **`("x", "a")`**: $x$ always occurs with $a$, so $T(x \to a) = 1$. In the other
@@ -99,13 +105,17 @@ scorer.tresoldi()[("x", "a")]  # (1.0, 1.244)
 
 The resampling tools accept `"tresoldi"` like any other measure:
 
-```python
-scorer.permutation_pvalue("tresoldi", n_permutations=999, seed=0)
-scorer.bootstrap_ci("tresoldi", n_bootstrap=999, confidence_level=0.95, seed=0)
+```pycon
+>>> pvalues = scorer.permutation_pvalue("tresoldi", n_permutations=999, seed=0)
+>>> round(pvalues[("x", "a")][0], 2)
+0.26
+>>> intervals = scorer.bootstrap_ci("tresoldi", n_bootstrap=999, seed=0)
+>>> len(intervals[("x", "a")])  # (low, high) for each direction
+2
 ```
 
 The saturation at $\pm 1$ carries over to these tests. In the example above,
-the deterministic direction $x \to a$ has a permutation p-value of about 0.26.
+the deterministic direction $x \to a$ has a permutation p-value of 0.26.
 Shuffled data often produce scores of 1 or more, so a perfect association does
 not stand out. Test the conditional probability or Theil's U when the question
 is whether one symbol predicts another.
@@ -128,11 +138,19 @@ is whether one symbol predicts another.
 - **Association, not causation.** The direction refers to which conditional
   probability is used, not to temporal or causal order.
 
+## API
+
+::: asymcat.scorer.CatScorer.tresoldi
+    options:
+      show_root_heading: true
+      show_root_full_path: false
+      heading_level: 3
+
 ## References
 
 - Church, K. W., & Hanks, P. (1990). Word association norms, mutual
   information, and lexicography. *Computational Linguistics*, 16(1), 22–29.
   [ACL Anthology J90-1003](https://aclanthology.org/J90-1003/)
 
-The [References](references.md) page lists the sources for every measure. To
-cite ASymCat, and with it this measure, see [How to cite](citing.md).
+The [References](../references.md) page lists the sources for every measure. To
+cite ASymCat, and with it this measure, see [How to cite](../citing.md).

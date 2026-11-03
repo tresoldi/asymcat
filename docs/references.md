@@ -35,7 +35,7 @@ With `smoothing_method="laplace"` or `"lidstone"`, the estimates come from
 `chi2`, `chi2_pvalue`, `cramers_v`, `fisher`, `fisher_pvalue`,
 `log_likelihood_ratio`, `log_likelihood_ratio_pvalue` and
 `goodman_kruskal_lambda`. On 2×2 tables, `chi2` uses SciPy's default Yates
-continuity correction.
+continuity correction, and `cramers_v` is bias-corrected.
 
 - Pearson, K. (1900). On the criterion that a given system of deviations from
   the probable in the case of a correlated system of variables is such that it
@@ -48,6 +48,10 @@ continuity correction.
   [doi:10.2307/2983604](https://doi.org/10.2307/2983604)
 - Cramér, H. (1946). *Mathematical Methods of Statistics*. Princeton, NJ:
   Princeton University Press. (Cramér's V)
+- Bergsma, W. (2013). A bias-correction for Cramér's V and Tschuprow's T.
+  *Journal of the Korean Statistical Society*, 42(3), 323–328.
+  [doi:10.1016/j.jkss.2012.10.002](https://doi.org/10.1016/j.jkss.2012.10.002)
+  (the bias-corrected Cramér's V that `cramers_v` computes)
 - Fisher, R. A. (1922). On the interpretation of χ² from contingency tables, and
   the calculation of P. *Journal of the Royal Statistical Society*, 85(1),
   87–94. [doi:10.2307/2340521](https://doi.org/10.2307/2340521)
@@ -104,7 +108,7 @@ FreqProb.
 
 ## The Tresoldi measure
 
-`tresoldi` is specific to ASymCat; [The Tresoldi Measure](TRESOLDI_MEASURE.md)
+`tresoldi` is specific to ASymCat; [The Tresoldi measure](measures/tresoldi.md)
 gives its definition. It combines pointwise mutual information (Church & Hanks,
 1990) with conditional probability.
 
@@ -112,8 +116,8 @@ gives its definition. It combines pointwise mutual information (Church & Hanks,
 
 `permutation_pvalue` shuffles the pairing of the two variables to estimate
 significance; `bootstrap_ci` resamples the co-occurrences to give percentile
-confidence intervals. The User Guide's advice on testing many pairs uses the
-false discovery rate.
+confidence intervals. [Test significance and uncertainty](how-to/significance.md#many-pairs-many-tests)
+controls the false discovery rate when testing many pairs.
 
 - Efron, B. (1979). Bootstrap methods: Another look at the jackknife. *The
   Annals of Statistics*, 7(1), 1–26.

@@ -90,9 +90,11 @@ bias-corrected estimate.
 
 The statistical tests also expose p-values (`chi2_pvalue`, `fisher_pvalue`,
 `log_likelihood_ratio_pvalue`). For any measure, `permutation_pvalue` and
-`bootstrap_ci` give resampling-based p-values and confidence intervals. The
-[User Guide](https://asymcat.tresoldi.org/USER_GUIDE/) explains each measure and
-when to use it.
+`bootstrap_ci` give resampling-based p-values and confidence intervals.
+[Choosing a measure](https://asymcat.tresoldi.org/concepts/choosing-a-measure/)
+helps pick one, and each has a
+[page of its own](https://asymcat.tresoldi.org/measures/) with its definition
+and a worked example.
 
 ## Highlights
 
@@ -111,12 +113,16 @@ when to use it.
 
 ## Documentation
 
-- **[User Guide](https://asymcat.tresoldi.org/USER_GUIDE/):** concepts, measure
-  selection, data preparation and worked examples.
-- **[The Tresoldi Measure](https://asymcat.tresoldi.org/TRESOLDI_MEASURE/):**
-  definition, properties and caveats of the `tresoldi` measure.
-- **[API Reference](https://asymcat.tresoldi.org/reference/):** every public
-  class and function, generated from the source.
+- **[Tutorial](https://asymcat.tresoldi.org/getting-started/tutorial/):** from
+  pairs of observations to directional scores, tests and matrices.
+- **[Concepts](https://asymcat.tresoldi.org/concepts/directional-association/):**
+  directional association, notation, choosing a measure and common pitfalls.
+- **[Measures](https://asymcat.tresoldi.org/measures/):** one page per measure,
+  with its definition, a worked example, its properties and references.
+- **[How-to guides](https://asymcat.tresoldi.org/how-to/):** preparing data,
+  sparse data, significance testing, ranking scores and plotting.
+- **[API Reference](https://asymcat.tresoldi.org/api/):** every public class
+  and function, generated from the source.
 - **[References](https://asymcat.tresoldi.org/references/):** the published
   source of each measure, with a BibTeX file.
 - **[Changelog](https://github.com/tresoldi/asymcat/blob/master/CHANGELOG.md)**

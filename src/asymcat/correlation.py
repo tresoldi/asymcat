@@ -1,13 +1,13 @@
 """
 Convenience wrappers for computing association measures on parallel series.
 
-Unlike :class:`asymcat.scorer.CatScorer`, which returns per-symbol-pair
+Unlike `asymcat.scorer.CatScorer`, which returns per-symbol-pair
 directional scores from a list of co-occurrences, the helpers in this module
 operate on two aligned series (``series_x`` and ``series_y``) and return a
 single summary statistic for the pair of variables.
 
-Note that not every measure here is symmetric: :func:`cramers_v` is symmetric
-by definition, whereas :func:`conditional_entropy` and :func:`theil_u` are
+Note that not every measure here is symmetric: `cramers_v` is symmetric
+by definition, whereas `conditional_entropy` and `theil_u` are
 directional (``x`` given ``y``) and are therefore, in general, asymmetric.
 """
 
@@ -67,7 +67,7 @@ def conditional_entropy(series_x, series_y, estimator="plugin"):
         The conditioning series, aligned with ``series_x``.
     estimator : str, optional
         Entropy estimator: ``"plugin"`` (default), ``"chao_shen"`` or
-        ``"nsb"``; see :func:`asymcat.scorer.conditional_entropy`.
+        ``"nsb"``; see `asymcat.scorer.conditional_entropy`.
 
     Returns
     -------
@@ -94,7 +94,7 @@ def theil_u(series_x, series_y, estimator="plugin"):
         The conditioning series, aligned with ``series_x``.
     estimator : str, optional
         Entropy estimator: ``"plugin"`` (default), ``"chao_shen"`` or
-        ``"nsb"``; see :func:`asymcat.scorer.compute_theil_u`. Bias-corrected
+        ``"nsb"``; see `asymcat.scorer.compute_theil_u`. Bias-corrected
         estimates are not confined to ``[0, 1]``.
 
     Returns

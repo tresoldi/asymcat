@@ -65,8 +65,10 @@ automatically on every commit.
   `scorer` for the `CatScorer` measures, `correlation` for sequence helpers).
 - `tests/` — `unit/`, `integration/`, and `performance/` suites with shared
   fixtures.
-- `docs/` — the MkDocs site (`USER_GUIDE.md`, `TRESOLDI_MEASURE.md`,
-  `reference.md`, `references.md` with `references.bib`, and `citing.md`).
+- `docs/` — the MkDocs site: `getting-started/`, `concepts/`, `measures/` (one
+  page per measure), `how-to/`, `api/`, `references.md` with `references.bib`,
+  and `citing.md`. Examples are written as `pycon` blocks with their real
+  output; `tests/unit/test_docs_examples.py` runs them.
 - `resources/` — sample datasets used by the docs, tests, and examples.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for a fuller tour of the codebase.
