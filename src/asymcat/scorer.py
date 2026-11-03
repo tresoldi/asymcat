@@ -874,8 +874,19 @@ class CatScorer:
 
     def mle(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
-        Return an MLE scorer, computing it if necessary.
-        Uses freqprob for robust probability estimation with optional smoothing.
+        Return an MLE scorer of conditional probabilities, computing it if necessary.
+
+        For every pair ``(x, y)`` the tuple is ``(P(y|x), P(x|y))``: how well
+        ``x`` predicts ``y``, then how well ``y`` predicts ``x``. This is the
+        same ``X→Y, Y→X`` order as :meth:`theil_u`, :meth:`cond_entropy` and
+        :meth:`goodman_kruskal_lambda`. With ``smoothing_method`` set to
+        ``"laplace"`` or ``"lidstone"``, the probabilities are smoothed with
+        freqprob.
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to ``(P(y|x), P(x|y))`` tuples.
         """
 
         # Compute the scorer, if necessary
@@ -892,7 +903,7 @@ class CatScorer:
                 if obs["01"] > 0:  # Y marginal count > 0
                     if self.smoothing_method == "mle":
                         # For MLE, use simple division to avoid log(0) issues
-                        xy_score = obs["11"] / obs["01"]
+                        p_x_given_y = obs["11"] / obs["01"]
                     else:
                         # For smoothing methods, use freqprob which handles zeros better
                         freq_dist_x_given_y = {pair[0]: obs["11"], f"NOT_{pair[0]}": obs["01"] - obs["11"]}
@@ -905,15 +916,15 @@ class CatScorer:
                         else:  # Lidstone
                             scorer_xy = self._freqprob_scorer_class(freq_dist_x_given_y, gamma=self.smoothing_alpha)  # type: ignore[call-arg]
 
-                        xy_score = math.exp(scorer_xy(pair[0]))
+                        p_x_given_y = math.exp(scorer_xy(pair[0]))
                 else:
-                    xy_score = 0.0
+                    p_x_given_y = 0.0
 
                 # P(Y|X) - distribution of Y values given X
                 if obs["10"] > 0:  # X marginal count > 0
                     if self.smoothing_method == "mle":
                         # For MLE, use simple division to avoid log(0) issues
-                        yx_score = obs["11"] / obs["10"]
+                        p_y_given_x = obs["11"] / obs["10"]
                     else:
                         # For smoothing methods, use freqprob which handles zeros better
                         freq_dist_y_given_x = {pair[1]: obs["11"], f"NOT_{pair[1]}": obs["10"] - obs["11"]}
@@ -926,11 +937,12 @@ class CatScorer:
                         else:  # Lidstone
                             scorer_yx = self._freqprob_scorer_class(freq_dist_y_given_x, gamma=self.smoothing_alpha)  # type: ignore[call-arg]
 
-                        yx_score = math.exp(scorer_yx(pair[1]))
+                        p_y_given_x = math.exp(scorer_yx(pair[1]))
                 else:
-                    yx_score = 0.0
+                    p_y_given_x = 0.0
 
-                self._mle[pair] = (xy_score, yx_score)
+                # Store in X→Y, Y→X order: (P(y|x), P(x|y)).
+                self._mle[pair] = (p_y_given_x, p_x_given_y)
 
         return self._mle
 
@@ -1420,9 +1432,19 @@ class CatScorer:
 
     def tresoldi(self) -> dict[tuple[Any, Any], tuple[float, float]]:
         """
-        Return a `tresoldi` asymmetric uncertainty scorer.
+        Return a Tresoldi scorer, the measure ASymCat provides for alignments.
 
-        This is our intended scorer for alignments.
+        For every pair ``(x, y)`` the tuple is ``(T(x→y), T(y→x))``, with
+        ``T(x→y) = sign(PMI) * |PMI(x, y)| ** (1 - P(y|x))``: the PMI pulled
+        towards ±1 as the conditional probability approaches 1. The
+        conditional probabilities come from :meth:`mle` (so smoothing applies
+        to them) and the PMI from :meth:`pmi`. See the documentation page
+        "The Tresoldi Measure" for its properties.
+
+        Returns
+        -------
+        Dict[Tuple[Any, Any], Tuple[float, float]]
+            Dictionary mapping symbol pairs to ``(T(x→y), T(y→x))`` tuples.
         """
 
         # Build the scorer, if necessary

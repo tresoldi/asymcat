@@ -75,7 +75,7 @@ xy, yx, x_labels, y_labels = asymcat.scorer.scorer2matrices(scorer.pmi())
 | `log_likelihood_ratio` | G² association statistic | statistical |
 | `goodman_kruskal_lambda` | proportional reduction in prediction error | statistical |
 | `jaccard_index` | directional set overlap | set-based |
-| `tresoldi` | smoothed measure tuned for sequence alignment | specialized |
+| `tresoldi` | PMI tempered by conditional probability, for alignments | specialized |
 
 **Significance and uncertainty.** The statistical tests expose matching p-value
 scorers (`chi2_pvalue`, `fisher_pvalue`, `log_likelihood_ratio_pvalue`). For any
@@ -119,8 +119,8 @@ scorer.theil_u()
   API reference.
 - **[User Guide](docs/USER_GUIDE.md)** — concepts, measure selection, data
   preparation, and worked examples.
-- **[The Tresoldi Measure](docs/TRESOLDI_MEASURE.md)** — motivation and
-  definition of the specialized `tresoldi` measure.
+- **[The Tresoldi Measure](docs/TRESOLDI_MEASURE.md)** — definition,
+  properties and caveats of the specialized `tresoldi` measure.
 - **[API Reference](https://asymcat.tresoldi.org/reference/)** — every public
   class and function, generated from the source.
 - **[References](https://asymcat.tresoldi.org/references/)** — the published
