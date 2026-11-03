@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*'
+  # Re-run a release whose tag event was lost: choose the tag as the ref.
+  workflow_dispatch:
 
 jobs:
   build:
@@ -32,6 +34,8 @@ jobs:
   publish:
     name: Publish to PyPI
     needs: build
+    # Only a version tag publishes, so a manual run on a branch cannot.
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -46,3 +50,6 @@ jobs:
           path: dist/
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # A repeated trigger for an already-published version is a no-op.
+          skip-existing: true
