@@ -17,7 +17,8 @@ Every release of ASymCat is archived on [Zenodo](https://doi.org/10.5281/zenodo.
 own DOI:
 
 - **A specific version:** cite the DOI of the release you used, so readers get
-  exactly that code. Version 0.8.0 is
+  exactly that code. Version 0.9.0 is
+  [10.5281/zenodo.23938358](https://doi.org/10.5281/zenodo.23938358), and version 0.8.0 is
   [10.5281/zenodo.23917212](https://doi.org/10.5281/zenodo.23917212). Other versions are listed under "Versions" on the
   Zenodo record.
 - **All versions:** [10.5281/zenodo.23917211](https://doi.org/10.5281/zenodo.23917211) always resolves to the latest
@@ -30,7 +31,7 @@ own DOI:
 
 > Tresoldi, T. (2026). *ASymCat: Asymmetric measures of association between
 > categorical variables* (Version 0.9.0) [Computer software]. Zenodo.
-> https://doi.org/10.5281/zenodo.23917211
+> https://doi.org/10.5281/zenodo.23938358
 
 **BibTeX** (biblatex, or any style that supports `@software`)
 
@@ -41,7 +42,7 @@ own DOI:
              categorical variables},
   year    = {2026},
   version = {0.9.0},
-  doi     = {10.5281/zenodo.23917211},
+  doi     = {10.5281/zenodo.23938358},
   url     = {https://asymcat.tresoldi.org/}
 }
 ```
@@ -56,8 +57,8 @@ templates)
                   categorical variables},
   year         = {2026},
   note         = {Version 0.9.0},
-  doi          = {10.5281/zenodo.23917211},
-  howpublished = {\url{https://doi.org/10.5281/zenodo.23917211}}
+  doi          = {10.5281/zenodo.23938358},
+  howpublished = {\url{https://doi.org/10.5281/zenodo.23938358}}
 }
 ```
 
