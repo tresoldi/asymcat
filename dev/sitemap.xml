@@ -2,134 +2,134 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://asymcat.tresoldi.org/dev/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/citing/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/references/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/api/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/api/catscorer/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/api/common/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/api/correlation/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/api/scorer-functions/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/concepts/choosing-a-measure/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/concepts/directional-association/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/concepts/notation/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/concepts/pitfalls/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/getting-started/installation/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/getting-started/tutorial/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/how-to/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/how-to/compare-scores/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/how-to/plot/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/how-to/prepare-data/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/how-to/significance/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/how-to/sparse-data/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/how-to/whole-variables/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/chi2/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/conditional-entropy/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/fisher/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/goodman-kruskal-lambda/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/jaccard/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/log-likelihood-ratio/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/mle/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/mutual-information/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/pmi/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/theil-u/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://asymcat.tresoldi.org/dev/measures/tresoldi/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
 </urlset>
