@@ -91,17 +91,17 @@ def performance_timer():
             self.duration = None
 
         def __enter__(self):
-            self.start_time = time.time()
+            self.start_time = time.perf_counter()
             return self
 
         def __exit__(self, exc_type, exc_val, exc_tb):
-            self.end_time = time.time()
+            self.end_time = time.perf_counter()
             self.duration = self.end_time - self.start_time
 
         def elapsed(self):
             if self.start_time is None:
                 return 0.0
-            return time.time() - self.start_time
+            return time.perf_counter() - self.start_time
 
     return Timer
 

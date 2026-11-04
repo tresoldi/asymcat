@@ -224,4 +224,5 @@ def assert_performance_acceptable(execution_time: float, max_time: float = 30.0)
         >>> assert_performance_acceptable(5.0, max_time=10.0)  # Passes
     """
     assert execution_time < max_time, f"Execution time {execution_time:.2f}s exceeds maximum {max_time}s"
-    assert execution_time > 0, "Execution time must be positive"
+    # A fast step can measure as 0.0 with a coarse clock, so only reject negative times.
+    assert execution_time >= 0, "Execution time must not be negative"

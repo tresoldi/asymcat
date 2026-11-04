@@ -29,6 +29,9 @@ identifiers:
     value: 10.5281/zenodo.23917211
     description: "Concept DOI for all versions of ASymCat; resolves to the latest release."
   - type: doi
+    value: 10.5281/zenodo.23938358
+    description: "DOI of ASymCat version 0.9.0."
+  - type: doi
     value: 10.5281/zenodo.23917212
     description: "DOI of ASymCat version 0.8.0."
 keywords:
