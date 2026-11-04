@@ -46,7 +46,7 @@ class TestCompleteWorkflows:
         if not file_path.exists():
             pytest.skip(f"Dataset {dataset} not available")
 
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # Step 1: Load data
         data = asymcat.read_sequences(str(file_path))
@@ -89,7 +89,7 @@ class TestCompleteWorkflows:
         assert len(x_labels) > 0 and len(y_labels) > 0, "Labels missing"
 
         # Performance check
-        execution_time = time.time() - start_time
+        execution_time = time.perf_counter() - start_time
         assert_performance_acceptable(execution_time, expected_properties["max_time"])
 
     def test_presence_absence_workflow(self):
@@ -106,7 +106,7 @@ class TestCompleteWorkflows:
         if not file_path.exists():
             pytest.skip("Galapagos dataset not available")
 
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # Step 1: Load presence-absence data
         combinations = asymcat.read_pa_matrix(str(file_path))
@@ -139,7 +139,7 @@ class TestCompleteWorkflows:
                 common_pairs = set(measures[name1].keys()) & set(measures[name2].keys())
                 assert len(common_pairs) > 0, f"No common pairs between {name1} and {name2}"
 
-        execution_time = time.time() - start_time
+        execution_time = time.perf_counter() - start_time
         assert_performance_acceptable(execution_time, max_time=10.0)
 
     def test_comparative_analysis_workflow(self):
@@ -248,19 +248,19 @@ class TestLargeDatasetWorkflows:
         if test_file is None:
             pytest.skip("No large dataset available for testing")
 
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         # Load and process data
         data = asymcat.read_sequences(str(test_file))
-        load_time = time.time() - start_time
+        load_time = time.perf_counter() - start_time
 
         # Should handle large datasets reasonably quickly
         assert_performance_acceptable(load_time, max_time=30.0)
 
         # Process co-occurrences
-        start_time = time.time()
+        start_time = time.perf_counter()
         cooccs = asymcat.collect_cooccs(data)
-        process_time = time.time() - start_time
+        process_time = time.perf_counter() - start_time
         assert_performance_acceptable(process_time, max_time=60.0)
 
         # Create scorer and test key measures
@@ -274,17 +274,17 @@ class TestLargeDatasetWorkflows:
         ]
 
         for measure_name, method in measures_to_test:
-            start_time = time.time()
+            start_time = time.perf_counter()
             scores = method()
-            method_time = time.time() - start_time
+            method_time = time.perf_counter() - start_time
 
             assert_valid_scores(scores)
             assert_performance_acceptable(method_time, max_time=30.0)
 
             # Test caching works
-            start_time = time.time()
+            start_time = time.perf_counter()
             cached_scores = method()
-            cache_time = time.time() - start_time
+            cache_time = time.perf_counter() - start_time
 
             assert scores is cached_scores, f"Caching not working for {measure_name}"
             assert_performance_acceptable(cache_time, max_time=0.1)

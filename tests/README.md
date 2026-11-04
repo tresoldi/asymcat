@@ -284,9 +284,9 @@ class TestNewScoringMethod:
         scorer = asymcat.scorer.CatScorer(cooccs)
 
         # Test method
-        start_time = time.time()
+        start_time = time.perf_counter()
         scores = scorer.new_method()
-        execution_time = time.time() - start_time
+        execution_time = time.perf_counter() - start_time
 
         # Validate results
         assert_valid_scores(scores)
