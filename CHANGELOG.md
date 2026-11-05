@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `AI_USAGE.md`: how AI assistants are used in developing this project, linked
+  from the README and the How to cite page.
 - Zenodo DOI for version 0.9.0: 10.5281/zenodo.23938358, in `CITATION.cff`, the README, the
   home page and the How to cite page.
 

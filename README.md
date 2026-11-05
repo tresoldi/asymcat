@@ -163,6 +163,12 @@ forms, and [References](https://asymcat.tresoldi.org/references/) for the papers
 behind each measure. Citation metadata is also in
 [`CITATION.cff`](https://github.com/tresoldi/asymcat/blob/master/CITATION.cff).
 
+## Use of AI
+
+We use AI assistants for routine engineering and for reviewing our writing; the
+design and all decisions are ours, and so is the responsibility. See
+[AI_USAGE.md](https://github.com/tresoldi/asymcat/blob/master/AI_USAGE.md).
+
 ## License
 
 MIT; see [LICENSE](https://github.com/tresoldi/asymcat/blob/master/LICENSE).
