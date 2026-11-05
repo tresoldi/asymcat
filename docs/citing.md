@@ -79,3 +79,9 @@ ASymCat computes its smoothed probabilities and bias-corrected entropies with
 [FreqProb](https://freqprob.tresoldi.org/). If those options matter to your
 results, cite FreqProb too; its
 [How to cite](https://freqprob.tresoldi.org/citing/) page has the entries.
+
+## Use of AI
+
+AI assistants helped with routine engineering and with reviewing the writing of
+this software and its documentation; the design, the data and the
+responsibility are ours. [AI_USAGE.md](https://github.com/tresoldi/asymcat/blob/master/AI_USAGE.md) describes how.
