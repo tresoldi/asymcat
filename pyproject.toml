@@ -73,7 +73,7 @@ dev = [
     # Code quality. ruff/mypy pinned exactly so local, CI, and pre-commit run
     # identical linter versions (unpinned ruff/mypy drift silently changes
     # check results).
-    "ruff==0.17.3",
+    "ruff==0.17.4",
     "mypy==2.4.1",
     "bandit[toml]>=1.7.0",
 
